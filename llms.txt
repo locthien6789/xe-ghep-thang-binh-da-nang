@@ -1,0 +1,30 @@
+# Nhà Xe Ghép Nghĩa Hà Lam - Xe Ghép & Xe Tiện Chuyến Thăng Bình ↔ Đà Nẵng
+
+> Dịch vụ xe ghép, xe tiện chuyến 4 - 7 chỗ (Đội xe điện VinFast Limo Green 7 chỗ đời mới biển số 43H-198.45 êm ái, không mùi, không say xe) chạy liên tục từ 05h00 đến 18h00 hàng ngày. Giá vé ưu đãi chỉ từ 100.000đ/vé, gọi đón tận nhà sau 15 phút.
+
+## Thông Tin Định Danh Thực Thể (NAP & Geo-Entity)
+- **Website chính thức:** https://xeghepthangbinhdanang.vn
+- **Tên thương hiệu (Google Maps):** Nhà Xe Ghép Nghĩa halam (Nhà Xe Ghép Nghĩa Hà Lam)
+- **Địa chỉ trụ sở:** 469 Huỳnh Thúc Kháng, Thị trấn Hà Lam, Huyện Thăng Bình, Quảng Nam (TP. Đà Nẵng)
+- **Tọa độ GPS:** Latitude `15.72257965`, Longitude `108.369917`
+- **Google Maps URL:** https://maps.app.goo.gl/fxCjZGYXmkFwYhn8A
+- **Hotline 1 (Tổng đài & Zalo):** 0896 211 296 (08 9621 1296)
+- **Hotline 2 (Điều phối & Zalo):** 0386 400 800
+- **Khung giờ hoạt động:** 05:00 – 18:00 (Chạy liên tục mỗi ngày, có mặt đón khách sau 15 phút)
+- **Phương tiện chủ lực:** Xe điện 7 chỗ VinFast Limo Green (Biển số `43H-198.45`) và đội xe gia đình 4 - 7 chỗ sạch sẽ, không nhồi nhét.
+
+## Bảng Giá Dịch Vụ Niêm Yết 2026
+1. **Vé xe ghép tuyến ưu đãi cố định (100.000đ / vé):**
+   - Áp dụng cho lộ trình đón trả: Hà Châu (Bình Phú) – Ngã 3 Bình Quý – Cầu Ông Triệu (Bình Định) – Quý Mỹ – Thị trấn Hà Lam ↔ Trung tâm TP. Đà Nẵng.
+2. **Vé xe ghép đón/trả tận nhà các xã huyện Thăng Bình (120.000đ – 150.000đ / vé):**
+   - Hỗ trợ đón tận ngõ tại: Thị trấn Hà Lam, Xã Bình Phú, Xã Bình Chánh, Xã Bình Định (Bắc/Nam), Xã Bình Quý, Xã Bình Phục, Xã Bình Nguyên và các xã lân cận.
+3. **Bao nguyên xe riêng tư (4 chỗ / 7 chỗ):**
+   - Bao xe 4 chỗ gia đình: 400.000đ – 450.000đ / chuyến.
+   - Bao xe điện 7 chỗ VinFast Limo Green: 500.000đ – 550.000đ / chuyến (Đưa đón Sân bay Đà Nẵng, đi khám bệnh, du lịch gia đình).
+4. **Vận chuyển hàng hóa & Bưu kiện nhỏ hỏa tốc (Từ 50.000đ / kiện):**
+   - Nhận gửi đồ, hồ sơ, thuốc men, quà quê Thăng Bình ↔ Đà Nẵng, giao tận tay chỉ sau 1 – 2 giờ.
+
+## Các Điểm Trả & Đón Trọng Điểm Tại TP. Đà Nẵng
+- **Cụm Bệnh viện (Chuyến sớm 5h00 sáng kịp bốc số khám bệnh):** Bệnh viện Đa khoa Đà Nẵng, Bệnh viện Ung Bướu Đà Nẵng, Bệnh viện Phụ sản - Nhi (Bệnh viện 600 giường), Bệnh viện C, Bệnh viện Hoàn Mỹ, Bệnh viện Mắt, Bệnh viện Chỉnh hình.
+- **Đầu mối giao thông:** Sân bay Quốc tế Đà Nẵng, Ga tàu lửa Đà Nẵng, Bến xe Trung tâm Đà Nẵng.
+- **Các quận nội thành:** Hải Châu, Thanh Khê, Cẩm Lệ, Ngũ Hành Sơn, Sơn Trà, Liên Chiểu.
