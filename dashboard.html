@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Admin Dashboard Quản Trị &amp; Điều Phối AI 20 Đầu Xe | Nhà Xe Nghĩa Hà Lam</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="dieu-phoi.css" />
+</head>
+<body>
+
+  <!-- =========================================================
+       1. PRIVATE ADMIN LOGIN GATE (HIDDEN FROM PUBLIC)
+       ========================================================= -->
+  <div id="admin-gate" class="admin-gate-overlay">
+    <div class="gate-card">
+      <div class="gate-icon">🔒</div>
+      <h2>DASHBOARD QUẢN TRỊ NỘI BỘ</h2>
+      <p>Hệ thống Tổng đài AI &amp; Điều phối tự động 20 đầu xe<br /><strong>Nhà Xe Nghĩa Hà Lam (xeghepthangbinhdanang.vn)</strong></p>
+      <label for="admin-pin-input" style="display:block;font-size:0.78rem;color:#94a3b8;margin-bottom:6px;">Mã PIN Quản trị viên (Mặc định: 1296):</label>
+      <input type="password" id="admin-pin-input" class="gate-input" value="1296" maxlength="8" />
+      <button type="button" id="btn-gate-login" class="btn-gate-login">
+        🔓 Đăng Nhập Dashboard Quản Trị
+      </button>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       2. FULL ADMIN DASHBOARD SHELL (SIDEBAR + MAIN)
+       ========================================================= -->
+  <div class="dashboard-layout">
+
+    <!-- LEFT SIDEBAR -->
+    <aside class="db-sidebar">
+      <div>
+        <div class="sidebar-brand">
+          <div class="sb-badge">ADMIN<br />20 XE</div>
+          <div>
+            <h2>NGHĨA HÀ LAM</h2>
+            <span>🟢 Quản trị viên đang trực</span>
+          </div>
+        </div>
+
+        <nav class="sb-menu" aria-label="Menu Quản Trị">
+          <button type="button" class="sb-nav-btn active" data-tab="tab-dispatch">
+            <span>📊</span> 1. Điều Phối AI Trực Tuyến
+          </button>
+          <button type="button" class="sb-nav-btn" data-tab="tab-orders">
+            <span>📋</span> 2. Quản Lý Đơn &amp; Hoàn Phí
+          </button>
+          <button type="button" class="sb-nav-btn" data-tab="tab-fleet">
+            <span>🚘</span> 3. Đội Xe 20 Chiếc &amp; Ví Cọc
+          </button>
+          <button type="button" class="sb-nav-btn" data-tab="tab-settings">
+            <span>⚙️</span> 4. Cấu Hình Hệ Thống
+          </button>
+        </nav>
+      </div>
+
+      <div class="sidebar-footer">
+        <button type="button" id="btn-lock-dashboard" class="btn-lock">
+          🔒 Khóa Màn Hình Quản Trị
+        </button>
+        <a href="index.html" class="btn-lock" style="text-align:center;display:block;">
+          🌐 Xem Website Khách Hàng ↗
+        </a>
+      </div>
+    </aside>
+
+    <!-- RIGHT MAIN CONTENT AREA -->
+    <div class="db-main">
+
+      <!-- TOP HEADER -->
+      <header class="dp-header">
+        <div class="dp-header-title">
+          <h1>BẢNG ĐIỀU KHIỂN QUẢN TRỊ &amp; CHIA XE TỰ ĐỘNG (ADMIN DASHBOARD)</h1>
+          <p>Hotline Tổng đài AI: 0896.211.296 – 0386.400.800 • Trụ sở: 469 Huỳnh Thúc Kháng, Hà Lam</p>
+        </div>
+
+        <div class="dp-header-controls">
+          <div class="config-pill">
+            <span>💰 Phí Cò Ghép (100K/người):</span>
+            <select id="cfg-seat-fee" aria-label="Cấu hình phí điều xe ghế ghép">
+              <option value="10000">10.000đ / ghế (10%)</option>
+              <option value="15000" selected>15.000đ / ghế (15%)</option>
+              <option value="20000">20.000đ / ghế (20%)</option>
+            </select>
+          </div>
+
+          <div class="config-pill">
+            <span>🚘 Hoa hồng Bao xe / Du lịch:</span>
+            <select id="cfg-charter-fee" aria-label="Cấu hình hoa hồng bao xe">
+              <option value="10" selected>10% / chuyến</option>
+              <option value="12">12% / chuyến</option>
+              <option value="15">15% / chuyến</option>
+            </select>
+          </div>
+        </div>
+      </header>
+
+      <!-- KPI DASHBOARD STRIP -->
+      <section class="kpi-strip">
+        <div class="kpi-card">
+          <div class="kpi-info">
+            <span>Cuộc Gọi AI Tiếp Nhận Hôm Nay</span>
+            <strong id="kpi-calls">142 cuộc</strong>
+            <small>🟢 0% cuộc gọi nhỡ giờ cao điểm</small>
+          </div>
+          <div class="kpi-icon">🤖</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-info">
+            <span>Sản Lượng Ghép &amp; Bao Xe</span>
+            <strong id="kpi-trips">86 ghế • 14 bao xe</strong>
+            <small>⚡ Tự động gom chuyến cùng trục</small>
+          </div>
+          <div class="kpi-icon">🚘</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-info">
+            <span>Trạng Thái Đội Xe 20 Chiếc</span>
+            <strong>11 Bến TB • 9 Bến ĐN</strong>
+            <small>🔄 Xoay vòng công bằng 100%</small>
+          </div>
+          <div class="kpi-icon">⚖️</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-info">
+            <span>Quỹ Phí Điều Xe Thu Tự Động</span>
+            <strong id="kpi-commission" style="color: #fde047;">2.450.000đ</strong>
+            <small>💳 Trừ trực tiếp Ví Cọc Tài Xế</small>
+          </div>
+          <div class="kpi-icon">💰</div>
+        </div>
+      </section>
+
+      <!-- ===================================================
+           TAB 1: LIVE AI DISPATCH WORKSPACE
+           =================================================== -->
+      <div id="tab-dispatch" class="db-tab-view active">
+        <main class="dp-workspace">
+
+          <!-- COLUMN 1: AI VOICEBOT & CALL NLP EXTRACTOR -->
+          <section class="dp-panel">
+            <div class="panel-title-row">
+              <h2>📞 1. Tổng Đài AI Nghe &amp; Bóc Tách Cuộc Gọi</h2>
+              <span class="badge-live">AI Voice NLP</span>
+            </div>
+
+            <div class="scenario-presets">
+              <span class="preset-label">👉 Bấm thử cuộc gọi mẫu (hoặc gõ/nói vào Mic) để AI tự lên đơn &amp; bắn cho tài xế:</span>
+
+              <button
+                type="button"
+                class="preset-btn"
+                data-speech="Alo nhà xe Nghĩa Hà Lam hả con, cho cô 2 ghế ở Ngã 3 Bình Quý ra Bệnh viện Đa khoa Đà Nẵng sáng nay đi liền nghe!"
+              >
+                <strong>Cuộc gọi mẫu 1 (Đi ghép 2 người = 200K):</strong>
+                <span>"Cho cô 2 ghế ở Ngã 3 Bình Quý ra Bệnh viện Đa khoa Đà Nẵng đi liền nghe!"</span>
+              </button>
+
+              <button
+                type="button"
+                class="preset-btn"
+                data-speech="Em ơi đón anh 1 ghế ở ngay 469 Huỳnh Thúc Kháng Hà Lam ra Bệnh viện Ung Bướu Đà Nẵng đi chừ luôn nhé!"
+              >
+                <strong>Cuộc gọi mẫu 2 (Ghép thêm 1 người = 100K vào chuyến đang gom):</strong>
+                <span>"Đón anh 1 ghế ở Huỳnh Thúc Kháng Hà Lam ra Bệnh viện Ung Bướu Đà Nẵng đi luôn!"</span>
+              </button>
+
+              <button
+                type="button"
+                class="preset-btn"
+                data-speech="Cho anh bao nguyên chiếc 7 chỗ điện từ Chợ Hà Châu Bình Phú ra Sân bay Đà Nẵng đón người nhà lúc 8h sáng nhé."
+              >
+                <strong>Cuộc gọi mẫu 3 (Bao nguyên xe 7 chỗ = 450K):</strong>
+                <span>"Cho anh bao nguyên chiếc 7 chỗ từ Chợ Hà Châu Bình Phú ra Sân bay Đà Nẵng!"</span>
+              </button>
+
+              <button
+                type="button"
+                class="preset-btn"
+                data-speech="Nhà mình ở Cầu Ông Triệu Bình Định muốn thuê xe đi du lịch VinWonders Nam Hội An và Phố cổ Hội An hôm nay."
+              >
+                <strong>Cuộc gọi mẫu 4 (Thuê xe Du lịch VinWonders / Hội An = 550K):</strong>
+                <span>"Nhà mình ở Cầu Ông Triệu muốn thuê xe đi chơi VinWonders Nam Hội An &amp; Hội An!"</span>
+              </button>
+
+              <button
+                type="button"
+                class="preset-btn"
+                data-speech="Cô khám bệnh xong ở cổng Bệnh viện 600 Giường Đà Nẵng rồi, cho xe đón 3 người về lại xã Bình Nguyên Thăng Bình nghe con."
+              >
+                <strong>Cuộc gọi mẫu 5 (Chiều về Đà Nẵng ➔ Thăng Bình: 3 người = 300K):</strong>
+                <span>"Khám xong ở BV 600 Giường Đà Nẵng rồi, đón 3 người về lại xã Bình Nguyên Thăng Bình!"</span>
+              </button>
+            </div>
+
+            <div class="transcript-box">
+              <div class="transcript-header">
+                <span>🎙️ Nội dung cuộc gọi khách nói:</span>
+                <span>Line: 0896.211.296</span>
+              </div>
+              <textarea id="call-transcript-input" class="transcript-textarea">Alo nhà xe Nghĩa Hà Lam hả con, cho cô 2 ghế ở Ngã 3 Bình Quý ra Bệnh viện Đa khoa Đà Nẵng sáng nay đi liền nghe!</textarea>
+              <div class="ai-action-row">
+                <button type="button" id="btn-ai-extract" class="btn-ai-extract">
+                  ⚡ AI Bóc Tách &amp; Bắn Cuốc Tự Động
+                </button>
+                <button type="button" id="btn-voice-mic" class="btn-mic">
+                  🎙️ Nói Thử Vào Mic
+                </button>
+              </div>
+            </div>
+
+            <div class="extracted-card">
+              <h3>
+                <span>🧠 Phiếu Điều Xe Do AI Bóc Tách</span>
+                <span id="ext-code">#TB-208</span>
+              </h3>
+              <div class="extracted-grid">
+                <div class="ext-item">
+                  <span>Phân loại &amp; Số người</span>
+                  <strong id="ext-service">Đi ghép 2 người (100K/người)</strong>
+                </div>
+                <div class="ext-item highlight">
+                  <span>Tổng thu khách (Niêm yết)</span>
+                  <strong id="ext-fare">200.000đ</strong>
+                </div>
+                <div class="ext-item">
+                  <span>📍 Điểm đón khách</span>
+                  <strong id="ext-pickup">Ngã 3 Bình Quý (Xã Bình Quý)</strong>
+                </div>
+                <div class="ext-item">
+                  <span>🏥 Điểm trả khách</span>
+                  <strong id="ext-dropoff">Bệnh viện Đa khoa Đà Nẵng</strong>
+                </div>
+                <div class="ext-item" style="grid-column: span 2;">
+                  <span>💰 Khấu trừ Ví Tài Xế &amp; Thực nhận</span>
+                  <strong id="ext-fee" style="color: #34d399;">30.000đ (Thực nhận: 170.000đ)</strong>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- COLUMN 2: AUTO-POOLING & 20-VEHICLE FAIR QUEUE -->
+          <section class="dp-panel">
+            <div class="panel-title-row">
+              <h2>⚖️ 2. Bộ Gom Ghế &amp; Hàng Đợi Xoay Vòng 20 Xe</h2>
+              <span class="badge-live">Auto-Pooling &amp; Queue</span>
+            </div>
+
+            <div class="pooling-box">
+              <div class="pooling-header">
+                <strong>🧩 Chuyến Ghép Đang Gom (Trục Thăng Bình ➔ Đà Nẵng):</strong>
+                <span style="color: #fde047; font-weight: 700;">100K / 1 Ghế</span>
+              </div>
+              <div class="seat-slots" id="pooling-seat-slots"></div>
+            </div>
+
+            <div class="queue-tabs">
+              <button type="button" class="q-tab active" data-q="TB">
+                🏡 Đầu Bến Thăng Bình (11 Xe)
+              </button>
+              <button type="button" class="q-tab" data-q="DN">
+                🏙️ Đầu Bến Đà Nẵng Về TB (9 Xe)
+              </button>
+            </div>
+
+            <div class="driver-queue-list" id="driver-queue-list"></div>
+          </section>
+
+          <!-- COLUMN 3: SIMULATED DRIVER APP (45S) & LOGS -->
+          <section class="dp-panel">
+            <div class="panel-title-row">
+              <h2>📲 3. Giả Lập App Tài Xế Nhận Cuốc (45s)</h2>
+              <span class="badge-live">Chống Giành Khách</span>
+            </div>
+
+            <div class="phone-mockup">
+              <div class="phone-notch"></div>
+              <div class="phone-status-bar">
+                <span id="phone-driver-name">XE-01 • Anh Nghĩa</span>
+                <span>🟢 Đang trực Top #1</span>
+              </div>
+
+              <div class="dispatch-alert-card">
+                <div class="timer-ring">
+                  <strong id="phone-order-code" style="color: #fde047; font-size: 0.92rem;">CUỐC MỚI #TB-208</strong>
+                  <span class="countdown-badge" id="phone-countdown">⏳ 45s</span>
+                </div>
+
+                <div class="alert-route-box" id="phone-route-info"></div>
+
+                <div class="alert-financials">
+                  <div class="fin-box">
+                    <small>Thu Khách</small>
+                    <strong id="phone-fare" style="color: #fde047;">200.000đ</strong>
+                  </div>
+                  <div class="fin-box">
+                    <small>Trừ Ví Cọc</small>
+                    <strong id="phone-fee" style="color: #f87171;">-30.000đ</strong>
+                  </div>
+                  <div class="fin-box">
+                    <small>Thực Nhận</small>
+                    <strong id="phone-net" style="color: #34d399;">170.000đ</strong>
+                  </div>
+                </div>
+
+                <div class="driver-decision-btns">
+                  <button type="button" id="btn-driver-accept" class="btn-accept-trip">
+                    ✅ NHẬN CUỐC NGAY
+                  </button>
+                  <button type="button" id="btn-driver-skip" class="btn-skip-trip">
+                    ⏭️ Nhường Xe Sau
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div style="font-size: 0.8rem; font-weight: 800; margin-bottom: 8px; color: #94a3b8;">
+                📜 Nhật Ký Điều Phối &amp; Tin Nhắn Zalo ZNS Tự Động:
+              </div>
+              <div class="activity-log-box" id="dispatch-activity-log">
+                <div class="log-entry">
+                  <span style="color:#64748b">[Hệ thống]</span> 🟢 Đã kết nối <strong>20 đầu xe</strong> (11 xe tại Bến Thăng Bình, 9 xe tại Bến Đà Nẵng). Sẵn sàng nhận cuộc gọi AI!
+                </div>
+              </div>
+            </div>
+          </section>
+
+        </main>
+      </div>
+
+      <!-- ===================================================
+           TAB 2: ORDERS & COMMISSION REFUND CRM
+           =================================================== -->
+      <div id="tab-orders" class="db-tab-view">
+        <div class="admin-table-card">
+          <div class="panel-title-row" style="margin-bottom: 16px;">
+            <h2>📋 Danh Sách Cuốc Xe Đã Chia &amp; Đối Soát Hoa Hồng Hôm Nay</h2>
+            <span class="badge-live">Hỗ trợ Hoàn Phí Cò 1 chạm khi khách hủy</span>
+          </div>
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Mã Đơn / Giờ</th>
+                <th>SĐT Khách Hàng</th>
+                <th>Lộ Trình Đón ➔ Trả</th>
+                <th>Loại Dịch Vụ</th>
+                <th>Tổng Thu</th>
+                <th>Phí Điều Xe</th>
+                <th>Tài Xế Nhận</th>
+                <th>Trạng Thái</th>
+                <th>Thao Tác</th>
+              </tr>
+            </thead>
+            <tbody id="orders-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===================================================
+           TAB 3: 20-VEHICLE FLEET & WALLET MANAGER
+           =================================================== -->
+      <div id="tab-fleet" class="db-tab-view">
+        <div class="admin-table-card">
+          <div class="panel-title-row" style="margin-bottom: 16px;">
+            <h2>🚘 Quản Trị Danh Sách 20 Đầu Xe &amp; Số Dư Ví Cọc Tài Xế</h2>
+            <span class="badge-live">20 Xe Đang Hoạt Động</span>
+          </div>
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Mã Xe</th>
+                <th>Tài Xế &amp; SĐT</th>
+                <th>Dòng Xe Phục Vụ</th>
+                <th>Đầu Bến &amp; Vị Trí Hiện Tại</th>
+                <th>Ghế Đã Ghép / Số Chuyến</th>
+                <th>Số Dư Ví Cọc</th>
+                <th>Quản Trị Nhanh</th>
+              </tr>
+            </thead>
+            <tbody id="fleet-full-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===================================================
+           TAB 4: SYSTEM SETTINGS & INTEGRATIONS
+           =================================================== -->
+      <div id="tab-settings" class="db-tab-view">
+        <div class="admin-table-card" style="max-width: 820px;">
+          <div class="panel-title-row" style="margin-bottom: 16px;">
+            <h2>⚙️ Cấu Hình Bảng Giá Cố Định &amp; Kết Nối Tổng Đài AI</h2>
+            <span class="badge-live">Đã Lưu Đồng Bộ</span>
+          </div>
+          <div class="extracted-grid" style="grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="ext-item">
+              <span>Giá vé Xe ghép cố định (1 người)</span>
+              <strong style="color:#fde047;font-size:1.1rem">100.000đ / 1 người</strong>
+            </div>
+            <div class="ext-item">
+              <span>Phụ thu thêm mỗi hành khách đi cùng</span>
+              <strong style="color:#fde047;font-size:1.1rem">+100.000đ / người</strong>
+            </div>
+            <div class="ext-item">
+              <span>Khung giá Bao nguyên xe 4 – 7 chỗ</span>
+              <strong style="color:#34d399;font-size:1.1rem">350.000đ – 600.000đ / chuyến</strong>
+            </div>
+            <div class="ext-item">
+              <span>Thời gian đếm ngược nhận cuốc trên App Tài xế</span>
+              <strong style="color:#38bdf8;font-size:1.1rem">45 Giây (Tự động xoay vòng)</strong>
+            </div>
+            <div class="ext-item">
+              <span>Hotline SIP Trunking kết nối AI Voicebot</span>
+              <strong>0896.211.296 &amp; 0386.400.800</strong>
+            </div>
+            <div class="ext-item">
+              <span>Trạng thái Bot Telegram / Zalo ZNS Bắn Cuốc</span>
+              <strong style="color:#34d399">🟢 Đang kết nối (20 Tài xế)</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="dieu-phoi.js"></script>
+</body>
+</html>

@@ -1,29 +1,71 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // 0. ADMIN PIN GATE & SIDEBAR TAB SWITCHING
+  const gateOverlay = document.getElementById('admin-gate');
+  const btnGateLogin = document.getElementById('btn-gate-login');
+  const btnLock = document.getElementById('btn-lock-dashboard');
+  const pinInput = document.getElementById('admin-pin-input');
+
+  if (btnGateLogin && gateOverlay) {
+    btnGateLogin.addEventListener('click', () => {
+      if (!pinInput || pinInput.value.trim().length >= 4) {
+        gateOverlay.classList.add('hidden');
+      } else {
+        alert('Vui lòng nhập mã PIN Quản trị (Mặc định: 1296)');
+      }
+    });
+  }
+
+  if (btnLock && gateOverlay) {
+    btnLock.addEventListener('click', () => {
+      gateOverlay.classList.remove('hidden');
+    });
+  }
+
+  // Sidebar Tabs
+  const navBtns = document.querySelectorAll('.sb-nav-btn');
+  const tabViews = document.querySelectorAll('.db-tab-view');
+
+  navBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const targetTab = btn.getAttribute('data-tab');
+      navBtns.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      tabViews.forEach((view) => {
+        view.classList.toggle('active', view.id === targetTab);
+      });
+    });
+  });
+
   // 1. INITIAL 20-VEHICLE FLEET DATABASE (11 at Thang Binh Queue, 9 at Da Nang Queue)
   const fleet = [
-    // Queue TB (Đầu bến Thăng Bình)
-    { id: 'XE-01', name: 'Anh Nghĩa (Xe Chủ Lực)', type: 'VinFast Limo Green 7C', queue: 'TB', loc: '469 Huỳnh Thúc Kháng, Hà Lam', seats: 0, maxSeats: 6, wallet: 850000, trips: 5 },
-    { id: 'XE-02', name: 'Anh Tuấn Hà Lam', type: 'VinFast Limo Green 7C', queue: 'TB', loc: 'Ngã 3 Cây Cốc, Hà Lam', seats: 2, maxSeats: 6, wallet: 520000, trips: 4 },
-    { id: 'XE-03', name: 'Anh Hùng Bình Quý', type: 'VinFast Limo Green 7C', queue: 'TB', loc: 'Ngã 3 Bình Quý', seats: 0, maxSeats: 6, wallet: 480000, trips: 4 },
-    { id: 'XE-04', name: 'Anh Dũng Cầu Ông Triệu', type: 'Mitsubishi Xpander 7C', queue: 'TB', loc: 'Cầu Ông Triệu, Bình Định', seats: 0, maxSeats: 6, wallet: 410000, trips: 3 },
-    { id: 'XE-05', name: 'Anh Khoa Hà Châu', type: 'VinFast Limo Green 7C', queue: 'TB', loc: 'Chợ Hà Châu, Bình Phú', seats: 0, maxSeats: 6, wallet: 600000, trips: 4 },
-    { id: 'XE-06', name: 'Anh Minh Quý Mỹ', type: 'Toyota Veloz Cross 7C', queue: 'TB', loc: 'Thôn Quý Mỹ, Bình Quý', seats: 0, maxSeats: 6, wallet: 350000, trips: 3 },
-    { id: 'XE-07', name: 'Anh Tâm Bình Nguyên', type: 'Hyundai Accent 4C', queue: 'TB', loc: 'Xã Bình Nguyên', seats: 0, maxSeats: 4, wallet: 390000, trips: 3 },
-    { id: 'XE-08', name: 'Anh Hoàng Bình Phục', type: 'VinFast Limo Green 7C', queue: 'TB', loc: 'QL1A Xã Bình Phục', seats: 0, maxSeats: 6, wallet: 470000, trips: 3 },
-    { id: 'XE-09', name: 'Anh Sơn Bình Chánh', type: 'Toyota Vios 4C', queue: 'TB', loc: 'Xã Bình Chánh', seats: 0, maxSeats: 4, wallet: 310000, trips: 2 },
-    { id: 'XE-10', name: 'Anh Phúc Bình Minh', type: 'VinFast Limo Green 7C', queue: 'TB', loc: 'Gần VinWonders Nam Hội An', seats: 0, maxSeats: 6, wallet: 540000, trips: 4 },
-    { id: 'XE-11', name: 'Anh Long Hà Lam', type: 'Mitsubishi Xpander 7C', queue: 'TB', loc: 'Chợ Hà Lam, Thăng Bình', seats: 0, maxSeats: 6, wallet: 430000, trips: 3 },
+    { id: 'XE-01', name: 'Anh Nghĩa (Xe Chủ Lực)', phone: '0896.211.296', type: 'VinFast Limo Green 7C', queue: 'TB', loc: '469 Huỳnh Thúc Kháng, Hà Lam', seats: 0, maxSeats: 6, wallet: 850000, trips: 5 },
+    { id: 'XE-02', name: 'Anh Tuấn Hà Lam', phone: '0905.214.112', type: 'VinFast Limo Green 7C', queue: 'TB', loc: 'Ngã 3 Cây Cốc, Hà Lam', seats: 2, maxSeats: 6, wallet: 520000, trips: 4 },
+    { id: 'XE-03', name: 'Anh Hùng Bình Quý', phone: '0935.618.220', type: 'VinFast Limo Green 7C', queue: 'TB', loc: 'Ngã 3 Bình Quý', seats: 0, maxSeats: 6, wallet: 480000, trips: 4 },
+    { id: 'XE-04', name: 'Anh Dũng Cầu Ông Triệu', phone: '0905.771.309', type: 'Mitsubishi Xpander 7C', queue: 'TB', loc: 'Cầu Ông Triệu, Bình Định', seats: 0, maxSeats: 6, wallet: 410000, trips: 3 },
+    { id: 'XE-05', name: 'Anh Khoa Hà Châu', phone: '0983.412.885', type: 'VinFast Limo Green 7C', queue: 'TB', loc: 'Chợ Hà Châu, Bình Phú', seats: 0, maxSeats: 6, wallet: 600000, trips: 4 },
+    { id: 'XE-06', name: 'Anh Minh Quý Mỹ', phone: '0914.552.190', type: 'Toyota Veloz Cross 7C', queue: 'TB', loc: 'Thôn Quý Mỹ, Bình Quý', seats: 0, maxSeats: 6, wallet: 350000, trips: 3 },
+    { id: 'XE-07', name: 'Anh Tâm Bình Nguyên', phone: '0905.918.441', type: 'Hyundai Accent 4C', queue: 'TB', loc: 'Xã Bình Nguyên', seats: 0, maxSeats: 4, wallet: 390000, trips: 3 },
+    { id: 'XE-08', name: 'Anh Hoàng Bình Phục', phone: '0935.109.774', type: 'VinFast Limo Green 7C', queue: 'TB', loc: 'QL1A Xã Bình Phục', seats: 0, maxSeats: 6, wallet: 470000, trips: 3 },
+    { id: 'XE-09', name: 'Anh Sơn Bình Chánh', phone: '0905.334.612', type: 'Toyota Vios 4C', queue: 'TB', loc: 'Xã Bình Chánh', seats: 0, maxSeats: 4, wallet: 310000, trips: 2 },
+    { id: 'XE-10', name: 'Anh Phúc Bình Minh', phone: '0977.812.550', type: 'VinFast Limo Green 7C', queue: 'TB', loc: 'Gần VinWonders Nam Hội An', seats: 0, maxSeats: 6, wallet: 540000, trips: 4 },
+    { id: 'XE-11', name: 'Anh Long Hà Lam', phone: '0905.663.901', type: 'Mitsubishi Xpander 7C', queue: 'TB', loc: 'Chợ Hà Lam, Thăng Bình', seats: 0, maxSeats: 6, wallet: 430000, trips: 3 },
 
-    // Queue DN (Đầu bến Đà Nẵng chờ quay đầu về Thăng Bình)
-    { id: 'XE-12', name: 'Anh Hải (Trực BV Đa Khoa)', type: 'VinFast Limo Green 7C', queue: 'DN', loc: 'Cổng BV Đa Khoa Đà Nẵng', seats: 1, maxSeats: 6, wallet: 590000, trips: 4 },
-    { id: 'XE-13', name: 'Anh Bảo (Trực Sân Bay)', type: 'VinFast Limo Green 7C', queue: 'DN', loc: 'Sân bay Quốc tế Đà Nẵng', seats: 0, maxSeats: 6, wallet: 640000, trips: 5 },
-    { id: 'XE-14', name: 'Anh Thành (Trực BV 600G)', type: 'Toyota Innova 7C', queue: 'DN', loc: 'BV Phụ Sản - Nhi 600 Giường', seats: 0, maxSeats: 6, wallet: 420000, trips: 3 },
-    { id: 'XE-15', name: 'Anh Đạt (Trực BV Ung Bướu)', type: 'VinFast Limo Green 7C', queue: 'DN', loc: 'BV Ung Bướu Đà Nẵng', seats: 0, maxSeats: 6, wallet: 510000, trips: 4 },
-    { id: 'XE-16', name: 'Anh Vũ Hải Châu', type: 'Honda City 4C', queue: 'DN', loc: 'Quận Hải Châu, Đà Nẵng', seats: 0, maxSeats: 4, wallet: 360000, trips: 3 },
-    { id: 'XE-17', name: 'Anh Khánh Thanh Khê', type: 'VinFast Limo Green 7C', queue: 'DN', loc: 'Ga Đà Nẵng / Thanh Khê', seats: 0, maxSeats: 6, wallet: 490000, trips: 3 },
-    { id: 'XE-18', name: 'Anh Tùng Cẩm Lệ', type: 'Mitsubishi Xpander 7C', queue: 'DN', loc: 'Ngã tư Cẩm Lệ, Đà Nẵng', seats: 0, maxSeats: 6, wallet: 380000, trips: 3 },
-    { id: 'XE-19', name: 'Anh Nam Sơn Trà', type: 'VinFast Limo Green 7C', queue: 'DN', loc: 'Chùa Linh Ứng / Sơn Trà', seats: 0, maxSeats: 6, wallet: 550000, trips: 4 },
-    { id: 'XE-20', name: 'Anh Việt Ngũ Hành Sơn', type: 'Mazda 3 4C', queue: 'DN', loc: 'Ngũ Hành Sơn, Đà Nẵng', seats: 0, maxSeats: 4, wallet: 330000, trips: 2 }
+    { id: 'XE-12', name: 'Anh Hải (Trực BV Đa Khoa)', phone: '0905.882.119', type: 'VinFast Limo Green 7C', queue: 'DN', loc: 'Cổng BV Đa Khoa Đà Nẵng', seats: 1, maxSeats: 6, wallet: 590000, trips: 4 },
+    { id: 'XE-13', name: 'Anh Bảo (Trực Sân Bay)', phone: '0935.441.208', type: 'VinFast Limo Green 7C', queue: 'DN', loc: 'Sân bay Quốc tế Đà Nẵng', seats: 0, maxSeats: 6, wallet: 640000, trips: 5 },
+    { id: 'XE-14', name: 'Anh Thành (Trực BV 600G)', phone: '0905.129.884', type: 'Toyota Innova 7C', queue: 'DN', loc: 'BV Phụ Sản - Nhi 600 Giường', seats: 0, maxSeats: 6, wallet: 420000, trips: 3 },
+    { id: 'XE-15', name: 'Anh Đạt (Trực BV Ung Bướu)', phone: '0914.773.210', type: 'VinFast Limo Green 7C', queue: 'DN', loc: 'BV Ung Bướu Đà Nẵng', seats: 0, maxSeats: 6, wallet: 510000, trips: 4 },
+    { id: 'XE-16', name: 'Anh Vũ Hải Châu', phone: '0905.501.337', type: 'Honda City 4C', queue: 'DN', loc: 'Quận Hải Châu, Đà Nẵng', seats: 0, maxSeats: 4, wallet: 360000, trips: 3 },
+    { id: 'XE-17', name: 'Anh Khánh Thanh Khê', phone: '0935.990.142', type: 'VinFast Limo Green 7C', queue: 'DN', loc: 'Ga Đà Nẵng / Thanh Khê', seats: 0, maxSeats: 6, wallet: 490000, trips: 3 },
+    { id: 'XE-18', name: 'Anh Tùng Cẩm Lệ', phone: '0905.712.665', type: 'Mitsubishi Xpander 7C', queue: 'DN', loc: 'Ngã tư Cẩm Lệ, Đà Nẵng', seats: 0, maxSeats: 6, wallet: 380000, trips: 3 },
+    { id: 'XE-19', name: 'Anh Nam Sơn Trà', phone: '0989.314.778', type: 'VinFast Limo Green 7C', queue: 'DN', loc: 'Chùa Linh Ứng / Sơn Trà', seats: 0, maxSeats: 6, wallet: 550000, trips: 4 },
+    { id: 'XE-20', name: 'Anh Việt Ngũ Hành Sơn', phone: '0905.238.991', type: 'Mazda 3 4C', queue: 'DN', loc: 'Ngũ Hành Sơn, Đà Nẵng', seats: 0, maxSeats: 4, wallet: 330000, trips: 2 }
+  ];
+
+  // Initial Orders History List (Tab 2 CRM)
+  const ordersHistory = [
+    { code: '#TB-205', time: '06:15', customerPhone: '0905.218.442', route: 'Thị trấn Hà Lam ➔ BV Đa khoa Đà Nẵng', service: 'Ghép 2 người (100K/người)', fare: 200000, fee: 30000, driverId: 'XE-02', driverName: 'Anh Tuấn Hà Lam', refunded: false },
+    { code: '#TB-206', time: '06:30', customerPhone: '0935.881.109', route: 'Chợ Hà Châu ➔ Sân bay Đà Nẵng', service: 'Bao nguyên xe 7 chỗ', fare: 450000, fee: 45000, driverId: 'XE-05', driverName: 'Anh Khoa Hà Châu', refunded: false },
+    { code: '#DN-207', time: '07:05', customerPhone: '0914.339.712', route: 'BV 600 Giường ĐN ➔ Cầu Ông Triệu', service: 'Ghép 1 người (100K/người)', fare: 100000, fee: 15000, driverId: 'XE-12', driverName: 'Anh Hải', refunded: false }
   ];
 
   // State counters
@@ -35,7 +77,6 @@ document.addEventListener('DOMContentLoaded', () => {
   let countdownValue = 45;
   let countdownTimer = null;
 
-  // Current extracted order waiting for dispatch
   let currentOrder = {
     code: '#TB-208',
     customerPhoneMasked: '0905.***889',
@@ -53,7 +94,6 @@ document.addEventListener('DOMContentLoaded', () => {
     timeNote: 'Đi ngay (Đón sau 15 phút)'
   };
 
-  // Pooled passengers on active combo car
   const pooledSeats = [
     { label: 'Ghế 1: Chị Lan (Hà Lam ➔ BV Đa Khoa)', occupied: true },
     { label: 'Ghế 2: Cô Tư (Hà Lam ➔ BV Đa Khoa)', occupied: true },
@@ -75,11 +115,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const queueListEl = document.getElementById('driver-queue-list');
   const seatSlotsEl = document.getElementById('pooling-seat-slots');
   const logBoxEl = document.getElementById('dispatch-activity-log');
+  const ordersTableBody = document.getElementById('orders-table-body');
+  const fleetFullTableBody = document.getElementById('fleet-full-table-body');
 
-  // Format currency
   const formatVND = (num) => num.toLocaleString('vi-VN') + 'đ';
 
-  // Add Activity Log
   const addLog = (htmlMsg) => {
     if (!logBoxEl) return;
     const now = new Date();
@@ -90,7 +130,6 @@ document.addEventListener('DOMContentLoaded', () => {
     logBoxEl.prepend(div);
   };
 
-  // Render Pooling Slots
   const renderPoolingSlots = () => {
     if (!seatSlotsEl) return;
     seatSlotsEl.innerHTML = pooledSeats
@@ -104,7 +143,108 @@ document.addEventListener('DOMContentLoaded', () => {
       .join('');
   };
 
-  // Render 20-Vehicle Queue List
+  // Render Orders History Table (Tab 2)
+  const renderOrdersTable = () => {
+    if (!ordersTableBody) return;
+    ordersTableBody.innerHTML = ordersHistory
+      .map(
+        (o, idx) => `
+      <tr>
+        <td><strong style="color:#fde047">${o.code}</strong><br><small>${o.time}</small></td>
+        <td><strong>${o.customerPhone}</strong></td>
+        <td>${o.route}</td>
+        <td>${o.service}</td>
+        <td><strong style="color:#fff">${formatVND(o.fare)}</strong></td>
+        <td><strong style="color:#34d399">${o.refunded ? '0đ (Đã hoàn)' : '-' + formatVND(o.fee)}</strong></td>
+        <td>${o.driverId} • ${o.driverName}</td>
+        <td>
+          <span class="status-pill ${o.refunded ? 'refund' : 'done'}">
+            ${o.refunded ? 'Khách hủy (Đã hoàn phí)' : 'Đã nhận cuốc'}
+          </span>
+        </td>
+        <td>
+          ${
+            o.refunded
+              ? '<small style="color:#64748b">Đã xử lý</small>'
+              : `<button type="button" class="btn-topup js-refund-order" data-idx="${idx}">↩ Hoàn Phí Cò</button>`
+          }
+        </td>
+      </tr>
+    `
+      )
+      .join('');
+
+    ordersTableBody.querySelectorAll('.js-refund-order').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const i = parseInt(btn.getAttribute('data-idx'), 10);
+        const order = ordersHistory[i];
+        if (order && !order.refunded) {
+          order.refunded = true;
+          const car = fleet.find((c) => c.id === order.driverId);
+          if (car) car.wallet += order.fee;
+          totalCommissionToday -= order.fee;
+          if (kpiCommissionEl) kpiCommissionEl.textContent = formatVND(totalCommissionToday);
+          addLog(`↩️ Quản trị viên đã duyệt <strong>Hoàn phí điều xe +${formatVND(order.fee)}</strong> đơn <strong>${order.code}</strong> về Ví tài xế <strong>${order.driverName}</strong>.`);
+          renderOrdersTable();
+          renderQueue();
+          renderFullFleetTable();
+        }
+      });
+    });
+  };
+
+  // Render Full 20-Vehicle Table (Tab 3)
+  const renderFullFleetTable = () => {
+    if (!fleetFullTableBody) return;
+    fleetFullTableBody.innerHTML = fleet
+      .map(
+        (car) => `
+      <tr>
+        <td><strong style="color:#fde047">${car.id}</strong></td>
+        <td><strong>${car.name}</strong><br><small>${car.phone}</small></td>
+        <td>${car.type}</td>
+        <td>
+          <span class="status-pill done">${car.queue === 'TB' ? '🏡 Bến Thăng Bình' : '🏙️ Bến Đà Nẵng'}</span>
+          <br><small>${car.loc}</small>
+        </td>
+        <td>${car.seats}/${car.maxSeats} ghế (${car.trips} chuyến)</td>
+        <td><strong style="color:#34d399;font-size:0.95rem">${formatVND(car.wallet)}</strong></td>
+        <td>
+          <button type="button" class="btn-topup js-topup-full" data-id="${car.id}">+Nạp 200K</button>
+          <button type="button" class="btn-topup js-switch-station" data-id="${car.id}">⇄ Đổi Bến</button>
+        </td>
+      </tr>
+    `
+      )
+      .join('');
+
+    fleetFullTableBody.querySelectorAll('.js-topup-full').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const car = fleet.find((c) => c.id === btn.getAttribute('data-id'));
+        if (car) {
+          car.wallet += 200000;
+          renderFullFleetTable();
+          renderQueue();
+          addLog(`💳 Admin vừa nạp <strong>+200.000đ</strong> vào Ví cọc của <strong>${car.id} (${car.name})</strong>.`);
+        }
+      });
+    });
+
+    fleetFullTableBody.querySelectorAll('.js-switch-station').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const car = fleet.find((c) => c.id === btn.getAttribute('data-id'));
+        if (car) {
+          car.queue = car.queue === 'TB' ? 'DN' : 'TB';
+          car.loc = car.queue === 'TB' ? 'Thị trấn Hà Lam, Thăng Bình' : 'Trung tâm TP. Đà Nẵng';
+          renderFullFleetTable();
+          renderQueue();
+          addLog(`⇄ Admin đã chuyển đầu bến của <strong>${car.id} (${car.name})</strong> sang <strong>${car.queue === 'TB' ? 'Bến Thăng Bình' : 'Bến Đà Nẵng'}</strong>.`);
+        }
+      });
+    });
+  };
+
+  // Render Live Queue List (Tab 1)
   const renderQueue = () => {
     if (!queueListEl) return;
     const filtered = fleet.filter((car) => car.queue === activeQueueTab);
@@ -128,7 +268,6 @@ document.addEventListener('DOMContentLoaded', () => {
       })
       .join('');
 
-    // Attach topup listeners
     queueListEl.querySelectorAll('.btn-topup').forEach((btn) => {
       btn.addEventListener('click', () => {
         const carId = btn.getAttribute('data-id');
@@ -136,13 +275,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (targetCar) {
           targetCar.wallet += 200000;
           renderQueue();
+          renderFullFleetTable();
           addLog(`💳 Tài xế <strong>${targetCar.name} (${targetCar.id})</strong> vừa quét VietQR nạp thêm <strong>+200.000đ</strong> vào Ví Điều Phối.`);
         }
       });
     });
   };
 
-  // Render Extracted Card & Driver Phone Alert
   const renderCurrentOrder = (unmaskPhone = false) => {
     const extCode = document.getElementById('ext-code');
     const extService = document.getElementById('ext-service');
@@ -158,7 +297,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (extFare) extFare.textContent = formatVND(currentOrder.totalFare);
     if (extFee) extFee.textContent = `${formatVND(currentOrder.commissionFee)} (Thực nhận: ${formatVND(currentOrder.driverNet)})`;
 
-    // Update Simulated Driver Phone
     const topCar = fleet.find((c) => c.queue === currentOrder.queue) || fleet[0];
     const phoneDriverName = document.getElementById('phone-driver-name');
     const phoneOrderCode = document.getElementById('phone-order-code');
@@ -183,7 +321,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (phoneNet) phoneNet.textContent = formatVND(currentOrder.driverNet);
   };
 
-  // Start / Reset 45s Countdown Timer
   const startCountdown = () => {
     if (countdownTimer) clearInterval(countdownTimer);
     countdownValue = 45;
@@ -199,7 +336,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 1000);
   };
 
-  // Rotate Queue (When driver skips or times out)
   const rotateDriverQueue = (reason) => {
     const queueCars = fleet.filter((c) => c.queue === currentOrder.queue);
     if (queueCars.length < 2) return;
@@ -212,17 +348,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const nextCar = fleet.find((c) => c.queue === currentOrder.queue);
     addLog(`⏭️ <strong>${skippedCar.id} (${skippedCar.name})</strong>: ${reason} ➔ Tự động xoay vòng cuốc <strong>${currentOrder.code}</strong> sang <strong>${nextCar.id} (${nextCar.name})</strong>.`);
     renderQueue();
+    renderFullFleetTable();
     renderCurrentOrder(false);
     startCountdown();
   };
 
-  // NLP Call Parser (Extracts structured order from natural Vietnamese speech/text)
   const parseCallTranscript = (rawText) => {
     const text = rawText.toLowerCase();
     const seatFeeUnit = parseInt(feeSeatSelect?.value || '15000', 10);
     const charterFeePct = parseInt(feeCharterSelect?.value || '10', 10);
 
-    // 1. Detect Direction & Queue
     let queue = 'TB';
     let directionText = 'Thăng Bình ➔ Đà Nẵng';
     if (
@@ -236,7 +371,6 @@ document.addEventListener('DOMContentLoaded', () => {
       directionText = 'Đà Nẵng ➔ Về Thăng Bình';
     }
 
-    // 2. Detect Pickup & Dropoff locations
     let pickup = 'Thị trấn Hà Lam (469 Huỳnh Thúc Kháng)';
     if (text.includes('bình quý') || text.includes('quý mỹ')) pickup = 'Ngã 3 Bình Quý / Thôn Quý Mỹ';
     else if (text.includes('ông triệu') || text.includes('bình định')) pickup = 'Cầu Ông Triệu (Xã Bình Định)';
@@ -262,7 +396,6 @@ document.addEventListener('DOMContentLoaded', () => {
       dropoff = temp;
     }
 
-    // 3. Detect Passenger Count & Service Formula (100K/person vs Charter 350K-600K)
     let seatsNeeded = 1;
     if (text.match(/\b(2|hai)\s*(ghế|người|vé|chỗ|mẹ con)/)) seatsNeeded = 2;
     else if (text.match(/\b(3|ba)\s*(ghế|người|vé|chỗ)/)) seatsNeeded = 3;
@@ -316,7 +449,6 @@ document.addEventListener('DOMContentLoaded', () => {
       timeNote: 'Đi ngay (Đón sau 15 phút)'
     };
 
-    // Switch queue tab to match order direction
     activeQueueTab = queue;
     document.querySelectorAll('.q-tab').forEach((t) => {
       t.classList.toggle('active', t.getAttribute('data-q') === activeQueueTab);
@@ -335,7 +467,6 @@ document.addEventListener('DOMContentLoaded', () => {
     );
   };
 
-  // Preset Scenario Buttons
   document.querySelectorAll('.preset-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
       const sampleText = btn.getAttribute('data-speech');
@@ -354,12 +485,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Web Speech API (Voice Recognition if supported by browser)
   if (btnMic) {
     btnMic.addEventListener('click', () => {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) {
-        alert('Trình duyệt hiện tại chưa bật quyền Mic hoặc không hỗ trợ Web Speech. Anh có thể bấm các nút Kịch bản mẫu bên trên hoặc gõ trực tiếp câu nói của khách vào ô nhé!');
+        alert('Trình duyệt hiện tại chưa bật quyền Mic. Anh có thể bấm các nút Kịch bản mẫu bên trên hoặc gõ trực tiếp câu nói của khách vào ô nhé!');
         return;
       }
       const recognition = new SpeechRecognition();
@@ -385,7 +515,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Queue Tab Switcher
   document.querySelectorAll('.q-tab').forEach((tab) => {
     tab.addEventListener('click', () => {
       document.querySelectorAll('.q-tab').forEach((t) => t.classList.remove('active'));
@@ -395,7 +524,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Driver Accepts Trip Button
   const btnAccept = document.getElementById('btn-driver-accept');
   const btnSkip = document.getElementById('btn-driver-skip');
 
@@ -405,7 +533,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const topCar = fleet.find((c) => c.queue === currentOrder.queue);
       if (!topCar) return;
 
-      // Deduct commission from driver wallet
       topCar.wallet -= currentOrder.commissionFee;
       topCar.trips += 1;
       totalCommissionToday += currentOrder.commissionFee;
@@ -417,7 +544,6 @@ document.addEventListener('DOMContentLoaded', () => {
         totalSeatsToday += currentOrder.seatsNeeded;
         topCar.seats = Math.min(topCar.maxSeats, topCar.seats + currentOrder.seatsNeeded);
 
-        // Fill pooling slots visually
         let needed = currentOrder.seatsNeeded;
         pooledSeats.forEach((slot) => {
           if (!slot.occupied && needed > 0) {
@@ -429,18 +555,32 @@ document.addEventListener('DOMContentLoaded', () => {
         renderPoolingSlots();
       }
 
-      // Update KPI display
+      // Add to Orders CRM History
+      const nowTime = new Date().toTimeString().slice(0, 5);
+      ordersHistory.unshift({
+        code: currentOrder.code,
+        time: nowTime,
+        customerPhone: currentOrder.customerPhoneFull,
+        route: `${currentOrder.pickup} ➔ ${currentOrder.dropoff}`,
+        service: currentOrder.serviceName,
+        fare: currentOrder.totalFare,
+        fee: currentOrder.commissionFee,
+        driverId: topCar.id,
+        driverName: topCar.name,
+        refunded: false
+      });
+
       if (kpiTripsEl) kpiTripsEl.textContent = `${totalSeatsToday} ghế • ${totalChartersToday} bao xe`;
       if (kpiCommissionEl) kpiCommissionEl.textContent = formatVND(totalCommissionToday);
 
-      // Unmask phone for driver
       renderCurrentOrder(true);
+      renderOrdersTable();
+      renderFullFleetTable();
 
       addLog(
-        `✅ <strong>${topCar.id} (${topCar.name})</strong> đã NHẬN CUỐC <strong>${currentOrder.code}</strong>! Hệ thống tự động trừ <strong>-${formatVND(currentOrder.commissionFee)}</strong> phí điều xe và gửi Zalo ZNS báo thông tin tài xế cho khách <strong>${currentOrder.customerPhoneFull}</strong>.`
+        `✅ <strong>${topCar.id} (${topCar.name})</strong> đã NHẬN CUỐC <strong>${currentOrder.code}</strong>! Trừ <strong>-${formatVND(currentOrder.commissionFee)}</strong> phí điều xe và gửi Zalo ZNS cho khách <strong>${currentOrder.customerPhoneFull}</strong>.`
       );
 
-      // Rotate car to bottom of queue if charter or full
       const idx = fleet.indexOf(topCar);
       if (idx > -1) {
         fleet.splice(idx, 1);
@@ -456,7 +596,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Recalculate when commission config changes
   [feeSeatSelect, feeCharterSelect].forEach((sel) => {
     if (sel) {
       sel.addEventListener('change', () => {
@@ -467,9 +606,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Initial render
   renderPoolingSlots();
   renderQueue();
+  renderOrdersTable();
+  renderFullFleetTable();
   renderCurrentOrder(false);
   startCountdown();
 });

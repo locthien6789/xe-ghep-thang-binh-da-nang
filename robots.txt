@@ -1,5 +1,7 @@
 User-agent: *
 Allow: /
+Disallow: /dashboard.html
+Disallow: /dieu-phoi.html
 
 # Allow AI Search & Answer Engine Crawlers (AEO & GEO 2026)
 User-agent: OAI-SearchBot
