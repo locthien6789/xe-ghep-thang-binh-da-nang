@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 2. INTERACTIVE BOOKING & INSTANT PRICE CALCULATOR
+  // 2. INTERACTIVE BOOKING & INSTANT PRICE CALCULATOR V2.0 (100K/NGUOI + BAO XE 350K-600K + FULL SERVICE)
   let currentDirection = 'Thăng Bình ➔ Đà Nẵng';
   const dirTabs = document.querySelectorAll('.dir-tab');
   const pickupSelect = document.getElementById('booking-pickup');
@@ -30,39 +30,52 @@ document.addEventListener('DOMContentLoaded', () => {
   const quoteNoteEl = document.getElementById('quote-note-display');
 
   const updateQuote = () => {
-    if (!pickupSelect || !serviceSelect || !quotePriceEl || !quoteNoteEl) return;
+    if (!serviceSelect || !quotePriceEl || !quoteNoteEl) return;
 
-    const pickupZone = pickupSelect.options[pickupSelect.selectedIndex]?.getAttribute('data-zone') || '100k';
     const serviceType = serviceSelect.value;
 
-    let priceText = '100.000đ / ghế';
-    let noteText = '✅ Tuyến ưu đãi cố định • Xe điện VinFast Limo Green đón tận nơi sau 15 phút';
+    let priceText = '100.000đ / 1 người';
+    let noteText = '🔥 Giá cố định 100K/người (thêm 1 người +100K) • Đón tận nhà sau 15 phút';
 
-    if (serviceType === 'ghep-1-ghe') {
-      if (pickupZone === '100k') {
-        priceText = '100.000đ / vé';
-        noteText = '🔥 Giá vé 100K áp dụng tuyến Hà Châu - Ngã 3 Bình Quý - Cầu Ông Triệu - Quý Mỹ - Hà Lam ↔ Đà Nẵng';
-      } else {
-        priceText = '120.000đ – 150.000đ / vé';
-        noteText = '🚗 Đón tận ngõ tại các xã Bình Phú, Bình Chánh, Bình Định, Bình Phục, Bình Nguyên (tùy vị trí)';
-      }
-    } else if (serviceType === 'ghep-2-ghe') {
-      if (pickupZone === '100k') {
-        priceText = '200.000đ / 2 vé';
-        noteText = '🔥 Đi 2 người tuyến cố định chỉ 200K • Đón trả tận nơi không phát sinh';
-      } else {
-        priceText = '240.000đ – 280.000đ / 2 vé';
-        noteText = '🚗 Đón tận nhà tại xã • Ghế ngồi rộng rãi, cốp để hành lý thoải mái';
-      }
-    } else if (serviceType === 'bao-xe-4-cho') {
-      priceText = '400.000đ – 450.000đ / chuyến';
-      noteText = '⭐ Bao nguyên xe 4 chỗ riêng tư • Xuất phát bất kỳ giờ nào theo ý khách';
-    } else if (serviceType === 'bao-xe-7-cho') {
-      priceText = '500.000đ – 550.000đ / chuyến';
-      noteText = '🌟 Bao nguyên xe điện 7 chỗ VinFast Limo Green (43H-198.45) • Êm ái, đi gia đình & sân bay cực sướng';
-    } else if (serviceType === 'gui-hang') {
-      priceText = 'Chỉ từ 50.000đ / kiện';
-      noteText = '📦 Nhận vận chuyển hàng hóa, bưu kiện nhỏ, hồ sơ, quà quê Thăng Bình ↔ Đà Nẵng nhận sau 1h30p';
+    switch (serviceType) {
+      case 'ghep-1':
+        priceText = '100.000đ (1 người)';
+        noteText = '✅ Giá vé cố định 100K/người • Đón tận nhà Thăng Bình ↔ Trả tận nơi Đà Nẵng';
+        break;
+      case 'ghep-2':
+        priceText = '200.000đ (2 người • +100K/người)';
+        noteText = '✅ Công thức cố định: 1 người 100K + thêm 1 người 100K = 200K trọn gói không phát sinh';
+        break;
+      case 'ghep-3':
+        priceText = '300.000đ (3 người • +100K/người)';
+        noteText = '💡 Mẹo tiết kiệm: Đi 3 người (300K) chỉ cần thêm từ 50K là BAO NGUYÊN XE RIÊNG (350K–600K) đi ngay!';
+        break;
+      case 'ghep-4':
+        priceText = '400.000đ (4 người • +100K/người)';
+        noteText = '🌟 Khuyên chọn: Đi 4 người (400K) anh/chị nên chọn BAO XE RIÊNG (chỉ từ 350K–600K) để đi riêng cả gia đình!';
+        break;
+      case 'bao-xe-4-7':
+        priceText = 'Liên hệ từ 350.000đ – 600.000đ / chuyến';
+        noteText = '🚘 Bao nguyên xe 4 chỗ – 7 chỗ riêng tư • Giờ giấc tự chọn, đón trả nhiều điểm theo yêu cầu';
+        break;
+      case 'thue-xe-du-lich':
+        priceText = 'Liên hệ từ 350.000đ (Báo giá trọn gói)';
+        noteText = '🏖️ Phục vụ đi VinWonders Nam Hội An, Phố cổ Hội An, Bà Nà Hills, Núi Thần Tài, Chùa Linh Ứng, Mỹ Sơn...';
+        break;
+      case 'thue-xe-cuoi-hoi':
+        priceText = 'Liên hệ báo giá ưu đãi trọn gói';
+        noteText = '💒 Đội xe điện VinFast Limo Green trắng ngọc trai sang trọng & xe 4–7 chỗ phục vụ Xe hoa, Rước dâu, Đưa đón hai họ';
+        break;
+      case 'thue-xe-di-tinh':
+        priceText = 'Báo giá hợp đồng siêu tiết kiệm';
+        noteText = '🛣️ Nhận đi Tam Kỳ, Sân bay Chu Lai, Tiên Phước, Quế Sơn, Quảng Ngãi, Huế, Măng Đen (1 chiều & 2 chiều)';
+        break;
+      case 'gui-hang':
+        priceText = 'Chỉ từ 50.000đ / kiện';
+        noteText = '📦 Nhận vận chuyển hàng hóa, bưu kiện nhỏ, hồ sơ, quà quê Thăng Bình ↔ Đà Nẵng nhận sau 1h30p';
+        break;
+      default:
+        break;
     }
 
     quotePriceEl.textContent = priceText;
@@ -82,15 +95,32 @@ document.addEventListener('DOMContentLoaded', () => {
     if (el) el.addEventListener('change', updateQuote);
   });
 
+  // Quick-select service from Ecosystem Cards (#dich-vu)
+  const quickServiceBtns = document.querySelectorAll('.js-select-service');
+  quickServiceBtns.forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const targetVal = btn.getAttribute('data-service');
+      if (serviceSelect && targetVal) {
+        serviceSelect.value = targetVal;
+        updateQuote();
+      }
+      const bookingSection = document.getElementById('dat-xe');
+      if (bookingSection) {
+        bookingSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+  });
+
   // Build booking summary text & open Zalo
   const buildBookingMessage = () => {
-    const pickupText = pickupSelect?.options[pickupSelect.selectedIndex]?.text || 'Hà Lam';
-    const dropoffText = dropoffSelect?.options[dropoffSelect.selectedIndex]?.text || 'Trung tâm Đà Nẵng';
-    const serviceText = serviceSelect?.options[serviceSelect.selectedIndex]?.text || 'Ghép 1 ghế';
+    const pickupText = pickupSelect?.options[pickupSelect.selectedIndex]?.text || 'Thăng Bình';
+    const dropoffText = dropoffSelect?.options[dropoffSelect.selectedIndex]?.text || 'Đà Nẵng';
+    const serviceText = serviceSelect?.options[serviceSelect.selectedIndex]?.text || 'Đi ghép 1 người (100K)';
     const timeText = timeSelect?.options[timeSelect.selectedIndex]?.text || 'Đi ngay (Đón sau 15 phút)';
     const priceText = quotePriceEl?.textContent || '100.000đ';
 
-    return `Xin chào Nhà Xe Ghép Nghĩa Hà Lam!\nTôi muốn đặt xe:\n- Chiều đi: ${currentDirection}\n- Điểm tại Thăng Bình: ${pickupText}\n- Điểm tại Đà Nẵng: ${dropoffText}\n- Dịch vụ: ${serviceText} (${priceText})\n- Khung giờ: ${timeText}\nVui lòng đón tôi nhé!`;
+    return `Xin chào Nhà Xe Nghĩa Hà Lam (xeghepthangbinhdanang.vn)!\nTôi muốn đặt dịch vụ:\n- Lộ trình: ${currentDirection}\n- Điểm đón/trả 1: ${pickupText}\n- Điểm trả/đến 2: ${dropoffText}\n- Dịch vụ chọn: ${serviceText}\n- Chi phí dự kiến: ${priceText}\n- Thời gian: ${timeText}\nVui lòng liên hệ xác nhận giúp tôi nhé!`;
   };
 
   const zaloBtn1 = document.getElementById('btn-book-zalo-1');
@@ -102,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
       navigator.clipboard.writeText(msg).catch(() => {});
     }
     alert(
-      `Đã sao chép thông tin chuyến đi của anh/chị:\n\n"${msg}"\n\nBấm OK để chuyển sang Zalo Nhà Xe Nghĩa Hà Lam (${phone}) và dán (Paste) tin nhắn nhé!`
+      `Đã sao chép thông tin đặt xe của anh/chị:\n\n"${msg}"\n\nBấm OK để mở Zalo Nhà Xe Nghĩa Hà Lam (${phone}) và dán (Paste) tin nhắn nhé!`
     );
     window.open(`https://zalo.me/${phone}`, '_blank', 'noopener');
   };
