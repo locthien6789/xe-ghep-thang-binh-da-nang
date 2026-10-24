@@ -1691,3 +1691,256 @@ img {
   color: var(--slate);
 }
 
+/* ==========================================
+   15. ELDERLY-FRIENDLY "📍 HÃY ĐÓN TÔI" MODAL
+   (ANDROID & iOS 100% COMPATIBLE)
+   ========================================== */
+.pickup-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(15, 23, 42, 0.82);
+  backdrop-filter: blur(6px);
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+  overflow-y: auto;
+}
+
+.pickup-modal-overlay.open {
+  display: flex;
+}
+
+.pickup-modal-card {
+  width: 100%;
+  max-width: 500px;
+  background: var(--white);
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
+  border: 3px solid var(--primary);
+  animation: fadeInSlide 0.22s ease-out;
+}
+
+.pickup-modal-header {
+  background: linear-gradient(135deg, #047857 0%, #0f172a 100%);
+  color: var(--white);
+  padding: 18px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.pickup-modal-header h3 {
+  font-size: 1.32rem;
+  font-weight: 900;
+  color: #fde047;
+  line-height: 1.25;
+  margin-bottom: 4px;
+}
+
+.pickup-modal-header p {
+  font-size: 0.9rem;
+  color: #e2e8f0;
+  font-weight: 500;
+}
+
+.btn-close-pickup {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+  color: var(--white);
+  border: none;
+  font-size: 1.25rem;
+  font-weight: 900;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.pickup-modal-body {
+  padding: 20px;
+}
+
+.gps-live-banner {
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 0.94rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  line-height: 1.35;
+}
+
+.gps-live-banner.loading {
+  background: #eff6ff;
+  color: #1e40af;
+  border: 1.5px solid #93c5fd;
+}
+
+.gps-live-banner.success {
+  background: #dcfce7;
+  color: #166534;
+  border: 1.5px solid #4ade80;
+}
+
+.gps-live-banner.fallback {
+  background: #fef9c3;
+  color: #854d0e;
+  border: 1.5px solid #fde047;
+}
+
+.elderly-field-group {
+  margin-bottom: 16px;
+}
+
+.elderly-field-group label {
+  display: block;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--navy);
+  margin-bottom: 8px;
+}
+
+.elderly-phone-input {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 1.45rem;
+  font-weight: 900;
+  color: var(--navy);
+  background: #f0fdf4;
+  border: 2.5px solid var(--primary);
+  border-radius: 14px;
+  font-family: inherit;
+  letter-spacing: 0.03em;
+}
+
+.elderly-phone-input:focus {
+  outline: none;
+  border-color: #dc2626;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.15);
+}
+
+.elderly-note-input {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--navy);
+  border: 1.5px solid #cbd5e1;
+  border-radius: 12px;
+  font-family: inherit;
+}
+
+.seat-quick-pills {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.seat-pill-btn {
+  padding: 11px 8px;
+  border-radius: 12px;
+  border: 2px solid #cbd5e1;
+  background: var(--white);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--slate);
+  cursor: pointer;
+  text-align: center;
+  line-height: 1.25;
+}
+
+.seat-pill-btn strong {
+  display: block;
+  font-size: 0.96rem;
+  color: var(--navy);
+}
+
+.seat-pill-btn.active {
+  border-color: var(--primary);
+  background: #dcfce7;
+  color: #166534;
+}
+
+.btn-pickup-submit {
+  width: 100%;
+  padding: 16px 20px;
+  border-radius: 16px;
+  border: none;
+  background: linear-gradient(135deg, #dc2626 0%, #ea580c 100%);
+  color: var(--white);
+  font-family: inherit;
+  font-size: 1.18rem;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(220, 38, 38, 0.38);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  margin-top: 6px;
+}
+
+.btn-pickup-submit small {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #fef08a;
+}
+
+.pickup-success-box {
+  display: none;
+  text-align: center;
+  padding: 8px 4px;
+}
+
+.pickup-success-box.active {
+  display: block;
+}
+
+.pickup-success-icon {
+  font-size: 3.1rem;
+  line-height: 1;
+  margin-bottom: 10px;
+}
+
+.pickup-success-box h4 {
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: #15803d;
+  margin-bottom: 8px;
+}
+
+.pickup-success-box p {
+  font-size: 1rem;
+  color: var(--navy);
+  font-weight: 600;
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+
+.pickup-backup-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.float-pickup-me {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  border: 1.5px solid #fde047;
+  color: #fde047 !important;
+}
+
+.float-pickup-me small {
+  color: #ffffff;
+}
+
+

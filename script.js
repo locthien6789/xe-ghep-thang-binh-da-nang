@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 2. INTERACTIVE BOOKING & INSTANT PRICE CALCULATOR V3.0 (WITH SMART UPSELL + GPS ZALO)
+  // 2. INTERACTIVE BOOKING & INSTANT PRICE CALCULATOR V4.0
   let currentDirection = 'Thăng Bình ➔ Đà Nẵng';
   const dirTabs = document.querySelectorAll('.dir-tab');
   const pickupSelect = document.getElementById('booking-pickup');
@@ -141,7 +141,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (el) el.addEventListener('change', updateQuote);
   });
 
-  // Quick-select service from Ecosystem Cards (#dich-vu)
   const quickServiceBtns = document.querySelectorAll('.js-select-service');
   quickServiceBtns.forEach((btn) => {
     btn.addEventListener('click', (e) => {
@@ -158,103 +157,447 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Build booking summary text
-  const buildBookingMessage = (gpsUrl = '') => {
+  const buildBookingMessage = (gpsUrl = '', customerPhone = '') => {
     const pickupText = pickupSelect?.options[pickupSelect.selectedIndex]?.text || 'Thăng Bình';
     const dropoffText = dropoffSelect?.options[dropoffSelect.selectedIndex]?.text || 'Đà Nẵng';
     const serviceText = serviceSelect?.options[serviceSelect.selectedIndex]?.text || 'Đi ghép 1 người (100K)';
     const timeText = timeSelect?.options[timeSelect.selectedIndex]?.text || 'Đi ngay (Đón sau 15 phút)';
     const priceText = quotePriceEl?.textContent || '100.000đ';
 
-    let msg = `Xin chào Nhà Xe Nghĩa Hà Lam (xeghepthangbinhdanang.vn)!\nTôi muốn đặt dịch vụ:\n- Lộ trình: ${currentDirection}\n- Điểm đón/trả 1: ${pickupText}\n- Điểm trả/đến 2: ${dropoffText}\n- Dịch vụ chọn: ${serviceText}\n- Chi phí dự kiến: ${priceText}\n- Thời gian: ${timeText}`;
-    if (gpsUrl) {
-      msg += `\n- Vị trí GPS đón thực tế: ${gpsUrl}`;
+    let msg = `📍 HÃY ĐÓN TÔI - Nhà Xe Nghĩa Hà Lam!\n`;
+    if (customerPhone) {
+      msg += `- SĐT liên hệ đón: ${customerPhone}\n`;
     }
-    msg += `\nVui lòng điều xe đón giúp tôi nhé!`;
+    msg += `- Lộ trình: ${currentDirection}\n- Điểm đón: ${pickupText}\n- Điểm đến: ${dropoffText}\n- Dịch vụ: ${serviceText} (${priceText})\n- Thời gian: ${timeText}`;
+    if (gpsUrl) {
+      msg += `\n- Bản đồ GPS chỗ tôi đứng: ${gpsUrl}`;
+    }
     return msg;
   };
 
   const zaloBtn1 = document.getElementById('btn-book-zalo-1');
   const zaloBtn2 = document.getElementById('btn-book-zalo-2');
 
-  const handleZaloBooking = (phone, gpsUrl = '') => {
-    const msg = buildBookingMessage(gpsUrl);
+  const handleDirectZalo = (phone) => {
+    const msg = buildBookingMessage();
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(msg).catch(() => {});
     }
-    try {
-      const pickupText = pickupSelect?.options[pickupSelect.selectedIndex]?.text || 'Thăng Bình';
-      const dropoffText = dropoffSelect?.options[dropoffSelect.selectedIndex]?.text || 'Đà Nẵng';
-      const serviceText = serviceSelect?.options[serviceSelect.selectedIndex]?.text || 'Đi ghép 1 người (100K)';
-      const nowTime = new Date().toTimeString().slice(0, 5);
-      const randId = Math.floor(300 + Math.random() * 699);
-      const saved = JSON.parse(localStorage.getItem('nghia_halam_web_orders') || '[]');
-      saved.unshift({
-        code: `#WEB-${randId}`,
-        time: nowTime,
-        customerPhone: gpsUrl ? `Khách Zalo + GPS (${phone})` : `Khách đặt Web Zalo (${phone})`,
-        route: `${pickupText} ➔ ${dropoffText}`,
-        service: serviceText,
-        fare: serviceText.includes('200') ? 200000 : serviceText.includes('300') ? 300000 : serviceText.includes('400') || serviceText.includes('Bao') ? 400000 : 100000,
-        fee: 15000,
-        driverId: 'XE-01',
-        driverName: 'Anh Nghĩa (Xe Chủ Lực)',
-        refunded: false
-      });
-      localStorage.setItem('nghia_halam_web_orders', JSON.stringify(saved.slice(0, 20)));
-    } catch (e) {}
     if (typeof window.gtag === 'function') {
       window.gtag('event', 'generate_lead', {
-        event_category: gpsUrl ? 'share_gps_zalo' : 'zalo_booking_submit',
+        event_category: 'zalo_booking_submit',
         event_label: phone,
         value: 100000,
         currency: 'VND'
       });
     }
-    alert(
-      `Đã sao chép thông tin đặt xe của anh/chị:\n\n"${msg}"\n\nBấm OK để mở Zalo Nhà Xe Nghĩa Hà Lam (${phone}) và dán (Paste) tin nhắn nhé!`
-    );
     window.open(`https://zalo.me/${phone}`, '_blank', 'noopener');
   };
 
-  if (zaloBtn1) {
-    zaloBtn1.addEventListener('click', () => handleZaloBooking('0896211296'));
+  if (zaloBtn1) zaloBtn1.addEventListener('click', () => handleDirectZalo('0896211296'));
+  if (zaloBtn2) zaloBtn2.addEventListener('click', () => handleDirectZalo('0386400800'));
+
+  // =========================================================================
+  // 3. ELDERLY-FRIENDLY "📍 HÃY ĐÓN TÔI (GỬI SĐT + VỊ TRÍ)" ENGINE
+  //    100% COMPATIBLE WITH ANDROID & iOS (iPHONE SAFARI / ZALO WEBVIEW)
+  // =========================================================================
+  let capturedGps = {
+    lat: null,
+    lng: null,
+    accuracy: null,
+    mapsUrl: '',
+    status: 'idle' // idle | loading | success | fallback
+  };
+
+  const detectDeviceName = () => {
+    const ua = navigator.userAgent || '';
+    if (/iPhone|iPad|iPod/i.test(ua)) return 'iPhone / iOS';
+    if (/Android/i.test(ua)) return 'Điện thoại Android';
+    return 'Điện thoại / Máy tính';
+  };
+
+  const buildSmsHref = (targetPhone, bodyText) => {
+    const ua = navigator.userAgent || '';
+    const isIOS = /iPhone|iPad|iPod/i.test(ua);
+    const sep = isIOS ? '&' : '?';
+    return `sms:${targetPhone}${sep}body=${encodeURIComponent(bodyText)}`;
+  };
+
+  // Inject Modal HTML into body so all 6 pages share the exact same experience
+  const injectPickupMeModal = () => {
+    if (document.getElementById('pickup-me-modal')) return;
+
+    const modalHtml = `
+      <div id="pickup-me-modal" class="pickup-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="pickup-modal-title">
+        <div class="pickup-modal-card">
+          <div class="pickup-modal-header">
+            <div>
+              <h3 id="pickup-modal-title">📍 HÃY ĐÓN TÔI TẠI ĐÂY</h3>
+              <p>Chỉ cần nhập Số Điện Thoại – Tài xế gọi lại đón ngay sau 1 phút!</p>
+            </div>
+            <button type="button" id="btn-close-pickup-modal" class="btn-close-pickup" aria-label="Đóng">✕</button>
+          </div>
+
+          <div class="pickup-modal-body">
+            <!-- FORM STEP -->
+            <div id="pickup-form-step">
+              <div id="gps-status-banner" class="gps-live-banner loading">
+                <span>📡</span>
+                <div id="gps-status-text">
+                  Đang lấy vị trí của cô/chú trên bản đồ...<br />
+                  <small>(Vui lòng bấm <strong>"Cho phép / Allow"</strong> nếu điện thoại hỏi)</small>
+                </div>
+              </div>
+
+              <div class="elderly-field-group">
+                <label for="elderly-phone-input">📞 1. Nhập Số Điện Thoại của Cô/Chú (Bắt buộc):</label>
+                <input
+                  type="tel"
+                  id="elderly-phone-input"
+                  class="elderly-phone-input"
+                  inputmode="numeric"
+                  autocomplete="tel"
+                  placeholder="Ví dụ: 0905 123 456"
+                  maxlength="15"
+                />
+              </div>
+
+              <div class="elderly-field-group">
+                <label>🚘 2. Chọn Số Người Đi (1 người = 100K):</label>
+                <div class="seat-quick-pills" id="modal-seat-pills">
+                  <button type="button" class="seat-pill-btn active" data-service="Đi ghép 1 người (100K)" data-fare="100000">
+                    <strong>1 Người</strong>
+                    <span>100.000đ</span>
+                  </button>
+                  <button type="button" class="seat-pill-btn" data-service="Đi ghép 2 người (200K)" data-fare="200000">
+                    <strong>2 Người</strong>
+                    <span>200.000đ</span>
+                  </button>
+                  <button type="button" class="seat-pill-btn" data-service="Bao nguyên xe riêng (350K–600K)" data-fare="400000">
+                    <strong>Bao Xe Riêng</strong>
+                    <span>350K–600K</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="elderly-field-group">
+                <label for="elderly-note-input">🏠 3. Ghi chú điểm đón (Không bắt buộc):</label>
+                <input
+                  type="text"
+                  id="elderly-note-input"
+                  class="elderly-note-input"
+                  placeholder="VD: Cổng BV Đa Khoa, Ngã 3 Bình Quý, Chợ Hà Lam..."
+                />
+              </div>
+
+              <button type="button" id="btn-submit-pickup-me" class="btn-pickup-submit">
+                <span>🚕 BẤM GỬI: HÃY ĐÓN TÔI NGAY!</span>
+                <small>Gửi SĐT + Vị trí bản đồ về thẳng Tổng đài 0896.211.296</small>
+              </button>
+            </div>
+
+            <!-- SUCCESS STEP (SYNCHRONOUS 1-TAP BACKUPS FOR iOS & ANDROID) -->
+            <div id="pickup-success-step" class="pickup-success-box">
+              <div class="pickup-success-icon">✅</div>
+              <h4>ĐÃ GỬI YÊU CẦU ĐÓN THÀNH CÔNG!</h4>
+              <p id="pickup-success-summary">
+                Nhà Xe Nghĩa Hà Lam đã nhận được Số điện thoại và vị trí của cô/chú. Tài xế gần nhất sẽ gọi lại ngay trong <strong>1 – 2 phút</strong>!
+              </p>
+
+              <div class="pickup-backup-actions">
+                <a href="tel:0896211296" class="btn btn-call-primary btn-xl" style="width:100%;justify-content:center;">
+                  📞 Gọi Luôn Tổng Đài: 0896.211.296
+                </a>
+                <a id="btn-backup-sms" href="sms:0896211296" class="btn btn-call-secondary" style="width:100%;justify-content:center;padding:13px;">
+                  ✉️ Gửi Thêm Tin Nhắn SMS Tọa Độ (1-Chạm)
+                </a>
+                <button type="button" id="btn-backup-zalo" class="btn btn-zalo" style="width:100%;justify-content:center;padding:13px;">
+                  💬 Mở Zalo Nhà Xe (Đã Copy Sẵn Vị Trí)
+                </button>
+                <button type="button" id="btn-reset-pickup-modal" class="btn" style="background:#f1f5f9;color:#334155;width:100%;">
+                  ← Đóng cửa sổ
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+  };
+
+  injectPickupMeModal();
+
+  // Upgrade all existing GPS buttons to say "📍 HÃY ĐÓN TÔI (Gửi SĐT & Vị Trí)"
+  document.querySelectorAll('.js-share-gps').forEach((btn) => {
+    if (!btn.classList.contains('btn-xl')) {
+      btn.innerHTML = '📍 HÃY ĐÓN TÔI (Gửi SĐT & Vị Trí)';
+    }
+  });
+
+  // Also upgrade the middle button of the Mobile Sticky Bottom Bar so elderly users can tap "📍 HÃY ĐÓN TÔI" from anywhere!
+  const floatingBarInner = document.querySelector('.floating-bar-inner');
+  if (floatingBarInner) {
+    const secondFloatBtn = floatingBarInner.querySelector('.float-call-2');
+    if (secondFloatBtn) {
+      secondFloatBtn.outerHTML = `
+        <button type="button" class="float-btn float-pickup-me js-share-gps" data-phone="0896211296" style="border:1.5px solid #fde047;cursor:pointer;font-family:inherit;">
+          <span>📍 HÃY ĐÓN TÔI</span>
+          <small>Gửi SĐT + Vị Trí</small>
+        </button>
+      `;
+    }
   }
-  if (zaloBtn2) {
-    zaloBtn2.addEventListener('click', () => handleZaloBooking('0386400800'));
-  }
 
-  // 2B. 1-TAP GPS LOCATION SHARE VIA ZALO (FOR ELDERLY & ALLEY PICKUPS)
-  const gpsButtons = document.querySelectorAll('.js-share-gps');
-  gpsButtons.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const targetPhone = btn.getAttribute('data-phone') || '0896211296';
-      const originalText = btn.innerHTML;
+  const modalEl = document.getElementById('pickup-me-modal');
+  const closeBtn = document.getElementById('btn-close-pickup-modal');
+  const resetBtn = document.getElementById('btn-reset-pickup-modal');
+  const gpsBanner = document.getElementById('gps-status-banner');
+  const gpsText = document.getElementById('gps-status-text');
+  const phoneInput = document.getElementById('elderly-phone-input');
+  const noteInput = document.getElementById('elderly-note-input');
+  const seatPills = document.querySelectorAll('#modal-seat-pills .seat-pill-btn');
+  const submitPickupBtn = document.getElementById('btn-submit-pickup-me');
+  const formStep = document.getElementById('pickup-form-step');
+  const successStep = document.getElementById('pickup-success-step');
+  const successSummary = document.getElementById('pickup-success-summary');
+  const backupSmsBtn = document.getElementById('btn-backup-sms');
+  const backupZaloBtn = document.getElementById('btn-backup-zalo');
 
-      if (!navigator.geolocation) {
-        handleZaloBooking(targetPhone, 'Khách sẽ gửi ghim vị trí trực tiếp trong Zalo');
-        return;
-      }
+  let selectedModalService = 'Đi ghép 1 người (100K)';
+  let selectedModalFare = 100000;
+  let lastSubmittedMsg = '';
 
-      btn.innerHTML = '⏳ Đang lấy tọa độ GPS...';
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          btn.innerHTML = originalText;
-          const lat = pos.coords.latitude.toFixed(6);
-          const lng = pos.coords.longitude.toFixed(6);
-          const mapsUrl = `https://maps.google.com/?q=${lat},${lng}`;
-          handleZaloBooking(targetPhone, mapsUrl);
-        },
-        () => {
-          btn.innerHTML = originalText;
-          handleZaloBooking(targetPhone, 'Nhờ tổng đài hướng dẫn bấm nút Gửi Vị Trí trong Zalo');
-        },
-        { enableHighAccuracy: true, timeout: 6000, maximumAge: 60000 }
-      );
+  // Pre-fill saved phone number for returning customers
+  try {
+    const savedPhone = localStorage.getItem('nghia_halam_customer_phone');
+    if (savedPhone && phoneInput) {
+      phoneInput.value = savedPhone;
+    }
+  } catch (e) {}
+
+  seatPills.forEach((pill) => {
+    pill.addEventListener('click', () => {
+      seatPills.forEach((p) => p.classList.remove('active'));
+      pill.classList.add('active');
+      selectedModalService = pill.getAttribute('data-service') || 'Đi ghép 1 người (100K)';
+      selectedModalFare = parseInt(pill.getAttribute('data-fare') || '100000', 10);
     });
   });
 
-  // 3. FAQ ACCORDION
+  const requestGpsSynchronously = () => {
+    if (!navigator.geolocation) {
+      capturedGps.status = 'fallback';
+      if (gpsBanner && gpsText) {
+        gpsBanner.className = 'gps-live-banner fallback';
+        gpsText.innerHTML =
+          '🟡 <strong>Điện thoại chưa bật định vị GPS:</strong> Không sao cả! Cô/chú chỉ cần nhập <strong>Số Điện Thoại</strong> bên dưới, tài xế sẽ gọi lại hỏi điểm đón ngay!';
+      }
+      return;
+    }
+
+    capturedGps.status = 'loading';
+    if (gpsBanner && gpsText) {
+      gpsBanner.className = 'gps-live-banner loading';
+      gpsText.innerHTML =
+        '📡 Đang xác định vị trí của cô/chú trên bản đồ...<br/><small>(Hãy bấm <strong>"Cho phép / Allow"</strong> nếu điện thoại hỏi)</small>';
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude.toFixed(6);
+        const lng = pos.coords.longitude.toFixed(6);
+        const acc = Math.round(pos.coords.accuracy || 15);
+        const url = `https://www.google.com/maps?q=${lat},${lng}`;
+        capturedGps = {
+          lat: parseFloat(lat),
+          lng: parseFloat(lng),
+          accuracy: acc,
+          mapsUrl: url,
+          status: 'success'
+        };
+        if (gpsBanner && gpsText) {
+          gpsBanner.className = 'gps-live-banner success';
+          gpsText.innerHTML = `🟢 <strong>Đã ghim đúng vị trí của cô/chú!</strong> (Sai số ~${acc}m) • <a href="${url}" target="_blank" rel="noopener" style="text-decoration:underline;font-weight:900;">Xem bản đồ ↗</a>`;
+        }
+      },
+      () => {
+        capturedGps.status = 'fallback';
+        if (gpsBanner && gpsText) {
+          gpsBanner.className = 'gps-live-banner fallback';
+          gpsText.innerHTML =
+            '🟡 <strong>Chưa bật vị trí GPS:</strong> Không sao cả! Cô/chú chỉ cần nhập <strong>Số Điện Thoại</strong> bên dưới, nhà xe sẽ gọi lại đón ngay!';
+        }
+      },
+      { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+    );
+  };
+
+  const openPickupMeModal = () => {
+    if (!modalEl) return;
+    if (formStep) formStep.style.display = 'block';
+    if (successStep) successStep.classList.remove('active');
+    modalEl.classList.add('open');
+
+    // Trigger GPS immediately inside the synchronous user click gesture (works on iOS Safari & Android!)
+    requestGpsSynchronously();
+
+    setTimeout(() => {
+      if (phoneInput && !phoneInput.value) {
+        phoneInput.focus();
+      }
+    }, 150);
+  };
+
+  const closePickupMeModal = () => {
+    if (modalEl) modalEl.classList.remove('open');
+  };
+
+  if (closeBtn) closeBtn.addEventListener('click', closePickupMeModal);
+  if (resetBtn) resetBtn.addEventListener('click', closePickupMeModal);
+  if (modalEl) {
+    modalEl.addEventListener('click', (e) => {
+      if (e.target === modalEl) closePickupMeModal();
+    });
+  }
+
+  // Bind all ".js-share-gps" buttons (including the newly injected sticky bar button)
+  document.querySelectorAll('.js-share-gps').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      openPickupMeModal();
+    });
+  });
+
+  // Handle Form Submission inside "📍 HÃY ĐÓN TÔI" Modal
+  if (submitPickupBtn) {
+    submitPickupBtn.addEventListener('click', async () => {
+      const rawPhone = (phoneInput?.value || '').trim();
+      const cleanDigits = rawPhone.replace(/\D/g, '');
+
+      if (cleanDigits.length < 9 || cleanDigits.length > 12) {
+        alert('Cô/chú vui lòng nhập đúng Số Điện Thoại (10 số) để tài xế gọi lại đón nhé!');
+        if (phoneInput) phoneInput.focus();
+        return;
+      }
+
+      // Save customer phone for future 1-tap use
+      try {
+        localStorage.setItem('nghia_halam_customer_phone', rawPhone);
+      } catch (e) {}
+
+      const pickupVal = pickupSelect?.options[pickupSelect.selectedIndex]?.text || 'Thăng Bình';
+      const dropoffVal = dropoffSelect?.options[dropoffSelect.selectedIndex]?.text || 'Đà Nẵng';
+      const noteVal = (noteInput?.value || '').trim();
+      const pickupCombined = noteVal ? `${noteVal} (${pickupVal})` : pickupVal;
+
+      const payload = {
+        phone: rawPhone,
+        serviceText: selectedModalService,
+        pickupText: capturedGps.mapsUrl ? `📍 Vị trí GPS khách đứng (${pickupCombined})` : pickupCombined,
+        dropoffText: dropoffVal,
+        note: noteVal,
+        lat: capturedGps.lat,
+        lng: capturedGps.lng,
+        accuracy: capturedGps.accuracy,
+        mapsUrl: capturedGps.mapsUrl,
+        device: detectDeviceName(),
+        fare: selectedModalFare
+      };
+
+      submitPickupBtn.disabled = true;
+      const origHtml = submitPickupBtn.innerHTML;
+      submitPickupBtn.innerHTML = '<span>⏳ ĐANG GỬI VỀ TỔNG ĐÀI...</span>';
+
+      let serverOrderCode = `#DON-${Math.floor(100 + Math.random() * 899)}`;
+
+      try {
+        const resp = await fetch('/api/pickup-request', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (resp.ok) {
+          const data = await resp.json();
+          if (data && data.order && data.order.code) {
+            serverOrderCode = data.order.code;
+          }
+        }
+      } catch (err) {
+        // Fallback if offline
+      }
+
+      // Also save to localStorage for local browser sync
+      try {
+        const nowTime = new Date().toTimeString().slice(0, 5);
+        const saved = JSON.parse(localStorage.getItem('nghia_halam_web_orders') || '[]');
+        saved.unshift({
+          code: serverOrderCode,
+          time: nowTime,
+          customerPhone: rawPhone,
+          route: `${payload.pickupText} ➔ ${payload.dropoffText}`,
+          service: selectedModalService,
+          mapsUrl: capturedGps.mapsUrl,
+          fare: selectedModalFare,
+          fee: selectedModalFare >= 350000 ? 45000 : 15000,
+          driverId: 'XE-01',
+          driverName: 'Anh Nghĩa (Xe Chủ Lực)',
+          refunded: false
+        });
+        localStorage.setItem('nghia_halam_web_orders', JSON.stringify(saved.slice(0, 30)));
+      } catch (e) {}
+
+      // Fire GA4 conversion event
+      if (typeof window.gtag === 'function') {
+        window.gtag('event', 'generate_lead', {
+          event_category: 'pickup_me_submit',
+          event_label: rawPhone,
+          value: selectedModalFare,
+          currency: 'VND'
+        });
+      }
+
+      // Build SMS & Zalo backup text
+      lastSubmittedMsg =
+        `📍 HÃY ĐÓN TÔI (${serverOrderCode})\n` +
+        `- SĐT khách: ${rawPhone}\n` +
+        `- Dịch vụ: ${selectedModalService}\n` +
+        `- Đón tại: ${payload.pickupText}\n` +
+        (capturedGps.mapsUrl ? `- Bản đồ GPS: ${capturedGps.mapsUrl}\n` : '') +
+        `Nhờ nhà xe Nghĩa Hà Lam gọi lại đón giúp tôi!`;
+
+      if (backupSmsBtn) {
+        backupSmsBtn.setAttribute('href', buildSmsHref('0896211296', lastSubmittedMsg));
+      }
+
+      if (successSummary) {
+        successSummary.innerHTML =
+          `Mã yêu cầu: <strong style="color:#dc2626">${serverOrderCode}</strong> • SĐT: <strong>${rawPhone}</strong><br/>` +
+          (capturedGps.mapsUrl
+            ? `🟢 <strong>Đã đính kèm tọa độ Google Maps chính xác chỗ cô/chú đang đứng!</strong><br/>`
+            : '') +
+          `Tổng đài Nhà Xe Nghĩa Hà Lam đã nhận thông tin và sẽ <strong>gọi điện lại cho cô/chú trong 1 – 2 phút</strong> nữa!`;
+      }
+
+      submitPickupBtn.disabled = false;
+      submitPickupBtn.innerHTML = origHtml;
+
+      if (formStep) formStep.style.display = 'none';
+      if (successStep) successStep.classList.add('active');
+    });
+  }
+
+  // Synchronous Zalo backup button on confirmation screen (100% iOS Safari compliant!)
+  if (backupZaloBtn) {
+    backupZaloBtn.addEventListener('click', () => {
+      if (navigator.clipboard && navigator.clipboard.writeText && lastSubmittedMsg) {
+        navigator.clipboard.writeText(lastSubmittedMsg).catch(() => {});
+      }
+      window.open('https://zalo.me/0896211296', '_blank', 'noopener');
+    });
+  }
+
+  // 4. FAQ ACCORDION
   const faqItems = document.querySelectorAll('.faq-item');
   faqItems.forEach((item) => {
     const btn = item.querySelector('.faq-question');
@@ -269,10 +612,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Initialize quote on load
   updateQuote();
 
-  // 4. GA4 LEAD CONVERSION TRACKING (G-79KC9WN1F0)
+  // 5. GA4 LEAD CONVERSION TRACKING (G-79KC9WN1F0)
   document.querySelectorAll('a[href^="tel:"]').forEach((link) => {
     link.addEventListener('click', () => {
       if (typeof window.gtag === 'function') {

@@ -156,7 +156,10 @@ document.addEventListener('DOMContentLoaded', () => {
         (o, idx) => `
       <tr>
         <td><strong style="color:#fde047">${o.code}</strong><br><small>${o.time}</small></td>
-        <td><strong>${o.customerPhone}</strong></td>
+        <td>
+          <strong><a href="tel:${o.phoneClean || o.customerPhone}" style="color:#38bdf8;text-decoration:underline;">📞 ${o.customerPhone}</a></strong>
+          ${o.mapsUrl ? `<br><a href="${o.mapsUrl}" target="_blank" rel="noopener" style="color:#34d399;font-size:0.78rem;font-weight:800;">🗺️ Mở Bản Đồ GPS ↗</a>` : ''}
+        </td>
         <td>${o.route}</td>
         <td>${o.service}</td>
         <td><strong style="color:#fff">${formatVND(o.fare)}</strong></td>
@@ -632,4 +635,147 @@ document.addEventListener('DOMContentLoaded', () => {
   renderFullFleetTable();
   renderCurrentOrder(false);
   startCountdown();
+
+  // =====================================================================
+  // 5. REAL-TIME POLLING OF "📍 HÃY ĐÓN TÔI" PICKUP REQUESTS FROM VPS API
+  // =====================================================================
+  const livePickupListEl = document.getElementById('live-pickup-list');
+  const livePickupCounterEl = document.getElementById('live-pickup-counter');
+  let knownServerOrderIds = new Set();
+  let isFirstLoad = true;
+
+  const playAlertChime = () => {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, ctx.currentTime);
+      osc.frequency.setValueAtTime(1174.66, ctx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0.18, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.55);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.55);
+    } catch (e) {}
+  };
+
+  const fetchServerPickups = async () => {
+    try {
+      const resp = await fetch('/api/pickup-requests?t=' + Date.now(), { cache: 'no-store' });
+      if (!resp.ok) return;
+      const data = await resp.json();
+      if (!data || !Array.isArray(data.orders)) return;
+
+      const serverOrders = data.orders;
+      let hasNewOrder = false;
+
+      serverOrders.forEach((srvOrder) => {
+        if (!knownServerOrderIds.has(srvOrder.id)) {
+          knownServerOrderIds.add(srvOrder.id);
+          if (!isFirstLoad) {
+            hasNewOrder = true;
+            addLog(
+              `🚨 <strong>KHÁCH BẤM "📍 HÃY ĐÓN TÔI" (${srvOrder.code}):</strong> SĐT <strong>${srvOrder.phone}</strong> • ${srvOrder.service} • ${srvOrder.mapsUrl ? `<a href="${srvOrder.mapsUrl}" target="_blank" style="color:#fde047;text-decoration:underline;">Mở Bản Đồ GPS ↗</a>` : srvOrder.pickup}`
+            );
+          }
+          // Sync into ordersHistory if not already present
+          if (!ordersHistory.some((o) => o.code === srvOrder.code)) {
+            ordersHistory.unshift({
+              code: srvOrder.code,
+              time: srvOrder.time,
+              customerPhone: srvOrder.phone,
+              phoneClean: srvOrder.phoneClean,
+              route: srvOrder.route,
+              service: srvOrder.service,
+              mapsUrl: srvOrder.mapsUrl,
+              fare: srvOrder.fare || 100000,
+              fee: srvOrder.fee || 15000,
+              driverId: srvOrder.driverId || 'XE-01',
+              driverName: srvOrder.driverName || 'Anh Nghĩa (Xe Chủ Lực)',
+              refunded: Boolean(srvOrder.refunded)
+            });
+          }
+        }
+      });
+
+      if (hasNewOrder) {
+        playAlertChime();
+        renderOrdersTable();
+      } else if (isFirstLoad && serverOrders.length > 0) {
+        renderOrdersTable();
+      }
+      isFirstLoad = false;
+
+      if (livePickupCounterEl) {
+        livePickupCounterEl.textContent = `🟢 ${serverOrders.length} Yêu Cầu Đón Thực Tế`;
+      }
+
+      if (livePickupListEl && serverOrders.length > 0) {
+        livePickupListEl.innerHTML = serverOrders
+          .slice(0, 6)
+          .map(
+            (item) => `
+            <div style="background:rgba(15,23,42,0.92);border:1.5px solid ${item.hasGps ? '#34d399' : '#fde047'};border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <strong style="color:#fde047;font-size:0.95rem;">${item.code} • 🕒 ${item.time}</strong>
+                <span style="font-size:0.75rem;background:rgba(52,211,153,0.18);color:#34d399;padding:2px 8px;border-radius:999px;font-weight:700;">${item.device || 'Mobile'}</span>
+              </div>
+              <div style="font-size:1.1rem;font-weight:900;">
+                <a href="tel:${item.phoneClean || item.phone}" style="color:#38bdf8;text-decoration:underline;">📞 Gọi Khách: ${item.phone}</a>
+              </div>
+              <div style="font-size:0.82rem;color:#cbd5e1;">
+                <strong>Dịch vụ:</strong> ${item.service} (${formatVND(item.fare || 100000)})<br/>
+                <strong>Đón:</strong> ${item.pickup}
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">
+                ${
+                  item.mapsUrl
+                    ? `<a href="${item.mapsUrl}" target="_blank" rel="noopener" class="btn-topup" style="border-color:#34d399;color:#34d399;font-weight:800;">🗺️ Mở Bản Đồ Chỗ Khách Đứng ↗</a>`
+                    : `<span style="font-size:0.76rem;color:#fde047;">🟡 Khách gửi SĐT (Chưa bật GPS)</span>`
+                }
+                <button type="button" class="btn-topup js-dispatch-pickup" data-code="${item.code}" style="border-color:#fde047;color:#fde047;font-weight:800;">
+                  ⚡ Bắn Cuốc Cho Tài Xế
+                </button>
+              </div>
+            </div>
+          `
+          )
+          .join('');
+
+        livePickupListEl.querySelectorAll('.js-dispatch-pickup').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const targetCode = btn.getAttribute('data-code');
+            const found = serverOrders.find((x) => x.code === targetCode);
+            if (!found) return;
+            currentOrder = {
+              code: found.code,
+              customerPhoneMasked: found.phone,
+              customerPhoneFull: found.phone,
+              queue: found.pickup.toLowerCase().includes('bệnh viện') || found.pickup.toLowerCase().includes('sân bay') ? 'DN' : 'TB',
+              directionText: found.route,
+              pickup: found.mapsUrl ? `${found.pickup} (Có ghim GPS)` : found.pickup,
+              dropoff: found.dropoff,
+              serviceName: found.service,
+              seatsNeeded: found.fare === 200000 ? 2 : 1,
+              isCharter: found.fare >= 350000,
+              totalFare: found.fare || 100000,
+              commissionFee: found.fee || 15000,
+              driverNet: (found.fare || 100000) - (found.fee || 15000),
+              timeNote: 'Khách bấm 📍 HÃY ĐÓN TÔI'
+            };
+            renderCurrentOrder(true);
+            startCountdown();
+            addLog(`⚡ Admin vừa nạp yêu cầu <strong>${found.code} (SĐT: ${found.phone})</strong> vào bộ chia xe tự động!`);
+          });
+        });
+      }
+    } catch (e) {}
+  };
+
+  fetchServerPickups();
+  setInterval(fetchServerPickups, 5000);
 });

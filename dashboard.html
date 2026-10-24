@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="dieu-phoi.css" />
+  <link rel="stylesheet" href="dieu-phoi.css?v=4.0" />
 </head>
 <body>
 
@@ -144,6 +144,19 @@
            TAB 1: LIVE AI DISPATCH WORKSPACE
            =================================================== -->
       <div id="tab-dispatch" class="db-tab-view active">
+        <!-- LIVE "📍 HÃY ĐÓN TÔI" REAL-TIME PICKUP ALERTS FROM VPS -->
+        <div class="dp-panel" style="margin: 14px 20px 0; border: 1.5px solid #fde047; background: linear-gradient(90deg, rgba(16,185,129,0.12) 0%, rgba(15,23,42,0.95) 100%);">
+          <div class="panel-title-row" style="margin-bottom: 10px;">
+            <h2>📍 Yêu Cầu "HÃY ĐÓN TÔI" (SĐT + Định Vị GPS Thực Tế Khách Vừa Bấm Trên Điện Thoại)</h2>
+            <span class="badge-live" id="live-pickup-counter">🟢 Tự động đồng bộ mỗi 5s</span>
+          </div>
+          <div id="live-pickup-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 10px;">
+            <div style="font-size: 0.85rem; color: #94a3b8; padding: 6px 0;">
+              Đang chờ khách bấm nút <strong>"📍 HÃY ĐÓN TÔI"</strong> trên điện thoại (Android / iPhone)... Khi khách bấm, SĐT + Bản đồ GPS sẽ nhảy lên đây kèm chuông báo!
+            </div>
+          </div>
+        </div>
+
         <main class="dp-workspace">
 
           <!-- COLUMN 1: AI VOICEBOT & CALL NLP EXTRACTOR -->
@@ -433,6 +446,6 @@
     </div>
   </div>
 
-  <script src="dieu-phoi.js"></script>
+  <script src="dieu-phoi.js?v=4.0"></script>
 </body>
 </html>
