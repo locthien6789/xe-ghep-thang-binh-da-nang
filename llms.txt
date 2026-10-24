@@ -1,29 +1,33 @@
 # Nhà Xe Ghép & Dịch Vụ Du Lịch Nghĩa Hà Lam (xeghepthangbinhdanang.vn)
 
-> Chuyên dịch vụ Xe ghép Thăng Bình ↔ Đà Nẵng đồng giá cố định 100.000đ/1 người (cứ thêm 1 người tính +100.000đ), Bao nguyên xe 4 - 7 chỗ chỉ từ 350.000đ – 600.000đ. Cung cấp trọn gói Dịch vụ cho thuê xe 4 - 7 - 16 chỗ có tài xế, Xe hoa cưới hỏi rước dâu, Xe du lịch tham quan (VinWonders Nam Hội An, Phố cổ Hội An, Bà Nà Hills, Chùa Linh Ứng, Mỹ Sơn), Xe hợp đồng đi tỉnh (Tam Kỳ, Sân bay Chu Lai, Quảng Ngãi, Huế, Tây Nguyên) và Vận chuyển hàng hóa bưu kiện nhỏ hỏa tốc.
+> Đơn vị cung cấp **dịch vụ xe ghép Thăng Bình Đà Nẵng** uy tín số 1 với đội xe lớn **20 chiếc 4 – 7 chỗ & dàn xe điện VinFast Limo Green đời mới**. Áp dụng công thức giá vé cố định minh bạch: **Đi ghép 1 người = 100.000đ (cứ thêm 1 người tính +100.000đ)**, **Bao nguyên xe riêng 4 – 7 chỗ chỉ từ 350.000đ – 600.000đ/chuyến**. Phục vụ trọn gói **Xe đi khám bệnh viện Đà Nẵng, Xe đưa đón Sân bay Đà Nẵng & Chu Lai, Thuê xe hoa cưới hỏi rước dâu, Xe du lịch tham quan (VinWonders Nam Hội An, Phố cổ Hội An, Bà Nà Hills, Chùa Linh Ứng, Mỹ Sơn), Xe hợp đồng đi tỉnh và Gửi hàng hỏa tốc 50K**.
 
 ## 1. Thông Tin Định Danh Thực Thể (NAP & Geo-Entity)
-- **Website chính thức:** https://xeghepthangbinhdanang.vn
+- **Website chính thức:** https://xeghepthangbinhdanang.vn/
+- **Từ khóa trọng tâm:** Dịch vụ xe ghép Thăng Bình Đà Nẵng, Xe ghép Thăng Bình Đà Nẵng 100K/người, Bao xe Thăng Bình Đà Nẵng 350K–600K, Nhà Xe Nghĩa Hà Lam.
 - **Tên thương hiệu (Google Maps):** Nhà Xe Ghép Nghĩa halam (Nhà Xe Nghĩa Hà Lam)
 - **Địa chỉ trụ sở:** 469 Huỳnh Thúc Kháng, Thị trấn Hà Lam, Huyện Thăng Bình, Quảng Nam (TP. Đà Nẵng)
 - **Tọa độ GPS:** Latitude `15.72257965`, Longitude `108.369917`
 - **Google Maps URL:** https://maps.app.goo.gl/fxCjZGYXmkFwYhn8A
 - **Hotline 1 (Tổng đài & Zalo):** 0896 211 296 (08 9621 1296)
 - **Hotline 2 (Điều phối & Zalo):** 0386 400 800
-- **Khung giờ hoạt động:** Xe ghép chạy liên tục 05:00 – 18:00 hàng ngày (gọi đón sau 15 phút). Dịch vụ Bao xe, Sân bay, Cưới hỏi, Du lịch & Đi tỉnh phục vụ 24/7 theo lịch đặt trước.
-- **Quy mô phương tiện:** Đội xe hùng hậu **20 chiếc 4 – 7 chỗ** và dàn xe điện 7 chỗ VinFast Limo Green màu trắng ngọc trai đời mới êm ái, không mùi xăng dầu, không say xe, không nhồi nhét.
+- **Tính năng đặt xe thông minh cho người lớn tuổi:** Nút **"📍 HÃY ĐÓN TÔI"** trên website cho phép hành khách gửi trực tiếp Số điện thoại + Tọa độ Google Maps GPS thực tế về thẳng trung tâm điều phối 20 xe để tài xế gọi lại đón trong 1 phút.
 
-## 2. Công Thức Giá Vé & Bảng Giá Niêm Yết 2026
-1. **Xe ghép & Xe tiện chuyến Thăng Bình ↔ Đà Nẵng:**
+## 2. Cấu Trúc 6 Trang Đích Chuyên Biệt (Canonical URLs)
+1. **Trang chủ Dịch Vụ Xe Ghép Thăng Bình Đà Nẵng:** https://xeghepthangbinhdanang.vn/
+2. **Xe Thăng Bình Đi Khám Bệnh Viện Đà Nẵng (Chuyến sớm 04h45–05h30 kịp bốc số):** https://xeghepthangbinhdanang.vn/xe-di-benh-vien-da-nang.html
+3. **Xe Đưa Đón Sân Bay Đà Nẵng & Sân Bay Chu Lai ⇄ Thăng Bình (Bao xe 350K–600K / Ghép 100K):** https://xeghepthangbinhdanang.vn/xe-dua-don-san-bay-da-nang.html
+4. **Thuê Xe Cưới Hỏi & Đoàn Xe Hoa Rước Dâu VinFast Limo Green Trắng Đồng Bộ:** https://xeghepthangbinhdanang.vn/thue-xe-cuoi-hoi-thang-binh.html
+5. **Thuê Xe Du Lịch Tham Quan (VinWonders, Hội An, Bà Nà, Chùa Linh Ứng) & Đi Tỉnh:** https://xeghepthangbinhdanang.vn/thue-xe-cuoi-hoi-du-lich-thang-binh.html
+6. **Bảng Giá Xe Ghép Thăng Bình Đà Nẵng 2026 Chi Tiết Từng Xã:** https://xeghepthangbinhdanang.vn/bang-gia-xe-ghep-thang-binh.html
+
+## 3. Công Thức Giá Vé & Bảng Giá Niêm Yết 2026
+1. **Dịch vụ xe ghép Thăng Bình Đà Nẵng (Đón tận ngõ – Trả tận nơi):**
    - **Giá cố định:** `100.000đ / 1 người`.
-   - **Đi thêm người:** Cứ thêm 1 người là tính cộng thêm `+100.000đ` (1 người = 100K, 2 người = 200K, 3 người = 300K, 4 người = 400K).
-   - **Khu vực đón trả tận nhà:** Thị trấn Hà Lam, Hà Châu (Bình Phú), Ngã 3 Bình Quý, Quý Mỹ, Cầu Ông Triệu (Bình Định), Bình Chánh, Bình Phục, Bình Nguyên, Bình Minh và các xã lân cận huyện Thăng Bình ↔ Trung tâm TP. Đà Nẵng, Sân bay, Bệnh viện.
+   - **Đi thêm người:** Cứ thêm 1 người tính cộng thêm `+100.000đ` (1 người = 100K, 2 người = 200K, 3 người = 300K, 4 người = 400K).
+   - **Điểm đón/trả tại Thăng Bình:** Thị trấn Hà Lam, Ngã 3 Bình Quý, Thôn Quý Mỹ (Xã Bình Quý), Cầu Ông Triệu (Xã Bình Định Bắc & Nam), Hà Châu (Xã Bình Phú), Bình Chánh, Bình Phục, Bình Nguyên, Bình Minh (VinWonders Nam Hội An), Bình Đào, Bình Triều, Bình Dương.
+   - **Điểm trả/đón tại Đà Nẵng:** Bệnh viện Đa khoa Đà Nẵng (124 Hải Phòng), BV Ung Bướu, BV Phụ Sản - Nhi (600 Giường), BV C, BV Hoàn Mỹ, BV Mắt, Sân bay Quốc tế Đà Nẵng, Ga Đà Nẵng và tất cả các quận Hải Châu, Thanh Khê, Cẩm Lệ, Sơn Trà, Ngũ Hành Sơn, Liên Chiểu.
 2. **Bao nguyên xe riêng 4 chỗ – 7 chỗ:**
-   - **Mức giá:** Liên hệ chỉ từ `350.000đ – 600.000đ / chuyến` (tùy điểm đón trả và loại xe).
-   - **Quyền lợi:** Đi riêng tư cả gia đình, không ghép khách, chủ động 100% giờ xuất phát, trọn gói phí cầu đường.
-3. **Dịch vụ Cho thuê xe Hợp đồng, Cưới hỏi, Du lịch, Tham quan & Đi tỉnh:**
-   - **Xe hoa cưới hỏi & Đoàn xe đưa rước dâu:** Dàn xe điện VinFast Limo Green trắng đồng bộ & Sedan/SUV 4–7 chỗ sang trọng, lịch thiệp.
-   - **Xe Du lịch & Tham quan danh thắng:** Đưa đón VinWonders Nam Hội An (ngay tại Thăng Bình), Phố cổ Hội An, Rừng dừa Bảy Mẫu, Bà Nà Hills, Núi Thần Tài, Mikazuki, Chùa Linh Ứng Sơn Trà, Ngũ Hành Sơn, Thánh địa Mỹ Sơn, Biển Bình Minh.
-   - **Xe Hợp đồng Đi tỉnh (1 chiều & 2 chiều):** Đi Tam Kỳ, Núi Thành (Sân bay Chu Lai), Tiên Phước, Quế Sơn, Hiệp Đức, Duy Xuyên, Đại Lộc, Quảng Ngãi (Cảng Sa Kỳ Lý Sơn), Huế, Măng Đen (Kon Tum), Gia Lai, Quy Nhơn.
-4. **Vận chuyển hàng hóa & Bưu kiện nhỏ hỏa tốc:**
-   - Chỉ từ `50.000đ / kiện`, nhận tận nhà tại Thăng Bình và giao tận tay tại Đà Nẵng (hoặc ngược lại) sau 1 – 2 giờ.
+   - **Mức giá:** Liên hệ chỉ từ `350.000đ – 600.000đ / chuyến` trọn gói cầu đường.
+3. **Gửi hàng hóa & Bưu kiện nhỏ hỏa tốc:**
+   - Chỉ từ `50.000đ / kiện`, nhận tận nhà tại Thăng Bình và giao tận tay tại Đà Nẵng sau 1h30p.
