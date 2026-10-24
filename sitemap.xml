@@ -3,30 +3,21 @@
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://xeghepthangbinhdanang.vn/</loc>
-    <lastmod>2026-10-21</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
+    <lastmod>2026-10-24</lastmod>
     <image:image>
       <image:loc>https://xeghepthangbinhdanang.vn/assets/images/xe-ghep-thang-binh-da-nang-100k-banner.jpg</image:loc>
-      <image:title>Xe ghép Thăng Bình Đà Nẵng giá vé 100K - Nhà Xe Nghĩa Hà Lam</image:title>
-      <image:caption>Tuyến Hà Châu - Ngã 3 Bình Quý - Cầu Ông Triệu - Quý Mỹ - Hà Lam đi Đà Nẵng giá 100K, Hotline 0896211296 - 0386400800</image:caption>
-      <image:geo_location>469 Huỳnh Thúc Kháng, Hà Lam, Thăng Bình, Đà Nẵng - Quảng Nam</image:geo_location>
     </image:image>
     <image:image>
       <image:loc>https://xeghepthangbinhdanang.vn/assets/images/xe-tien-chuyen-thang-binh-da-nang-vinfast.jpg</image:loc>
-      <image:title>Đội xe 20 chiếc 4-7 chỗ và xe điện VinFast Limo Green chạy tuyến Thăng Bình Đà Nẵng</image:title>
     </image:image>
     <image:image>
       <image:loc>https://xeghepthangbinhdanang.vn/assets/images/xe-ghep-ha-lam-thang-binh-43h-19845.jpg</image:loc>
-      <image:title>Đón khách tận nhà tại Hà Lam và các xã huyện Thăng Bình đi Đà Nẵng</image:title>
     </image:image>
     <image:image>
       <image:loc>https://xeghepthangbinhdanang.vn/assets/images/doi-xe-dien-limo-green-thang-binh-da-nang.jpg</image:loc>
-      <image:title>Đội xe điện VinFast Limo Green không mùi xăng dầu, không say xe</image:title>
     </image:image>
     <image:image>
       <image:loc>https://xeghepthangbinhdanang.vn/assets/images/hotline-xe-ghep-nghia-ha-lam-0896211296.jpg</image:loc>
-      <image:title>Hotline đặt xe ghép Thăng Bình Đà Nẵng đón sau 15 phút: 0896211296 - 0386400800</image:title>
     </image:image>
   </url>
 </urlset>

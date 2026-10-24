@@ -161,4 +161,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initialize quote on load
   updateQuote();
+
+  // 4. GA4 LEAD CONVERSION TRACKING (G-79KC9WN1F0)
+  document.querySelectorAll('a[href^="tel:"]').forEach((link) => {
+    link.addEventListener('click', () => {
+      if (typeof window.gtag === 'function') {
+        const phone = link.getAttribute('href').replace('tel:', '');
+        window.gtag('event', 'generate_lead', {
+          event_category: 'call_hotline',
+          event_label: phone,
+          value: 100000,
+          currency: 'VND'
+        });
+      }
+    });
+  });
+
+  document.querySelectorAll('a[href*="zalo.me"]').forEach((link) => {
+    link.addEventListener('click', () => {
+      if (typeof window.gtag === 'function') {
+        window.gtag('event', 'generate_lead', {
+          event_category: 'chat_zalo',
+          event_label: link.getAttribute('href'),
+          value: 100000,
+          currency: 'VND'
+        });
+      }
+    });
+  });
 });
