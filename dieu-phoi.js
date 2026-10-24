@@ -61,12 +61,17 @@ document.addEventListener('DOMContentLoaded', () => {
     { id: 'XE-20', name: 'Anh Việt Ngũ Hành Sơn', phone: '0905.238.991', type: 'Mazda 3 4C', queue: 'DN', loc: 'Ngũ Hành Sơn, Đà Nẵng', seats: 0, maxSeats: 4, wallet: 330000, trips: 2 }
   ];
 
-  // Initial Orders History List (Tab 2 CRM)
-  const ordersHistory = [
+  // Initial Orders History List (Tab 2 CRM) + Sync Web Bookings from localStorage
+  const defaultOrders = [
     { code: '#TB-205', time: '06:15', customerPhone: '0905.218.442', route: 'Thị trấn Hà Lam ➔ BV Đa khoa Đà Nẵng', service: 'Ghép 2 người (100K/người)', fare: 200000, fee: 30000, driverId: 'XE-02', driverName: 'Anh Tuấn Hà Lam', refunded: false },
     { code: '#TB-206', time: '06:30', customerPhone: '0935.881.109', route: 'Chợ Hà Châu ➔ Sân bay Đà Nẵng', service: 'Bao nguyên xe 7 chỗ', fare: 450000, fee: 45000, driverId: 'XE-05', driverName: 'Anh Khoa Hà Châu', refunded: false },
     { code: '#DN-207', time: '07:05', customerPhone: '0914.339.712', route: 'BV 600 Giường ĐN ➔ Cầu Ông Triệu', service: 'Ghép 1 người (100K/người)', fare: 100000, fee: 15000, driverId: 'XE-12', driverName: 'Anh Hải', refunded: false }
   ];
+  let webSavedOrders = [];
+  try {
+    webSavedOrders = JSON.parse(localStorage.getItem('nghia_halam_web_orders') || '[]');
+  } catch (e) {}
+  const ordersHistory = [...webSavedOrders, ...defaultOrders];
 
   // State counters
   let totalCallsToday = 142;
@@ -166,13 +171,28 @@ document.addEventListener('DOMContentLoaded', () => {
           ${
             o.refunded
               ? '<small style="color:#64748b">Đã xử lý</small>'
-              : `<button type="button" class="btn-topup js-refund-order" data-idx="${idx}">↩ Hoàn Phí Cò</button>`
+              : `<button type="button" class="btn-topup js-refund-order" data-idx="${idx}">↩ Hoàn Phí Cò</button>
+                 <button type="button" class="btn-topup js-remind-return" data-idx="${idx}" style="margin-top:4px;border-color:#38bdf8;color:#38bdf8;">💬 Nhắc Chiều Về</button>`
           }
         </td>
       </tr>
     `
       )
       .join('');
+
+    ordersTableBody.querySelectorAll('.js-remind-return').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const i = parseInt(btn.getAttribute('data-idx'), 10);
+        const order = ordersHistory[i];
+        if (!order) return;
+        const msg = `Dạ Nhà Xe Nghĩa Hà Lam (xeghepthangbinhdanang.vn) cảm ơn anh/chị (${order.customerPhone}) đã đặt chuyến ${order.route}! Anh/chị lưu số tổng đài 0896.211.296 nhé, lúc nào khám bệnh / công việc xong chỉ cần gọi trước 15 phút hoặc gửi định vị Zalo là có xe điện đón về tận nhà ngay ạ!`;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(msg).catch(() => {});
+        }
+        addLog(`💬 Đã sao chép tin nhắn <strong>Chăm sóc & Chốt chiều về (Khứ hồi)</strong> cho đơn <strong>${order.code} (${order.customerPhone})</strong>.`);
+        alert(`Đã sao chép tin nhắn chăm sóc khách & chốt chiều về:\n\n"${msg}"`);
+      });
+    });
 
     ordersTableBody.querySelectorAll('.js-refund-order').forEach((btn) => {
       btn.addEventListener('click', () => {

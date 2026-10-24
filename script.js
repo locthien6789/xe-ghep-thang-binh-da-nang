@@ -182,6 +182,27 @@ document.addEventListener('DOMContentLoaded', () => {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(msg).catch(() => {});
     }
+    try {
+      const pickupText = pickupSelect?.options[pickupSelect.selectedIndex]?.text || 'Thăng Bình';
+      const dropoffText = dropoffSelect?.options[dropoffSelect.selectedIndex]?.text || 'Đà Nẵng';
+      const serviceText = serviceSelect?.options[serviceSelect.selectedIndex]?.text || 'Đi ghép 1 người (100K)';
+      const nowTime = new Date().toTimeString().slice(0, 5);
+      const randId = Math.floor(300 + Math.random() * 699);
+      const saved = JSON.parse(localStorage.getItem('nghia_halam_web_orders') || '[]');
+      saved.unshift({
+        code: `#WEB-${randId}`,
+        time: nowTime,
+        customerPhone: gpsUrl ? `Khách Zalo + GPS (${phone})` : `Khách đặt Web Zalo (${phone})`,
+        route: `${pickupText} ➔ ${dropoffText}`,
+        service: serviceText,
+        fare: serviceText.includes('200') ? 200000 : serviceText.includes('300') ? 300000 : serviceText.includes('400') || serviceText.includes('Bao') ? 400000 : 100000,
+        fee: 15000,
+        driverId: 'XE-01',
+        driverName: 'Anh Nghĩa (Xe Chủ Lực)',
+        refunded: false
+      });
+      localStorage.setItem('nghia_halam_web_orders', JSON.stringify(saved.slice(0, 20)));
+    } catch (e) {}
     if (typeof window.gtag === 'function') {
       window.gtag('event', 'generate_lead', {
         event_category: gpsUrl ? 'share_gps_zalo' : 'zalo_booking_submit',
