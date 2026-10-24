@@ -1484,3 +1484,210 @@ img {
     grid-template-columns: 1fr;
   }
 }
+
+/* ==========================================
+   13. SMART UPSELL BANNER & 1-TAP GPS ZALO
+   ========================================== */
+.upsell-banner {
+  display: none;
+  margin-top: 14px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #fffbeb 0%, #fef3c7 100%);
+  border: 2px solid #f59e0b;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  animation: fadeInSlide 0.25s ease-out;
+}
+
+.upsell-banner.active {
+  display: flex;
+}
+
+@keyframes fadeInSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.upsell-text {
+  font-size: 0.9rem;
+  color: #78350f;
+  font-weight: 600;
+  flex: 1;
+  min-width: 240px;
+}
+
+.upsell-text strong {
+  color: #b45309;
+  font-weight: 800;
+}
+
+.btn-upsell-switch {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  color: var(--white);
+  padding: 9px 16px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-upsell-switch:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(217, 119, 6, 0.45);
+}
+
+.btn-gps {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color: #fde047;
+  border: 1.5px solid #fde047;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.22);
+}
+
+.btn-gps:hover {
+  background: #1e293b;
+  color: #fef08a;
+  transform: translateY(-2px);
+}
+
+/* ==========================================
+   14. SUB-PAGE ARCHITECTURE & INTERNAL SILO
+   ========================================== */
+.breadcrumb-bar {
+  background: #f1f5f9;
+  border-bottom: 1px solid var(--border);
+  padding: 10px 0;
+  font-size: 0.85rem;
+  color: var(--slate);
+}
+
+.breadcrumb-list {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.breadcrumb-list a {
+  color: var(--primary-dark);
+  font-weight: 700;
+}
+
+.breadcrumb-list a:hover {
+  text-decoration: underline;
+}
+
+.breadcrumb-current {
+  color: var(--navy);
+  font-weight: 700;
+}
+
+.subpage-hero {
+  background: radial-gradient(circle at top right, #d1fae5 0%, #f0fdf4 45%, #ffffff 100%);
+  padding: 40px 0 48px;
+  border-bottom: 1px solid var(--border);
+}
+
+.subpage-links-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+  margin-top: 28px;
+}
+
+.subpage-link-card {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.22s ease;
+}
+
+.subpage-link-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.subpage-link-card h3 {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--navy);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.subpage-link-card p {
+  font-size: 0.86rem;
+  color: var(--slate);
+}
+
+.subpage-link-card .card-cta {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--primary-dark);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.step-box {
+  background: var(--white);
+  border-radius: var(--radius-md);
+  padding: 24px 20px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+}
+
+.step-num {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--primary);
+  color: var(--white);
+  font-weight: 900;
+  font-size: 1.05rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.step-box h3 {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--navy);
+  margin-bottom: 6px;
+}
+
+.step-box p {
+  font-size: 0.88rem;
+  color: var(--slate);
+}
+
