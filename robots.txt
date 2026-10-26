@@ -2,30 +2,55 @@ User-agent: *
 Allow: /
 Disallow: /dashboard.html
 Disallow: /dieu-phoi.html
+Disallow: /api/
 
 # Allow AI Search & Answer Engine Crawlers (AEO & GEO 2026)
-User-agent: OAI-SearchBot
+User-agent: Googlebot
 Allow: /
-
-User-agent: GPTBot
-Allow: /
-
-User-agent: ChatGPT-User
-Allow: /
+Disallow: /dashboard.html
+Disallow: /dieu-phoi.html
+Disallow: /api/
 
 User-agent: Google-Extended
 Allow: /
+Disallow: /dashboard.html
+Disallow: /dieu-phoi.html
+Disallow: /api/
 
-User-agent: Googlebot
+User-agent: OAI-SearchBot
 Allow: /
+Disallow: /dashboard.html
+Disallow: /dieu-phoi.html
+Disallow: /api/
+
+User-agent: GPTBot
+Allow: /
+Disallow: /dashboard.html
+Disallow: /dieu-phoi.html
+Disallow: /api/
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /dashboard.html
+Disallow: /dieu-phoi.html
+Disallow: /api/
 
 User-agent: PerplexityBot
 Allow: /
+Disallow: /dashboard.html
+Disallow: /dieu-phoi.html
+Disallow: /api/
 
 User-agent: ClaudeBot
 Allow: /
+Disallow: /dashboard.html
+Disallow: /dieu-phoi.html
+Disallow: /api/
 
 User-agent: Applebot-Extended
 Allow: /
+Disallow: /dashboard.html
+Disallow: /dieu-phoi.html
+Disallow: /api/
 
 Sitemap: https://xeghepthangbinhdanang.vn/sitemap.xml
