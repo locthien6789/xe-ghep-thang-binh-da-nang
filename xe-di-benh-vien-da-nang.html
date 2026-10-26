@@ -48,61 +48,77 @@
   <!-- JSON-LD SCHEMA.ORG GRAPH -->
   <script type="application/ld+json">
   {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          {
-            "@type": "ListItem",
-            "position": 1,
-            "name": "Dịch Vụ Xe Ghép Thăng Bình Đà Nẵng",
-            "item": "https://xeghepthangbinhdanang.vn/"
-          },
-          {
-            "@type": "ListItem",
-            "position": 2,
-            "name": "Xe Thăng Bình Đi Khám Bệnh Viện Đà Nẵng",
-            "item": "https://xeghepthangbinhdanang.vn/xe-di-benh-vien-da-nang.html"
-          }
-        ]
-      },
-      {
-        "@type": "Service",
-        "@id": "https://xeghepthangbinhdanang.vn/xe-di-benh-vien-da-nang.html#service",
-        "name": "Dịch Vụ Xe Ghép & Bao Xe Thăng Bình Đi Khám Bệnh Viện Đà Nẵng",
-        "provider": {
-          "@type": "TaxiService",
-          "name": "Nhà Xe Ghép Nghĩa Hà Lam - Dịch Vụ Xe Ghép Thăng Bình Đà Nẵng", "hasMap": "https://maps.app.goo.gl/fxCjZGYXmkFwYhn8A", "aggregateRating": {"@type": "AggregateRating", "ratingValue": "4.9", "bestRating": "5", "ratingCount": "186"},
-          "telephone": "+84896211296",
-          "address": "469 Huỳnh Thúc Kháng, Thị trấn Hà Lam, Thăng Bình, Quảng Nam - Đà Nẵng"
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Dịch Vụ Xe Ghép Thăng Bình Đà Nẵng",
+          "item": "https://xeghepthangbinhdanang.vn/"
         },
-        "areaServed": "Huyện Thăng Bình và các Bệnh viện tại Thành phố Đà Nẵng",
-        "description": "Đưa đón tận nhà từ 04h45 - 05h30 sáng tại Hà Lam, Bình Quý, Bình Phú, Bình Định, Bình Nguyên đi thẳng cổng các Bệnh viện lớn tại Đà Nẵng (BV Đa khoa Đà Nẵng, BV Ung Bướu, BV 600 Giường, BV C, Hoàn Mỹ). Giá cố định 100.000đ/1 người, thêm người +100.000đ, bao nguyên xe 4-7 chỗ từ 350.000đ - 600.000đ."
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Xe Thăng Bình Đi Khám Bệnh Viện Đà Nẵng",
+          "item": "https://xeghepthangbinhdanang.vn/xe-di-benh-vien-da-nang.html"
+        }
+      ]
+    },
+    {
+      "@type": "Service",
+      "@id": "https://xeghepthangbinhdanang.vn/xe-di-benh-vien-da-nang.html#service",
+      "name": "Dịch Vụ Xe Ghép & Bao Xe Thăng Bình Đi Khám Bệnh Viện Đà Nẵng",
+      "provider": {
+        "@type": "LocalBusiness",
+        "@id": "https://xeghepthangbinhdanang.vn/#nha-xe-ghep-nghia-ha-lam",
+        "name": "Nhà Xe Ghép Nghĩa Hà Lam - Dịch Vụ Xe Ghép Thăng Bình Đà Nẵng",
+        "image": "https://xeghepthangbinhdanang.vn/assets/images/xe-ghep-thang-binh-da-nang-100k-banner.jpg",
+        "priceRange": "100.000đ - 600.000đ",
+        "telephone": "+84896211296",
+        "hasMap": "https://maps.app.goo.gl/fxCjZGYXmkFwYhn8A",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "469 Huỳnh Thúc Kháng, Thị trấn Hà Lam",
+          "addressLocality": "Thăng Bình",
+          "addressRegion": "Đà Nẵng - Quảng Nam",
+          "addressCountry": "VN"
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.9",
+          "bestRating": "5",
+          "ratingCount": "186"
+        }
       },
-      {
-        "@type": "FAQPage",
-        "mainEntity": [
-          {
-            "@type": "Question",
-            "name": "Xe đi khám bệnh Đà Nẵng xuất phát lúc mấy giờ để kịp bốc số?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Nhà Xe Nghĩa Hà Lam có đội xe 20 chiếc xuất phát chuyến sớm nhất từ 04h45 – 05h30 sáng đón tận ngõ tại Thăng Bình, đưa bà con tới tận cổng Bệnh viện Đa khoa Đà Nẵng, BV Ung Bướu, BV 600 Giường, BV Hoàn Mỹ trước 06h15 – 06h30 sáng để kịp lấy số thứ tự khám đầu giờ."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "Khám bệnh xong lúc trưa hoặc chiều gọi xe đón về lại Thăng Bình mất bao lâu?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Vì đội xe 20 chiếc của Nhà Xe Nghĩa Hà Lam luôn có các đầu xe túc trực sẵn quanh khu vực Hải Châu, Thanh Khê, Ngũ Hành Sơn (Đà Nẵng), bà con chỉ cần gọi 0896.211.296 hoặc bấm nút Gửi Định Vị Zalo trước 15 – 20 phút là có xe điện mát rượi đón ngay cổng bệnh viện về tận nhà."
-            }
+      "areaServed": "Huyện Thăng Bình và các Bệnh viện tại Thành phố Đà Nẵng",
+      "description": "Đưa đón tận nhà từ 04h45 - 05h30 sáng tại Hà Lam, Bình Quý, Bình Phú, Bình Định, Bình Nguyên đi thẳng cổng các Bệnh viện lớn tại Đà Nẵng (BV Đa khoa Đà Nẵng, BV Ung Bướu, BV 600 Giường, BV C, Hoàn Mỹ). Giá cố định 100.000đ/1 người, thêm người +100.000đ, bao nguyên xe 4-7 chỗ từ 350.000đ - 600.000đ."
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Xe đi khám bệnh Đà Nẵng xuất phát lúc mấy giờ để kịp bốc số?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Nhà Xe Nghĩa Hà Lam có đội xe 20 chiếc xuất phát chuyến sớm nhất từ 04h45 – 05h30 sáng đón tận ngõ tại Thăng Bình, đưa bà con tới tận cổng Bệnh viện Đa khoa Đà Nẵng, BV Ung Bướu, BV 600 Giường, BV Hoàn Mỹ trước 06h15 – 06h30 sáng để kịp lấy số thứ tự khám đầu giờ."
           }
-        ]
-      }
-    ]
-  }
+        },
+        {
+          "@type": "Question",
+          "name": "Khám bệnh xong lúc trưa hoặc chiều gọi xe đón về lại Thăng Bình mất bao lâu?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Vì đội xe 20 chiếc của Nhà Xe Nghĩa Hà Lam luôn có các đầu xe túc trực sẵn quanh khu vực Hải Châu, Thanh Khê, Ngũ Hành Sơn (Đà Nẵng), bà con chỉ cần gọi 0896.211.296 hoặc bấm nút Gửi Định Vị Zalo trước 15 – 20 phút là có xe điện mát rượi đón ngay cổng bệnh viện về tận nhà."
+          }
+        }
+      ]
+    }
+  ]
+}
   </script>
 </head>
 <body>

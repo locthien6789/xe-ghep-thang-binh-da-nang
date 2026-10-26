@@ -48,40 +48,56 @@
   <!-- JSON-LD SCHEMA.ORG GRAPH -->
   <script type="application/ld+json">
   {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          {
-            "@type": "ListItem",
-            "position": 1,
-            "name": "Dịch Vụ Xe Ghép Thăng Bình Đà Nẵng",
-            "item": "https://xeghepthangbinhdanang.vn/"
-          },
-          {
-            "@type": "ListItem",
-            "position": 2,
-            "name": "Thuê Xe Cưới Hỏi & Đoàn Xe Rước Dâu Thăng Bình",
-            "item": "https://xeghepthangbinhdanang.vn/thue-xe-cuoi-hoi-thang-binh.html"
-          }
-        ]
-      },
-      {
-        "@type": "Service",
-        "@id": "https://xeghepthangbinhdanang.vn/thue-xe-cuoi-hoi-thang-binh.html#service",
-        "name": "Dịch Vụ Cho Thuê Xe Hoa Cưới Hỏi & Đoàn Xe Đưa Rước Dâu Tại Thăng Bình",
-        "provider": {
-          "@type": "AutoRental",
-          "name": "Nhà Xe Ghép & Dịch Vụ Du Lịch Nghĩa Hà Lam",
-          "telephone": "+84896211296",
-          "address": "469 Huỳnh Thúc Kháng, Thị trấn Hà Lam, Thăng Bình, Quảng Nam - Đà Nẵng"
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Dịch Vụ Xe Ghép Thăng Bình Đà Nẵng",
+          "item": "https://xeghepthangbinhdanang.vn/"
         },
-        "areaServed": "Huyện Thăng Bình, Tỉnh Quảng Nam, Thành phố Đà Nẵng và các tỉnh miền Trung",
-        "description": "Chuyên cho thuê xe hoa cô dâu chú rể và nguyên đoàn xe điện 7 chỗ VinFast Limo Green màu trắng ngọc trai đồng bộ phục vụ lễ ăn hỏi, lễ rước dâu tại Thị trấn Hà Lam và các xã huyện Thăng Bình."
-      }
-    ]
-  }
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Thuê Xe Cưới Hỏi & Đoàn Xe Rước Dâu Thăng Bình",
+          "item": "https://xeghepthangbinhdanang.vn/thue-xe-cuoi-hoi-thang-binh.html"
+        }
+      ]
+    },
+    {
+      "@type": "Service",
+      "@id": "https://xeghepthangbinhdanang.vn/thue-xe-cuoi-hoi-thang-binh.html#service",
+      "name": "Dịch Vụ Cho Thuê Xe Hoa Cưới Hỏi & Đoàn Xe Đưa Rước Dâu Tại Thăng Bình",
+      "provider": {
+        "@type": "LocalBusiness",
+        "@id": "https://xeghepthangbinhdanang.vn/#nha-xe-ghep-nghia-ha-lam",
+        "name": "Nhà Xe Ghép Nghĩa Hà Lam - Dịch Vụ Xe Ghép Thăng Bình Đà Nẵng",
+        "image": "https://xeghepthangbinhdanang.vn/assets/images/xe-ghep-thang-binh-da-nang-100k-banner.jpg",
+        "priceRange": "100.000đ - 600.000đ",
+        "telephone": "+84896211296",
+        "hasMap": "https://maps.app.goo.gl/fxCjZGYXmkFwYhn8A",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "469 Huỳnh Thúc Kháng, Thị trấn Hà Lam",
+          "addressLocality": "Thăng Bình",
+          "addressRegion": "Đà Nẵng - Quảng Nam",
+          "addressCountry": "VN"
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.9",
+          "bestRating": "5",
+          "ratingCount": "186"
+        }
+      },
+      "areaServed": "Huyện Thăng Bình, Tỉnh Quảng Nam, Thành phố Đà Nẵng và các tỉnh miền Trung",
+      "description": "Chuyên cho thuê xe hoa cô dâu chú rể và nguyên đoàn xe điện 7 chỗ VinFast Limo Green màu trắng ngọc trai đồng bộ phục vụ lễ ăn hỏi, lễ rước dâu tại Thị trấn Hà Lam và các xã huyện Thăng Bình."
+    }
+  ]
+}
   </script>
 </head>
 <body>

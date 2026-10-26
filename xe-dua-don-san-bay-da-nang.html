@@ -48,61 +48,77 @@
   <!-- JSON-LD SCHEMA.ORG GRAPH -->
   <script type="application/ld+json">
   {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          {
-            "@type": "ListItem",
-            "position": 1,
-            "name": "Dịch Vụ Xe Ghép Thăng Bình Đà Nẵng",
-            "item": "https://xeghepthangbinhdanang.vn/"
-          },
-          {
-            "@type": "ListItem",
-            "position": 2,
-            "name": "Xe Đưa Đón Sân Bay Đà Nẵng & Chu Lai ⇄ Thăng Bình",
-            "item": "https://xeghepthangbinhdanang.vn/xe-dua-don-san-bay-da-nang.html"
-          }
-        ]
-      },
-      {
-        "@type": "Service",
-        "@id": "https://xeghepthangbinhdanang.vn/xe-dua-don-san-bay-da-nang.html#service",
-        "name": "Dịch Vụ Xe Đưa Đón Sân Bay Đà Nẵng, Sân Bay Chu Lai & Ga Tàu Đi Về Thăng Bình",
-        "provider": {
-          "@type": "TaxiService",
-          "name": "Nhà Xe Ghép Nghĩa Hà Lam - Dịch Vụ Xe Ghép Thăng Bình Đà Nẵng", "hasMap": "https://maps.app.goo.gl/fxCjZGYXmkFwYhn8A", "aggregateRating": {"@type": "AggregateRating", "ratingValue": "4.9", "bestRating": "5", "ratingCount": "186"},
-          "telephone": "+84896211296",
-          "address": "469 Huỳnh Thúc Kháng, Thị trấn Hà Lam, Thăng Bình, Quảng Nam - Đà Nẵng"
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Dịch Vụ Xe Ghép Thăng Bình Đà Nẵng",
+          "item": "https://xeghepthangbinhdanang.vn/"
         },
-        "areaServed": "Sân bay Quốc tế Đà Nẵng, Ga Đà Nẵng, Sân bay Chu Lai và Huyện Thăng Bình",
-        "description": "Chuyên đưa đón hành khách tận sảnh Sân bay Quốc tế Đà Nẵng, Ga Đà Nẵng và Sân bay Chu Lai đi về Thị trấn Hà Lam và các xã huyện Thăng Bình. Giá bao nguyên xe riêng 4-7 chỗ từ 350.000đ - 600.000đ/chuyến (rộng cốp để valy, đã gồm phí sân bay) hoặc đi ghép đồng giá 100.000đ/1 người (+100.000đ/người)."
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Xe Đưa Đón Sân Bay Đà Nẵng & Chu Lai ⇄ Thăng Bình",
+          "item": "https://xeghepthangbinhdanang.vn/xe-dua-don-san-bay-da-nang.html"
+        }
+      ]
+    },
+    {
+      "@type": "Service",
+      "@id": "https://xeghepthangbinhdanang.vn/xe-dua-don-san-bay-da-nang.html#service",
+      "name": "Dịch Vụ Xe Đưa Đón Sân Bay Đà Nẵng, Sân Bay Chu Lai & Ga Tàu Đi Về Thăng Bình",
+      "provider": {
+        "@type": "LocalBusiness",
+        "@id": "https://xeghepthangbinhdanang.vn/#nha-xe-ghep-nghia-ha-lam",
+        "name": "Nhà Xe Ghép Nghĩa Hà Lam - Dịch Vụ Xe Ghép Thăng Bình Đà Nẵng",
+        "image": "https://xeghepthangbinhdanang.vn/assets/images/xe-ghep-thang-binh-da-nang-100k-banner.jpg",
+        "priceRange": "100.000đ - 600.000đ",
+        "telephone": "+84896211296",
+        "hasMap": "https://maps.app.goo.gl/fxCjZGYXmkFwYhn8A",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "469 Huỳnh Thúc Kháng, Thị trấn Hà Lam",
+          "addressLocality": "Thăng Bình",
+          "addressRegion": "Đà Nẵng - Quảng Nam",
+          "addressCountry": "VN"
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.9",
+          "bestRating": "5",
+          "ratingCount": "186"
+        }
       },
-      {
-        "@type": "FAQPage",
-        "mainEntity": [
-          {
-            "@type": "Question",
-            "name": "Bao nguyên xe 4 chỗ, 7 chỗ từ Sân bay Đà Nẵng về Thăng Bình giá bao nhiêu?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Giá bao nguyên chiếc xe riêng 4 chỗ hoặc 7 chỗ (dàn xe điện VinFast Limo Green đời mới cốp rộng) từ Sân bay Quốc tế Đà Nẵng về Thị trấn Hà Lam và các xã huyện Thăng Bình (hoặc chiều ngược lại) chỉ từ 350.000đ – 600.000đ/chuyến trọn gói. Tài xế đón ngay tại sảnh đến, đi thẳng không chờ ghép khách."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "Máy bay hạ cánh trễ giờ (delay) hoặc bay chuyến sáng sớm 5h thì nhà xe có đón không?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Có. Khi đặt lịch trước qua số 0896.211.296 hoặc 0386.400.800, tổng đài Nhà Xe Nghĩa Hà Lam theo dõi giờ hạ cánh thực tế của chuyến bay để điều xe chờ đón đúng lúc khách vừa lấy hành lý xong, kể cả chuyến bay sáng sớm hay đêm muộn."
-            }
+      "areaServed": "Sân bay Quốc tế Đà Nẵng, Ga Đà Nẵng, Sân bay Chu Lai và Huyện Thăng Bình",
+      "description": "Chuyên đưa đón hành khách tận sảnh Sân bay Quốc tế Đà Nẵng, Ga Đà Nẵng và Sân bay Chu Lai đi về Thị trấn Hà Lam và các xã huyện Thăng Bình. Giá bao nguyên xe riêng 4-7 chỗ từ 350.000đ - 600.000đ/chuyến (rộng cốp để valy, đã gồm phí sân bay) hoặc đi ghép đồng giá 100.000đ/1 người (+100.000đ/người)."
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Bao nguyên xe 4 chỗ, 7 chỗ từ Sân bay Đà Nẵng về Thăng Bình giá bao nhiêu?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Giá bao nguyên chiếc xe riêng 4 chỗ hoặc 7 chỗ (dàn xe điện VinFast Limo Green đời mới cốp rộng) từ Sân bay Quốc tế Đà Nẵng về Thị trấn Hà Lam và các xã huyện Thăng Bình (hoặc chiều ngược lại) chỉ từ 350.000đ – 600.000đ/chuyến trọn gói. Tài xế đón ngay tại sảnh đến, đi thẳng không chờ ghép khách."
           }
-        ]
-      }
-    ]
-  }
+        },
+        {
+          "@type": "Question",
+          "name": "Máy bay hạ cánh trễ giờ (delay) hoặc bay chuyến sáng sớm 5h thì nhà xe có đón không?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Có. Khi đặt lịch trước qua số 0896.211.296 hoặc 0386.400.800, tổng đài Nhà Xe Nghĩa Hà Lam theo dõi giờ hạ cánh thực tế của chuyến bay để điều xe chờ đón đúng lúc khách vừa lấy hành lý xong, kể cả chuyến bay sáng sớm hay đêm muộn."
+          }
+        }
+      ]
+    }
+  ]
+}
   </script>
 </head>
 <body>

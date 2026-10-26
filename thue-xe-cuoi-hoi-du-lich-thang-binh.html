@@ -48,61 +48,77 @@
   <!-- JSON-LD SCHEMA.ORG GRAPH -->
   <script type="application/ld+json">
   {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          {
-            "@type": "ListItem",
-            "position": 1,
-            "name": "Dịch Vụ Xe Ghép Thăng Bình Đà Nẵng",
-            "item": "https://xeghepthangbinhdanang.vn/"
-          },
-          {
-            "@type": "ListItem",
-            "position": 2,
-            "name": "Thuê Xe Cưới Hỏi, Du Lịch & Đi Tỉnh Tại Thăng Bình",
-            "item": "https://xeghepthangbinhdanang.vn/thue-xe-cuoi-hoi-du-lich-thang-binh.html"
-          }
-        ]
-      },
-      {
-        "@type": "Service",
-        "@id": "https://xeghepthangbinhdanang.vn/thue-xe-cuoi-hoi-du-lich-thang-binh.html#service",
-        "name": "Dịch Vụ Cho Thuê Xe Cưới Hỏi Rước Dâu, Xe Du Lịch Tham Quan & Hợp Đồng Đi Tỉnh Thăng Bình",
-        "provider": {
-          "@type": "AutoRental",
-          "name": "Nhà Xe Ghép & Dịch Vụ Du Lịch Nghĩa Hà Lam",
-          "telephone": "+84896211296",
-          "address": "469 Huỳnh Thúc Kháng, Thị trấn Hà Lam, Thăng Bình, Quảng Nam - Đà Nẵng"
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Dịch Vụ Xe Ghép Thăng Bình Đà Nẵng",
+          "item": "https://xeghepthangbinhdanang.vn/"
         },
-        "areaServed": "Thăng Bình, Quảng Nam, Đà Nẵng, Quảng Ngãi, Huế, Tây Nguyên",
-        "description": "Cung cấp đội xe lớn 20 chiếc 4-7 chỗ và dàn xe điện VinFast Limo Green màu trắng ngọc trai đồng bộ phục vụ Xe hoa cưới hỏi rước dâu, Thuê xe du lịch VinWonders Nam Hội An, Phố cổ Hội An, Bà Nà Hills, Núi Thần Tài, Chùa Linh Ứng, Mỹ Sơn và Hợp đồng xe đi tỉnh giá gốc nhà xe."
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Thuê Xe Cưới Hỏi, Du Lịch & Đi Tỉnh Tại Thăng Bình",
+          "item": "https://xeghepthangbinhdanang.vn/thue-xe-cuoi-hoi-du-lich-thang-binh.html"
+        }
+      ]
+    },
+    {
+      "@type": "Service",
+      "@id": "https://xeghepthangbinhdanang.vn/thue-xe-cuoi-hoi-du-lich-thang-binh.html#service",
+      "name": "Dịch Vụ Cho Thuê Xe Cưới Hỏi Rước Dâu, Xe Du Lịch Tham Quan & Hợp Đồng Đi Tỉnh Thăng Bình",
+      "provider": {
+        "@type": "LocalBusiness",
+        "@id": "https://xeghepthangbinhdanang.vn/#nha-xe-ghep-nghia-ha-lam",
+        "name": "Nhà Xe Ghép Nghĩa Hà Lam - Dịch Vụ Xe Ghép Thăng Bình Đà Nẵng",
+        "image": "https://xeghepthangbinhdanang.vn/assets/images/xe-ghep-thang-binh-da-nang-100k-banner.jpg",
+        "priceRange": "100.000đ - 600.000đ",
+        "telephone": "+84896211296",
+        "hasMap": "https://maps.app.goo.gl/fxCjZGYXmkFwYhn8A",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "469 Huỳnh Thúc Kháng, Thị trấn Hà Lam",
+          "addressLocality": "Thăng Bình",
+          "addressRegion": "Đà Nẵng - Quảng Nam",
+          "addressCountry": "VN"
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.9",
+          "bestRating": "5",
+          "ratingCount": "186"
+        }
       },
-      {
-        "@type": "FAQPage",
-        "mainEntity": [
-          {
-            "@type": "Question",
-            "name": "Nhà xe có nhận cung cấp nguyên dàn xe màu trắng đồng bộ đi rước dâu không?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Có. Nhà Xe Nghĩa Hà Lam sở hữu đội xe 20 chiếc, trong đó có dàn xe điện 7 chỗ VinFast Limo Green màu trắng ngọc trai đồng bộ 100%, nội thất sang trọng, không mùi xăng dầu, rất được các gia đình tại Hà Lam, Bình Quý, Bình Phú, Bình Định... tin chọn làm đoàn xe rước dâu và đưa đón hai họ."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "Thuê xe 4 chỗ, 7 chỗ có tài xế đi VinWonders Nam Hội An, Bà Nà Hills hoặc đi tỉnh tính giá thế nào?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Giá thuê xe có tài xế đi tham quan du lịch và đi tỉnh được tính trọn gói cực kỳ tiết kiệm (chỉ từ 350.000đ cho chặng ngắn hoặc báo giá khứ hồi 2 chiều chờ đón miễn phí). Quý khách gọi 0896.211.296 hoặc 0386.400.800 để nhận báo giá gốc nhà xe."
-            }
+      "areaServed": "Thăng Bình, Quảng Nam, Đà Nẵng, Quảng Ngãi, Huế, Tây Nguyên",
+      "description": "Cung cấp đội xe lớn 20 chiếc 4-7 chỗ và dàn xe điện VinFast Limo Green màu trắng ngọc trai đồng bộ phục vụ Xe hoa cưới hỏi rước dâu, Thuê xe du lịch VinWonders Nam Hội An, Phố cổ Hội An, Bà Nà Hills, Núi Thần Tài, Chùa Linh Ứng, Mỹ Sơn và Hợp đồng xe đi tỉnh giá gốc nhà xe."
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Nhà xe có nhận cung cấp nguyên dàn xe màu trắng đồng bộ đi rước dâu không?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Có. Nhà Xe Nghĩa Hà Lam sở hữu đội xe 20 chiếc, trong đó có dàn xe điện 7 chỗ VinFast Limo Green màu trắng ngọc trai đồng bộ 100%, nội thất sang trọng, không mùi xăng dầu, rất được các gia đình tại Hà Lam, Bình Quý, Bình Phú, Bình Định... tin chọn làm đoàn xe rước dâu và đưa đón hai họ."
           }
-        ]
-      }
-    ]
-  }
+        },
+        {
+          "@type": "Question",
+          "name": "Thuê xe 4 chỗ, 7 chỗ có tài xế đi VinWonders Nam Hội An, Bà Nà Hills hoặc đi tỉnh tính giá thế nào?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Giá thuê xe có tài xế đi tham quan du lịch và đi tỉnh được tính trọn gói cực kỳ tiết kiệm (chỉ từ 350.000đ cho chặng ngắn hoặc báo giá khứ hồi 2 chiều chờ đón miễn phí). Quý khách gọi 0896.211.296 hoặc 0386.400.800 để nhận báo giá gốc nhà xe."
+          }
+        }
+      ]
+    }
+  ]
+}
   </script>
 </head>
 <body>
