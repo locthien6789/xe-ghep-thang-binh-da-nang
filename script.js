@@ -80,6 +80,14 @@ document.addEventListener('DOMContentLoaded', () => {
         priceText = 'Liên hệ từ 350.000đ – 600.000đ / chuyến';
         noteText = '🚘 Bao nguyên xe 4 chỗ – 7 chỗ riêng tư • Giờ giấc tự chọn, đi thẳng không ghép khách, đón trả tận sảnh';
         break;
+      case 'bao-xe-khu-hoi':
+        priceText = 'Báo giá khứ hồi ưu đãi (Có chờ đón về)';
+        noteText = '🔄 Bao nguyên xe 4–7 chỗ đi và chờ đón chiều về trong ngày • Tiết kiệm hơn đặt lẻ 2 chiều';
+        break;
+      case 'nhom-sat-hach':
+        priceText = 'Bao xe 4–7 chỗ chia đầu người (~80K–100K/HV)';
+        noteText = '🎓 Đưa nhóm học viên tới tận cổng Trung tâm Sát hạch Minh Sơn / QJC trước 06h30 sáng • Nhận chờ thi xong đón về';
+        break;
       case 'thue-xe-du-lich':
         priceText = 'Liên hệ từ 350.000đ (Báo giá trọn gói)';
         noteText = '🏖️ Phục vụ đi VinWonders Nam Hội An, Phố cổ Hội An, Bà Nà Hills, Núi Thần Tài, Chùa Linh Ứng, Mỹ Sơn...';
@@ -597,7 +605,28 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 4. FAQ ACCORDION
+  // 4. QUICK LANDMARK CHIPS (1-TAP PICKUP POINT SELECTION FOR LOCAL & ELDERLY USERS)
+  const landmarkChips = document.querySelectorAll('.js-landmark-chip');
+  landmarkChips.forEach((chip) => {
+    chip.addEventListener('click', () => {
+      landmarkChips.forEach((c) => c.classList.remove('active'));
+      chip.classList.add('active');
+      const landmarkName = chip.getAttribute('data-landmark') || chip.textContent.trim();
+      const selectVal = chip.getAttribute('data-pickup-val');
+      if (pickupSelect && selectVal) {
+        const opt = Array.from(pickupSelect.options).find((o) => o.value === selectVal);
+        if (opt) pickupSelect.value = selectVal;
+      }
+      if (noteInput && landmarkName) {
+        noteInput.value = landmarkName;
+      }
+      if (quoteNoteEl && landmarkName) {
+        quoteNoteEl.innerHTML = `📍 Đã chọn điểm đón/trả: <strong>${landmarkName}</strong> • Bấm Gọi Ngay hoặc HÃY ĐÓN TÔI để xe vào đón!`;
+      }
+    });
+  });
+
+  // 5. FAQ ACCORDION
   const faqItems = document.querySelectorAll('.faq-item');
   faqItems.forEach((item) => {
     const btn = item.querySelector('.faq-question');

@@ -46,7 +46,7 @@
   <!-- STYLESHEET & FAVICON -->
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  <link rel="stylesheet" href="styles.css?v=4.0" />
+  <link rel="stylesheet" href="styles.css?v=5.0" />
 
   <!-- JSON-LD SCHEMA.ORG GRAPH (MULTI-SERVICE SEO + AEO + GEO 2026) -->
   <script type="application/ld+json">
@@ -54,7 +54,8 @@
     "@context": "https://schema.org",
     "@graph": [
       {
-        "@type": ["TaxiService", "AutoRental", "TravelAgency", "LocalBusiness"],
+        "@type": "LocalBusiness",
+        "additionalType": ["https://schema.org/TaxiService", "https://schema.org/AutoRental", "https://schema.org/TravelAgency"],
         "@id": "https://xeghepthangbinhdanang.vn/#nha-xe-ghep-nghia-ha-lam",
         "url": "https://xeghepthangbinhdanang.vn/",
         "name": "Nhà Xe Ghép Nghĩa halam - Dịch Vụ Xe Ghép Thăng Bình Đà Nẵng, Cho Thuê Xe Du Lịch, Cưới Hỏi",
@@ -142,14 +143,16 @@
           "closes": "18:00"
         },
         "areaServed": [
-          {"@type": "Place", "name": "Thị trấn Hà Lam, Thăng Bình"},
-          {"@type": "Place", "name": "Ngã 3 Bình Quý & Thôn Quý Mỹ, Xã Bình Quý, Thăng Bình"},
-          {"@type": "Place", "name": "Cầu Ông Triệu, Xã Bình Định, Thăng Bình"},
-          {"@type": "Place", "name": "Hà Châu, Xã Bình Phú, Thăng Bình"},
-          {"@type": "Place", "name": "Xã Bình Chánh, Bình Phục, Bình Nguyên, Bình Minh, Thăng Bình"},
-          {"@type": "City", "name": "Thành phố Đà Nẵng"},
-          {"@type": "Place", "name": "VinWonders Nam Hội An, Phố cổ Hội An, Tam Kỳ, Sân bay Chu Lai"},
-          {"@type": "Place", "name": "Quảng Ngãi, Huế, Kon Tum (Măng Đen), Gia Lai, Quy Nhơn"}
+          {"@type": "Place", "name": "Thị trấn Hà Lam, Xã Thăng Bình, Quảng Nam - Đà Nẵng"},
+          {"@type": "Place", "name": "Trung tâm Sát hạch lái xe Quảng Nam (Minh Sơn & QJC - Thanh Ly 1, Bình Nguyên)"},
+          {"@type": "Place", "name": "Bệnh viện Đa khoa Thăng Hoa (QL1A, thôn Liễu Trì, Xã Bình Nguyên, Thăng Bình)"},
+          {"@type": "Place", "name": "Ngã 3 Bình Quý, Chợ Quý Hương & Thôn Quý Mỹ, Xã Bình Quý, Thăng Bình"},
+          {"@type": "Place", "name": "Ngã 3 Đồng Dương, Cầu Ông Triệu, Xã Bình Định Bắc & Bình Định Nam (Xã Đồng Dương), Thăng Bình"},
+          {"@type": "Place", "name": "Chợ Bình Phú, Ngã 3 Lý Trường, Hà Châu, Xã Bình Phú (Xã Thăng Phú), Thăng Bình"},
+          {"@type": "Place", "name": "Xã Bình Phục, Xã Bình Tú, Xã Bình Chánh, Xã Bình Minh (VinWonders Nam Hội An), Thăng Bình"},
+          {"@type": "Place", "name": "Chợ Hương An, Cầu Hương An, Thôn Mộc Bài (Quế Phú / Xã Xuân Phú), Quế Sơn - Thăng Bình"},
+          {"@type": "City", "name": "Thành phố Đà Nẵng (Hải Châu, Thanh Khê, Cẩm Lệ, Sơn Trà, Ngũ Hành Sơn, Liên Chiểu, Hòa Vang)"},
+          {"@type": "Place", "name": "Phố cổ Hội An, Tam Kỳ, Sân bay Chu Lai, Quảng Ngãi, Huế, Măng Đen"}
         ],
         "hasOfferCatalog": {
           "@type": "OfferCatalog",
@@ -463,42 +466,62 @@
           </div>
         </div>
 
+        <!-- 1-TAP LANDMARK CHIPS FOR ZERO-TYPING UX -->
+        <div class="landmark-chips-box" style="margin-bottom: 18px;">
+          <div class="landmark-chips-label">
+            ⚡ <strong>Bấm chọn nhanh điểm đón/đến quen thuộc (1-Chạm không cần gõ chữ):</strong>
+          </div>
+          <div class="landmark-chips-list">
+            <button type="button" class="landmark-chip js-landmark-chip active" data-pickup="ha-lam" data-landmark="Chợ Hà Lam / Ngã 3 Cây Cốc (469 Huỳnh Thúc Kháng)">📍 Chợ Hà Lam / Cây Cốc</button>
+            <button type="button" class="landmark-chip js-landmark-chip" data-pickup="sat-hach-quang-nam" data-landmark="Trung tâm Sát hạch lái xe Minh Sơn & QJC (Thanh Ly 1, Bình Nguyên)">🎓 Sát Hạch Minh Sơn &amp; QJC</button>
+            <button type="button" class="landmark-chip js-landmark-chip" data-pickup="bv-thang-hoa" data-landmark="Bệnh viện Đa khoa Thăng Hoa (QL1A, thôn Liễu Trì, Bình Nguyên)">🏥 BV Đa Khoa Thăng Hoa</button>
+            <button type="button" class="landmark-chip js-landmark-chip" data-pickup="nga-3-binh-quy" data-landmark="Ngã 3 Bình Quý / Chợ Quý Hương (ĐT611)">📍 Ngã 3 Bình Quý / Quý Hương</button>
+            <button type="button" class="landmark-chip js-landmark-chip" data-pickup="dong-duong" data-landmark="Ngã 3 Đồng Dương / Cầu Ông Triệu (Xã Bình Định)">📍 Đồng Dương / Cầu Ông Triệu</button>
+            <button type="button" class="landmark-chip js-landmark-chip" data-pickup="binh-phu" data-landmark="Chợ Bình Phú / Ngã 3 Lý Trường / Hà Châu">📍 Bình Phú / Lý Trường</button>
+            <button type="button" class="landmark-chip js-landmark-chip" data-pickup="huong-an-moc-bai" data-landmark="Chợ Hương An / Cầu Hương An / Thôn Mộc Bài (QL1A)">📍 Hương An &amp; Mộc Bài</button>
+            <button type="button" class="landmark-chip js-landmark-chip" data-pickup="binh-minh-vinwonders" data-landmark="Chợ Bình Minh / Biển Bình Minh / VinWonders Nam Hội An">🏖️ Biển Bình Minh / VinWonders</button>
+          </div>
+        </div>
+
         <div class="booking-form-grid">
           <div class="form-group">
-            <label for="booking-pickup">📍 Điểm đón tại Thăng Bình:</label>
+            <label for="booking-pickup">📍 Điểm đón/trả tại Thăng Bình &amp; Hương An:</label>
             <select id="booking-pickup" class="form-control">
-              <optgroup label="⭐ Trục Trung Tâm &amp; Điểm Đón Chính">
-                <option value="ha-lam">Thị trấn Hà Lam (Huỳnh Thúc Kháng / Cây Cốc)</option>
-                <option value="nga-3-binh-quy">Ngã 3 Bình Quý (Xã Bình Quý)</option>
-                <option value="quy-my">Thôn Quý Mỹ (Xã Bình Quý)</option>
-                <option value="cau-ong-trieu">Cầu Ông Triệu (Xã Bình Định)</option>
-                <option value="ha-chau">Hà Châu / Chợ Hà Châu (Xã Bình Phú)</option>
+              <optgroup label="⭐ Trục Trung Tâm, Sát Hạch &amp; Bệnh Viện">
+                <option value="ha-lam">Thị trấn Hà Lam (469 Huỳnh Thúc Kháng / Cây Cốc)</option>
+                <option value="sat-hach-quang-nam">Trung tâm Sát hạch lái xe Quảng Nam (Minh Sơn &amp; QJC)</option>
+                <option value="bv-thang-hoa">Bệnh viện Đa khoa Thăng Hoa (QL1A, thôn Liễu Trì)</option>
+                <option value="nga-3-binh-quy">Ngã 3 Bình Quý / Chợ Quý Hương / Quý Mỹ</option>
+                <option value="dong-duong">Ngã 3 Đồng Dương / Cầu Ông Triệu (Bình Định Bắc &amp; Nam)</option>
+                <option value="ha-chau">Chợ Bình Phú / Ngã 3 Lý Trường / Hà Châu</option>
               </optgroup>
-              <optgroup label="🏠 Đón Tận Nhà Các Xã Huyện Thăng Bình">
-                <option value="binh-phu">Xã Bình Phú (Đón tận ngõ)</option>
-                <option value="binh-chanh">Xã Bình Chánh (Đón tận ngõ)</option>
-                <option value="binh-dinh">Xã Bình Định Bắc / Nam (Đón tận ngõ)</option>
-                <option value="binh-phuc">Xã Bình Phục (Đón tận ngõ)</option>
-                <option value="binh-nguyen">Xã Bình Nguyên (Đón tận ngõ)</option>
-                <option value="binh-minh-vinwonders">Xã Bình Minh / VinWonders Nam Hội An</option>
-                <option value="xa-khac">Xã lân cận khác thuộc Thăng Bình</option>
+              <optgroup label="🏠 Đón Tận Nhà Các Xã Huyện Thăng Bình &amp; Lân Cận">
+                <option value="binh-nguyen">Xã Bình Nguyên (Chợ Bình Nguyên / Thanh Ly)</option>
+                <option value="binh-phuc">Xã Bình Phục (Chợ Bình Phục / Tất Viên / Ngọc Sơn)</option>
+                <option value="huong-an-moc-bai">Chợ Hương An / Cầu Hương An / Thôn Mộc Bài (QL1A)</option>
+                <option value="binh-tu">Xã Bình Tú (Chợ Bình Tú / Ngã tư Bình Tú)</option>
+                <option value="binh-minh-vinwonders">Xã Bình Minh (Biển Bình Minh / VinWonders Nam Hội An)</option>
+                <option value="binh-phu">Các thôn sâu Xã Bình Phú / Xã Bình Chánh</option>
+                <option value="xa-khac">Xã lân cận khác thuộc huyện Thăng Bình</option>
               </optgroup>
             </select>
           </div>
 
           <div class="form-group">
-            <label for="booking-dropoff">🏥 Điểm đến (Đà Nẵng / Du lịch / Đi tỉnh):</label>
+            <label for="booking-dropoff">🏥 Điểm đến (Đà Nẵng / Sát hạch / Du lịch / Đi tỉnh):</label>
             <select id="booking-dropoff" class="form-control">
-              <optgroup label="🏥 Cụm Bệnh Viện Lớn Đà Nẵng">
+              <optgroup label="🏥 Cụm Bệnh Viện Lớn Đà Nẵng &amp; Thăng Bình">
                 <option value="bv-da-nang">Bệnh viện Đa khoa Đà Nẵng (124 Hải Phòng)</option>
                 <option value="bv-ung-buou">Bệnh viện Ung Bướu Đà Nẵng</option>
                 <option value="bv-600-giuong">Bệnh viện Phụ Sản - Nhi (600 Giường)</option>
                 <option value="bv-hoan-my-bv-c">Bệnh viện C / Hoàn Mỹ / BV Mắt / Chỉnh Hình</option>
+                <option value="bv-thang-hoa-den">Bệnh viện Đa khoa Thăng Hoa (QL1A, Bình Nguyên)</option>
               </optgroup>
-              <optgroup label="✈️ Sân Bay, Ga Tàu &amp; Trung Tâm Đà Nẵng">
+              <optgroup label="✈️ Sân Bay, Sát Hạch &amp; Trung Tâm Đà Nẵng">
                 <option value="san-bay-da-nang">Sân bay Quốc tế Đà Nẵng (Đón/Trả tận sảnh)</option>
                 <option value="ga-ben-xe">Ga Đà Nẵng / Bến xe Trung tâm Đà Nẵng</option>
-                <option value="trung-tam-da-nang">Trung tâm Hải Châu / Thanh Khê / Cẩm Lệ / Sơn Trà</option>
+                <option value="trung-tam-da-nang">Trung tâm Hải Châu / Thanh Khê / Cẩm Lệ / Sơn Trà / Liên Chiểu</option>
+                <option value="sat-hach-quang-nam-den">Trung tâm Sát hạch lái xe Minh Sơn &amp; QJC (Thanh Ly 1)</option>
               </optgroup>
               <optgroup label="🏖️ Điểm Du Lịch, Tham Quan &amp; Chùa Chiền">
                 <option value="vinwonders-hoi-an">VinWonders Nam Hội An / Phố cổ Hội An / Rừng Dừa</option>
@@ -520,9 +543,11 @@
                 <option value="ghep-2">Đi ghép 2 người (+100K = 200.000đ)</option>
                 <option value="ghep-3">Đi ghép 3 người (+100K = 300.000đ)</option>
                 <option value="ghep-4">Đi ghép 4 người (+100K = 400.000đ)</option>
+                <option value="nhom-sat-hach">Ghép nhóm học viên sát hạch 3–4 người (300K–400K)</option>
               </optgroup>
               <optgroup label="⭐ Bao Xe Riêng &amp; Dịch Vụ Mở Rộng (Full Công Năng)">
-                <option value="bao-xe-4-7">Bao nguyên xe 4 – 7 chỗ (Liên hệ 350K – 600K)</option>
+                <option value="bao-xe-4-7">Bao nguyên xe 4 – 7 chỗ 1 chiều (350K – 600K)</option>
+                <option value="bao-xe-khu-hoi">Bao xe 2 chiều có chờ (Khám bệnh / Thi sát hạch): 650K – 950K</option>
                 <option value="thue-xe-du-lich">Thuê xe Du lịch – Tham quan – Chùa chiền</option>
                 <option value="thue-xe-cuoi-hoi">Thuê xe Hoa – Cưới hỏi – Đưa rước dâu</option>
                 <option value="thue-xe-di-tinh">Thuê xe Hợp đồng Đi tỉnh (1 chiều / 2 chiều)</option>
@@ -828,77 +853,125 @@
         </div>
       </div>
 
-      <!-- Hyper-Local Commune SEO Cards -->
+      <!-- Hyper-Local 10 Bi-Directional Route Cards (Clean Anti-Clutter Hub) -->
       <div class="commune-grid">
         <article class="commune-card">
           <div class="commune-card-top">
-            <h3>Xe Ghép Thị Trấn Hà Lam</h3>
-            <span class="price-chip chip-100k">100K / 1 Người</span>
+            <h3><a href="xe-ghep-ha-lam-da-nang.html" style="color: inherit; text-decoration: none;">1. Xe Ghép Hà Lam ↔ Đà Nẵng</a></h3>
+            <span class="price-chip chip-100k">100K / Người</span>
           </div>
-          <p>Đón tận nơi tại đường Huỳnh Thúc Kháng (Trụ sở số 469), Tiểu La, Ngã 3 Cây Cốc, Chợ Hà Lam đi thẳng Đà Nẵng, Sân bay, Bệnh viện. Thêm người +100K, bao xe từ 350K.</p>
+          <p>Trụ sở 469 Huỳnh Thúc Kháng. Đón tận nơi tại <strong>Chợ Hà Lam, Ngã 3 Cây Cốc, Tiểu La, BV Thăng Hoa</strong> đi thẳng Đà Nẵng, Sân bay, Bệnh viện.</p>
           <div class="commune-meta">
-            <span>⏱️ Có xe sau 5 – 10 phút</span>
-            <a href="tel:0896211296">Gọi 0896.211.296 →</a>
+            <span>⏱️ Đón sau 5 – 10 phút</span>
+            <a href="xe-ghep-ha-lam-da-nang.html">Xem lộ trình &amp; Đặt xe →</a>
           </div>
         </article>
 
         <article class="commune-card">
           <div class="commune-card-top">
-            <h3>Xe Ghép Bình Quý &amp; Quý Mỹ</h3>
-            <span class="price-chip chip-100k">100K / 1 Người</span>
+            <h3><a href="xe-di-sat-hach-lai-xe-quang-nam-da-nang.html" style="color: inherit; text-decoration: none;">2. Xe Đi Sát Hạch Lái Xe Quảng Nam</a></h3>
+            <span class="price-chip chip-100k">100K / Học Viên</span>
           </div>
-          <p>Chuyên tuyến đón trả tại <strong>Ngã 3 Bình Quý</strong>, thôn <strong>Quý Mỹ</strong> và xã Bình Quý đi Đà Nẵng. Nhận hợp đồng xe cưới hỏi, du lịch và đi tỉnh giá rẻ.</p>
+          <p>Đưa đón tận cổng cả 2 cơ sở <strong>Trung tâm Sát hạch Minh Sơn &amp; QJC (Thanh Ly 1, Bình Nguyên)</strong>. Chuyến sớm 05h30 kịp điểm danh, có gói bao xe chờ thi xong đón về.</p>
           <div class="commune-meta">
-            <span>⏱️ Đón tận nơi sau 10 – 15 phút</span>
-            <a href="tel:0896211296">Gọi 0896.211.296 →</a>
+            <span>🎓 Khứ hồi có chờ</span>
+            <a href="xe-di-sat-hach-lai-xe-quang-nam-da-nang.html">Xem giờ xe sát hạch →</a>
           </div>
         </article>
 
         <article class="commune-card">
           <div class="commune-card-top">
-            <h3>Xe Ghép Bình Định &amp; Cầu Ông Triệu</h3>
-            <span class="price-chip chip-100k">100K / 1 Người</span>
+            <h3><a href="xe-ghep-binh-nguyen-da-nang.html" style="color: inherit; text-decoration: none;">3. Xe Ghép Bình Nguyên &amp; BV Thăng Hoa</a></h3>
+            <span class="price-chip chip-100k">100K / Người</span>
           </div>
-          <p>Đón trả khách tận nhà tại khu vực <strong>Cầu Ông Triệu</strong>, Đồng Dương, xã Bình Định Bắc và Bình Định Nam đi Đà Nẵng khám bệnh, đi học, đi làm mỗi ngày.</p>
+          <p>Đón trả hai chiều tại <strong>Bệnh viện Đa khoa Thăng Hoa (thôn Liễu Trì), Chợ Bình Nguyên, Thanh Ly 1 &amp; 2</strong> dọc trục QL1A đi Đà Nẵng khám bệnh, đi làm.</p>
           <div class="commune-meta">
-            <span>⏱️ Đón tận nơi sau 15 phút</span>
-            <a href="tel:0386400800">Gọi 0386.400.800 →</a>
+            <span>⏱️ Trục QL1A 50 phút</span>
+            <a href="xe-ghep-binh-nguyen-da-nang.html">Xem lộ trình &amp; Đặt xe →</a>
           </div>
         </article>
 
         <article class="commune-card">
           <div class="commune-card-top">
-            <h3>Xe Ghép Hà Châu &amp; Xã Bình Phú</h3>
-            <span class="price-chip chip-100k">100K / 1 Người</span>
+            <h3><a href="xe-ghep-binh-quy-da-nang.html" style="color: inherit; text-decoration: none;">4. Xe Ghép Bình Quý &amp; Quý Hương</a></h3>
+            <span class="price-chip chip-100k">100K / Người</span>
           </div>
-          <p>Phục vụ bà con khu vực <strong>Hà Châu</strong> (Chợ Hà Châu) và các thôn thuộc xã <strong>Bình Phú</strong>. Đồng giá 100K/người, bao nguyên chuyến 4–7 chỗ chỉ từ 350K–600K.</p>
+          <p>Chuyên tuyến đón trả tại <strong>Ngã 3 Bình Quý, Chợ Quý Hương, thôn Quý Mỹ, Quý Thạnh, Quý Xuân</strong> dọc trục ĐT611 – QL1A đi thẳng trung tâm Đà Nẵng.</p>
           <div class="commune-meta">
-            <span>⏱️ Chạy liên tục 05h – 18h</span>
-            <a href="tel:0896211296">Gọi 0896.211.296 →</a>
+            <span>⏱️ Đón sau 10 – 15 phút</span>
+            <a href="xe-ghep-binh-quy-da-nang.html">Xem lộ trình &amp; Đặt xe →</a>
           </div>
         </article>
 
         <article class="commune-card">
           <div class="commune-card-top">
-            <h3>Xe Ghép Xã Bình Chánh &amp; Bình Phục</h3>
-            <span class="price-chip chip-100k">100K / 1 Người</span>
+            <h3><a href="xe-ghep-dong-duong-da-nang.html" style="color: inherit; text-decoration: none;">5. Xe Ghép Đồng Dương &amp; Bình Định</a></h3>
+            <span class="price-chip chip-100k">100K / Người</span>
           </div>
-          <p>Hỗ trợ đón trả tận ngõ tại xã <strong>Bình Chánh</strong> và dọc tuyến xã <strong>Bình Phục</strong>. Cứ 1 người 100K, thêm người +100K, lên xe điện êm ái tới thẳng Đà Nẵng.</p>
+          <p>Đón trả tận nhà tại <strong>Ngã 3 Đồng Dương, Cầu Ông Triệu, Tháp Chăm Đồng Dương, xã Bình Định Bắc &amp; Bình Định Nam</strong> (xã Đồng Dương mới) đi Đà Nẵng.</p>
           <div class="commune-meta">
-            <span>⏱️ Đón nhanh 15 phút</span>
-            <a href="tel:0896211296">Gọi 0896.211.296 →</a>
+            <span>⏱️ Đón tận thôn xóm</span>
+            <a href="xe-ghep-dong-duong-da-nang.html">Xem lộ trình &amp; Đặt xe →</a>
           </div>
         </article>
 
         <article class="commune-card">
           <div class="commune-card-top">
-            <h3>Xe Ghép Xã Bình Nguyên &amp; Bình Minh</h3>
-            <span class="price-chip chip-100k">100K / 1 Người</span>
+            <h3><a href="xe-ghep-binh-phu-da-nang.html" style="color: inherit; text-decoration: none;">6. Xe Ghép Bình Phú &amp; Lý Trường</a></h3>
+            <span class="price-chip chip-100k">100K / Người</span>
           </div>
-          <p>Đón tận nhà tại xã <strong>Bình Nguyên</strong>, <strong>Bình Minh (VinWonders Nam Hội An)</strong> và các xã lân cận đi Sân bay, Bệnh viện Đà Nẵng, Hội An, Tam Kỳ.</p>
+          <p>Phục vụ bà con khu vực <strong>Chợ Bình Phú, Ngã 3 Lý Trường, thôn Lý Trường, Đức An, Phước Hà, Hà Châu</strong> (xã Thăng Phú mới) đi Đà Nẵng hai chiều.</p>
           <div class="commune-meta">
-            <span>⏱️ Không nhồi nhét khách</span>
-            <a href="tel:0386400800">Gọi 0386.400.800 →</a>
+            <span>⏱️ Xe điện không say</span>
+            <a href="xe-ghep-binh-phu-da-nang.html">Xem lộ trình &amp; Đặt xe →</a>
+          </div>
+        </article>
+
+        <article class="commune-card">
+          <div class="commune-card-top">
+            <h3><a href="xe-ghep-binh-phuc-da-nang.html" style="color: inherit; text-decoration: none;">7. Xe Ghép Xã Bình Phục ↔ Đà Nẵng</a></h3>
+            <span class="price-chip chip-100k">100K / Người</span>
+          </div>
+          <p>Đón trả tận ngõ tại <strong>Chợ Bình Phục, Ngã 3 Cây Cốc, thôn Tất Viên, Ngọc Sơn, Bình Hiệp</strong> ngay sát trụ sở Hà Lam đi Sân bay, Bệnh viện Đà Nẵng.</p>
+          <div class="commune-meta">
+            <span>⏱️ Có xe sau 10 phút</span>
+            <a href="xe-ghep-binh-phuc-da-nang.html">Xem lộ trình &amp; Đặt xe →</a>
+          </div>
+        </article>
+
+        <article class="commune-card">
+          <div class="commune-card-top">
+            <h3><a href="xe-ghep-huong-an-moc-bai-da-nang.html" style="color: inherit; text-decoration: none;">8. Xe Ghép Hương An &amp; Mộc Bài</a></h3>
+            <span class="price-chip chip-100k">100K / Người</span>
+          </div>
+          <p>Đón trả nhanh dọc trục QL1A tại <strong>Chợ Hương An, Cầu Hương An, Ngã 3 Hương An và thôn Mộc Bài (Quế Phú / xã Xuân Phú)</strong> đi Đà Nẵng chỉ 40–45 phút.</p>
+          <div class="commune-meta">
+            <span>⏱️ Đón nhanh trục QL1A</span>
+            <a href="xe-ghep-huong-an-moc-bai-da-nang.html">Xem lộ trình &amp; Đặt xe →</a>
+          </div>
+        </article>
+
+        <article class="commune-card">
+          <div class="commune-card-top">
+            <h3><a href="xe-ghep-binh-tu-da-nang.html" style="color: inherit; text-decoration: none;">9. Xe Ghép Xã Bình Tú ↔ Đà Nẵng</a></h3>
+            <span class="price-chip chip-100k">100K / Người</span>
+          </div>
+          <p>Đón trả tận nhà tại <strong>Chợ Bình Tú, Ngã tư Bình Tú, UBND xã Bình Tú và các thôn Tú Cẩm, Tú Trà, Tú Phương</strong> kết nối ĐT613 – QL1A đi Đà Nẵng.</p>
+          <div class="commune-meta">
+            <span>⏱️ Chạy liên tục 05h–18h</span>
+            <a href="xe-ghep-binh-tu-da-nang.html">Xem lộ trình &amp; Đặt xe →</a>
+          </div>
+        </article>
+
+        <article class="commune-card">
+          <div class="commune-card-top">
+            <h3><a href="xe-ghep-binh-minh-da-nang.html" style="color: inherit; text-decoration: none;">10. Xe Ghép Bình Minh &amp; VinWonders</a></h3>
+            <span class="price-chip chip-100k">100K / Người</span>
+          </div>
+          <p>Đón trả dọc trục biển Võ Chí Công (ĐT613B) tại <strong>Chợ Bình Minh, Bãi biển Bình Minh, cổng VinWonders Nam Hội An, thôn Hà Bình</strong> đi thẳng Đà Nẵng, Hội An.</p>
+          <div class="commune-meta">
+            <span>🏖️ Đường biển Võ Chí Công</span>
+            <a href="xe-ghep-binh-minh-da-nang.html">Xem lộ trình &amp; Đặt xe →</a>
           </div>
         </article>
       </div>
@@ -1329,30 +1402,41 @@
         </div>
       </div>
 
-      <!-- Expanded Keyword Tag Silo for SEO/AEO/GEO 2026 -->
-      <div class="keyword-cloud">
-        <h4>Hệ thống từ khóa dịch vụ (Chuẩn SEO / AEO / GEO 2026):</h4>
-        <div class="kw-tags">
-          <span class="kw-tag">dịch vụ xe ghép thăng bình đà nẵng</span>
-          <span class="kw-tag">xe ghép thăng bình đà nẵng 100k</span>
-          <span class="kw-tag">xe tiện chuyến thăng bình đà nẵng</span>
-          <span class="kw-tag">bao xe thăng bình đà nẵng 350k</span>
-          <span class="kw-tag">nhà xe ghép nghĩa hà lam</span>
-          <span class="kw-tag">dịch vụ cho thuê xe thăng bình</span>
-          <span class="kw-tag">thuê xe 4 chỗ 7 chỗ hà lam</span>
-          <span class="kw-tag">thuê xe cưới hỏi thăng bình</span>
-          <span class="kw-tag">thuê xe hoa rước dâu hà lam quảng nam</span>
-          <span class="kw-tag">thuê xe du lịch thăng bình đà nẵng</span>
-          <span class="kw-tag">xe đi vinwonders nam hội an</span>
-          <span class="kw-tag">thuê xe đi hội an bà nà hills</span>
-          <span class="kw-tag">thuê xe đi chùa linh ứng ngũ hành sơn</span>
-          <span class="kw-tag">xe hợp đồng đi tỉnh thăng bình</span>
-          <span class="kw-tag">xe thăng bình đi tam kỳ chu lai</span>
-          <span class="kw-tag">thuê xe thăng bình đi quảng ngãi huế</span>
-          <span class="kw-tag">xe ghép ngã 3 bình quý cầu ông triệu</span>
-          <span class="kw-tag">xe ghép hà châu bình phú bình nguyên</span>
-          <span class="kw-tag">gửi hàng thăng bình đà nẵng</span>
-          <span class="kw-tag">xeghepthangbinhdanang.vn</span>
+            <!-- CLEAN 3-COLUMN ROUTE & SERVICE DIRECTORY SILO (ANTI-CLUTTER UI/UX + SEO 2026) -->
+      <div class="route-directory-silo" aria-label="Danh mục tuyến xe ghép hai chiều và chuyên trang dịch vụ">
+        <h4>🧭 Danh Mục Tuyến Xe Ghép Hai Chiều Thăng Bình ↔ Đà Nẵng &amp; Chuyên Trang Dịch Vụ:</h4>
+        <div class="directory-columns">
+          <div class="dir-col">
+            <h5>1. Trục Quốc Lộ 1A &amp; Trung Tâm</h5>
+            <ul>
+              <li><a href="xe-ghep-ha-lam-da-nang.html"><span>Xe ghép Thị trấn Hà Lam ↔ Đà Nẵng</span> <span class="dir-badge">100K</span></a></li>
+              <li><a href="xe-di-sat-hach-lai-xe-quang-nam-da-nang.html"><span>Xe đi Sát Hạch Lái Xe (Minh Sơn &amp; QJC)</span> <span class="dir-badge">100K</span></a></li>
+              <li><a href="xe-ghep-binh-nguyen-da-nang.html"><span>Xe ghép Bình Nguyên &amp; BV Thăng Hoa ↔ Đà Nẵng</span> <span class="dir-badge">100K</span></a></li>
+              <li><a href="xe-ghep-binh-phuc-da-nang.html"><span>Xe ghép Xã Bình Phục (Cây Cốc) ↔ Đà Nẵng</span> <span class="dir-badge">100K</span></a></li>
+              <li><a href="xe-ghep-huong-an-moc-bai-da-nang.html"><span>Xe ghép Hương An &amp; Mộc Bài ↔ Đà Nẵng</span> <span class="dir-badge">100K</span></a></li>
+            </ul>
+          </div>
+          <div class="dir-col">
+            <h5>2. Trục Tây (ĐT611) &amp; Trục Đông (Biển)</h5>
+            <ul>
+              <li><a href="xe-ghep-binh-quy-da-nang.html"><span>Xe ghép Xã Bình Quý (Quý Hương) ↔ Đà Nẵng</span> <span class="dir-badge">100K</span></a></li>
+              <li><a href="xe-ghep-dong-duong-da-nang.html"><span>Xe ghép Đồng Dương &amp; Bình Định ↔ Đà Nẵng</span> <span class="dir-badge">100K</span></a></li>
+              <li><a href="xe-ghep-binh-phu-da-nang.html"><span>Xe ghép Xã Bình Phú &amp; Lý Trường ↔ Đà Nẵng</span> <span class="dir-badge">100K</span></a></li>
+              <li><a href="xe-ghep-binh-tu-da-nang.html"><span>Xe ghép Xã Bình Tú (Chợ Bình Tú) ↔ Đà Nẵng</span> <span class="dir-badge">100K</span></a></li>
+              <li><a href="xe-ghep-binh-minh-da-nang.html"><span>Xe ghép Biển Bình Minh &amp; VinWonders ↔ Đà Nẵng</span> <span class="dir-badge">100K</span></a></li>
+            </ul>
+          </div>
+          <div class="dir-col">
+            <h5>3. Chuyên Trang Dịch Vụ Trọng Điểm</h5>
+            <ul>
+              <li><a href="/"><span>Trang Chủ: Xe Ghép Thăng Bình Đà Nẵng</span> <span class="dir-badge">20 Xe</span></a></li>
+              <li><a href="xe-di-benh-vien-da-nang.html"><span>Xe Đi Khám Bệnh Viện Đà Nẵng (04h45)</span> <span class="dir-badge">100K</span></a></li>
+              <li><a href="xe-dua-don-san-bay-da-nang.html"><span>Xe Đưa Đón Sân Bay Đà Nẵng &amp; Chu Lai</span> <span class="dir-badge">350K</span></a></li>
+              <li><a href="thue-xe-cuoi-hoi-thang-binh.html"><span>Thuê Xe Hoa Cưới Hỏi &amp; Rước Dâu</span> <span class="dir-badge">Xe Trắng</span></a></li>
+              <li><a href="thue-xe-cuoi-hoi-du-lich-thang-binh.html"><span>Thuê Xe Du Lịch &amp; Hợp Đồng Đi Tỉnh</span> <span class="dir-badge">24/7</span></a></li>
+              <li><a href="bang-gia-xe-ghep-thang-binh.html"><span>Bảng Giá Xe Ghép Toàn Huyện 2026</span> <span class="dir-badge">Niêm Yết</span></a></li>
+            </ul>
+          </div>
         </div>
       </div>
 
@@ -1383,6 +1467,6 @@
   </div>
 
   <!-- INTERACTIVE SCRIPT -->
-  <script src="script.js?v=4.0"></script>
+  <script src="script.js?v=5.0"></script>
 </body>
 </html>
