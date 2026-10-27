@@ -598,9 +598,17 @@ img {
 
 .booking-form-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
   margin-bottom: 20px;
+  align-items: end;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-width: 0;
 }
 
 .form-group label {
@@ -608,19 +616,25 @@ img {
   font-size: 0.84rem;
   font-weight: 700;
   color: var(--slate);
-  margin-bottom: 6px;
+  margin-bottom: 8px;
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .form-control {
   width: 100%;
-  padding: 12px 14px;
+  height: 46px;
+  padding: 10px 12px;
   border-radius: 10px;
   border: 1.5px solid #cbd5e1;
   font-family: inherit;
-  font-size: 0.95rem;
+  font-size: 0.89rem;
   font-weight: 600;
   color: var(--navy);
   background-color: var(--white);
+  text-overflow: ellipsis;
   transition: border-color 0.2s ease;
 }
 
@@ -937,7 +951,7 @@ img {
 /* Hyper-local SEO Commune Cards */
 .commune-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 18px;
 }
 
@@ -947,6 +961,10 @@ img {
   padding: 20px;
   border: 1px solid var(--border);
   box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -959,7 +977,8 @@ img {
 .commune-card-top {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  gap: 10px;
   margin-bottom: 10px;
 }
 
@@ -976,6 +995,8 @@ img {
   font-size: 0.8rem;
   padding: 4px 10px;
   border-radius: 999px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .price-chip.chip-100k {
@@ -998,6 +1019,7 @@ img {
   align-items: center;
   border-top: 1px dashed var(--border);
   padding-top: 10px;
+  margin-top: auto;
 }
 
 /* ==========================================
@@ -1603,9 +1625,27 @@ img {
 
 .subpage-links-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 18px;
   margin-top: 28px;
+}
+
+.services-grid > .service-card:nth-child(7):last-child,
+.subpage-links-grid > .subpage-link-card:nth-child(4):last-child {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 992px) {
+  .subpage-links-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .subpage-links-grid,
+  .commune-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .subpage-link-card {
