@@ -245,13 +245,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const seoFunnelTableBody = document.getElementById('seo-funnel-table-body');
   const trafficSourcesGrid = document.getElementById('traffic-sources-grid');
 
+  const getVnDateStr = (d = new Date()) => {
+    const vnTime = new Date(d.getTime() + 7 * 3600 * 1000);
+    return vnTime.toISOString().slice(0, 10);
+  };
+
   const getFilteredConversions = () => {
     const dateMode = filterDateRangeEl?.value || 'all';
     const typeMode = filterConvTypeEl?.value || 'all';
     const statusMode = filterConvStatusEl?.value || 'all';
 
     const now = new Date();
-    const todayIso = now.toISOString().slice(0, 10);
+    const todayIso = getVnDateStr(now);
     const monthPrefix = todayIso.slice(0, 7);
     const sevenDaysAgoTs = Math.floor(now.getTime() / 1000) - 7 * 86400;
 
@@ -824,6 +829,46 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Owner 4268 Reset All Data to 0 Button
+  const btnResetAllData = document.getElementById('btn-reset-all-data');
+  if (btnResetAllData) {
+    btnResetAllData.addEventListener('click', async () => {
+      if (currentRole !== 'owner') {
+        alert('Chỉ Chủ Web (PIN 4268) mới có quyền Reset số liệu đối soát!');
+        return;
+      }
+      if (
+        !confirm(
+          '🧹 XÁC NHẬN RESET SỐ LIỆU VỀ 0:\nToàn bộ lịch sử chuyển đổi test và bộ đếm lượt xem/hoa hồng sẽ được đặt lại về 0 để bắt đầu kỳ đối soát mới.\nAnh chắc chắn muốn Reset chứ?'
+        )
+      ) {
+        return;
+      }
+      try {
+        localStorage.removeItem('nghia_halam_web_orders');
+      } catch (e) {}
+      try {
+        const resp = await fetch('/api/reset-data', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Admin-Pin': currentPin
+          },
+          body: JSON.stringify({ pin: currentPin, notifyTelegram: true })
+        });
+        if (resp.ok) {
+          knownServerOrderIds.clear();
+          serverOrdersList = [];
+          serverPageStats = { pages: {}, daily: {} };
+          renderConversionDashboard();
+          await fetchDashboardData();
+          addLog('🧹 <strong>Chủ Web (PIN 4268)</strong> vừa Reset toàn bộ số liệu chuyển đổi & đối soát về <strong>0</strong>.');
+          alert('✅ Đã Reset toàn bộ số liệu về 0 thành công! Hệ thống sẵn sàng ghi nhận dữ liệu chuẩn từ bây giờ.');
+        }
+      } catch (e) {}
+    });
+  }
+
   // =========================================================================
   // 4. OWNER CONFIGURATION & TELEGRAM BOT SETUP (PIN 4268)
   // =========================================================================
@@ -857,6 +902,9 @@ document.addEventListener('DOMContentLoaded', () => {
       alert('Chỉ Mã PIN Chủ Web (4268) mới có quyền thay đổi cấu hình ăn chia & Telegram!');
       return;
     }
+    if (testTelegram && inputCfgTgEnabled) {
+      inputCfgTgEnabled.checked = true;
+    }
     const payload = {
       pin: currentPin,
       seatFee: parseInt(inputCfgSeatFee?.value || '10000', 10),
@@ -882,9 +930,18 @@ document.addEventListener('DOMContentLoaded', () => {
         if (data && data.config) syncConfigInputs(data.config);
         if (settingsSaveFeedback) {
           settingsSaveFeedback.style.display = 'block';
-          settingsSaveFeedback.textContent = testTelegram
-            ? '🚀 Đã lưu cấu hình và gửi tin nhắn Test về Telegram! Anh vui lòng kiểm tra điện thoại.'
-            : '✅ Đã lưu cấu hình công thức ăn chia (10K/ghế • 10%) & Telegram thành công!';
+          if (testTelegram) {
+            if (data.telegramSent) {
+              settingsSaveFeedback.style.color = '#34d399';
+              settingsSaveFeedback.textContent = `🚀 Đã bắn tin nhắn Test vào nhóm Telegram (Chat ID: ${data.telegramInfo}) thành công! Anh kiểm tra điện thoại ngay nhé.`;
+            } else {
+              settingsSaveFeedback.style.color = '#f87171';
+              settingsSaveFeedback.textContent = `❌ Chưa gửi được Telegram (${data.telegramInfo || 'Kiểm tra lại Token/Chat ID'}).`;
+            }
+          } else {
+            settingsSaveFeedback.style.color = '#34d399';
+            settingsSaveFeedback.textContent = '✅ Đã lưu cấu hình công thức ăn chia (10K/ghế • 10%) & Telegram thành công!';
+          }
         }
         fetchDashboardData();
       }
@@ -914,27 +971,27 @@ document.addEventListener('DOMContentLoaded', () => {
   // 5. 20-VEHICLE FLEET & AI DISPATCH WORKSPACE (TAB 3 & TAB 4)
   // =========================================================================
   const fleet = [
-    { id: 'XE-01', name: 'Anh Nghĩa (Xe Chủ Lực)', phone: '0896.211.296', type: 'VinFast Limo Green 7C', queue: 'TB', loc: '469 Huỳnh Thúc Kháng, Hà Lam', seats: 0, maxSeats: 6, wallet: 850000, trips: 5 },
-    { id: 'XE-02', name: 'Anh Tuấn Hà Lam', phone: '0905.214.112', type: 'VinFast Limo Green 7C', queue: 'TB', loc: 'Ngã 3 Cây Cốc, Hà Lam', seats: 2, maxSeats: 6, wallet: 520000, trips: 4 },
-    { id: 'XE-03', name: 'Anh Hùng Bình Quý', phone: '0935.618.220', type: 'VinFast Limo Green 7C', queue: 'TB', loc: 'Ngã 3 Bình Quý', seats: 0, maxSeats: 6, wallet: 480000, trips: 4 },
-    { id: 'XE-04', name: 'Anh Dũng Cầu Ông Triệu', phone: '0905.771.309', type: 'Mitsubishi Xpander 7C', queue: 'TB', loc: 'Cầu Ông Triệu, Bình Định', seats: 0, maxSeats: 6, wallet: 410000, trips: 3 },
-    { id: 'XE-05', name: 'Anh Khoa Hà Châu', phone: '0983.412.885', type: 'VinFast Limo Green 7C', queue: 'TB', loc: 'Chợ Hà Châu, Bình Phú', seats: 0, maxSeats: 6, wallet: 600000, trips: 4 },
-    { id: 'XE-06', name: 'Anh Minh Quý Mỹ', phone: '0914.552.190', type: 'Toyota Veloz Cross 7C', queue: 'TB', loc: 'Thôn Quý Mỹ, Bình Quý', seats: 0, maxSeats: 6, wallet: 350000, trips: 3 },
-    { id: 'XE-07', name: 'Anh Tâm Bình Nguyên', phone: '0905.918.441', type: 'Hyundai Accent 4C', queue: 'TB', loc: 'Xã Bình Nguyên', seats: 0, maxSeats: 4, wallet: 390000, trips: 3 },
-    { id: 'XE-08', name: 'Anh Hoàng Bình Phục', phone: '0935.109.774', type: 'VinFast Limo Green 7C', queue: 'TB', loc: 'QL1A Xã Bình Phục', seats: 0, maxSeats: 6, wallet: 470000, trips: 3 },
-    { id: 'XE-09', name: 'Anh Sơn Bình Chánh', phone: '0905.334.612', type: 'Toyota Vios 4C', queue: 'TB', loc: 'Xã Bình Chánh', seats: 0, maxSeats: 4, wallet: 310000, trips: 2 },
-    { id: 'XE-10', name: 'Anh Phúc Bình Minh', phone: '0977.812.550', type: 'VinFast Limo Green 7C', queue: 'TB', loc: 'Gần VinWonders Nam Hội An', seats: 0, maxSeats: 6, wallet: 540000, trips: 4 },
-    { id: 'XE-11', name: 'Anh Long Hà Lam', phone: '0905.663.901', type: 'Mitsubishi Xpander 7C', queue: 'TB', loc: 'Chợ Hà Lam, Thăng Bình', seats: 0, maxSeats: 6, wallet: 430000, trips: 3 },
+    { id: 'XE-01', name: 'Anh Nghĩa (Xe Chủ Lực)', phone: '0896.211.296', type: 'VinFast Limo Green 7C', queue: 'TB', loc: '469 Huỳnh Thúc Kháng, Hà Lam', seats: 0, maxSeats: 6, wallet: 850000, trips: 0 },
+    { id: 'XE-02', name: 'Anh Tuấn Hà Lam', phone: '0905.214.112', type: 'VinFast Limo Green 7C', queue: 'TB', loc: 'Ngã 3 Cây Cốc, Hà Lam', seats: 0, maxSeats: 6, wallet: 520000, trips: 0 },
+    { id: 'XE-03', name: 'Anh Hùng Bình Quý', phone: '0935.618.220', type: 'VinFast Limo Green 7C', queue: 'TB', loc: 'Ngã 3 Bình Quý', seats: 0, maxSeats: 6, wallet: 480000, trips: 0 },
+    { id: 'XE-04', name: 'Anh Dũng Cầu Ông Triệu', phone: '0905.771.309', type: 'Mitsubishi Xpander 7C', queue: 'TB', loc: 'Cầu Ông Triệu, Bình Định', seats: 0, maxSeats: 6, wallet: 410000, trips: 0 },
+    { id: 'XE-05', name: 'Anh Khoa Hà Châu', phone: '0983.412.885', type: 'VinFast Limo Green 7C', queue: 'TB', loc: 'Chợ Hà Châu, Bình Phú', seats: 0, maxSeats: 6, wallet: 600000, trips: 0 },
+    { id: 'XE-06', name: 'Anh Minh Quý Mỹ', phone: '0914.552.190', type: 'Toyota Veloz Cross 7C', queue: 'TB', loc: 'Thôn Quý Mỹ, Bình Quý', seats: 0, maxSeats: 6, wallet: 350000, trips: 0 },
+    { id: 'XE-07', name: 'Anh Tâm Bình Nguyên', phone: '0905.918.441', type: 'Hyundai Accent 4C', queue: 'TB', loc: 'Xã Bình Nguyên', seats: 0, maxSeats: 4, wallet: 390000, trips: 0 },
+    { id: 'XE-08', name: 'Anh Hoàng Bình Phục', phone: '0935.109.774', type: 'VinFast Limo Green 7C', queue: 'TB', loc: 'QL1A Xã Bình Phục', seats: 0, maxSeats: 6, wallet: 470000, trips: 0 },
+    { id: 'XE-09', name: 'Anh Sơn Bình Chánh', phone: '0905.334.612', type: 'Toyota Vios 4C', queue: 'TB', loc: 'Xã Bình Chánh', seats: 0, maxSeats: 4, wallet: 310000, trips: 0 },
+    { id: 'XE-10', name: 'Anh Phúc Bình Minh', phone: '0977.812.550', type: 'VinFast Limo Green 7C', queue: 'TB', loc: 'Gần VinWonders Nam Hội An', seats: 0, maxSeats: 6, wallet: 540000, trips: 0 },
+    { id: 'XE-11', name: 'Anh Long Hà Lam', phone: '0905.663.901', type: 'Mitsubishi Xpander 7C', queue: 'TB', loc: 'Chợ Hà Lam, Thăng Bình', seats: 0, maxSeats: 6, wallet: 430000, trips: 0 },
 
-    { id: 'XE-12', name: 'Anh Hải (Trực BV Đa Khoa)', phone: '0905.882.119', type: 'VinFast Limo Green 7C', queue: 'DN', loc: 'Cổng BV Đa Khoa Đà Nẵng', seats: 1, maxSeats: 6, wallet: 590000, trips: 4 },
-    { id: 'XE-13', name: 'Anh Bảo (Trực Sân Bay)', phone: '0935.441.208', type: 'VinFast Limo Green 7C', queue: 'DN', loc: 'Sân bay Quốc tế Đà Nẵng', seats: 0, maxSeats: 6, wallet: 640000, trips: 5 },
-    { id: 'XE-14', name: 'Anh Thành (Trực BV 600G)', phone: '0905.129.884', type: 'Toyota Innova 7C', queue: 'DN', loc: 'BV Phụ Sản - Nhi 600 Giường', seats: 0, maxSeats: 6, wallet: 420000, trips: 3 },
-    { id: 'XE-15', name: 'Anh Đạt (Trực BV Ung Bướu)', phone: '0914.773.210', type: 'VinFast Limo Green 7C', queue: 'DN', loc: 'BV Ung Bướu Đà Nẵng', seats: 0, maxSeats: 6, wallet: 510000, trips: 4 },
-    { id: 'XE-16', name: 'Anh Vũ Hải Châu', phone: '0905.501.337', type: 'Honda City 4C', queue: 'DN', loc: 'Quận Hải Châu, Đà Nẵng', seats: 0, maxSeats: 4, wallet: 360000, trips: 3 },
-    { id: 'XE-17', name: 'Anh Khánh Thanh Khê', phone: '0935.990.142', type: 'VinFast Limo Green 7C', queue: 'DN', loc: 'Ga Đà Nẵng / Thanh Khê', seats: 0, maxSeats: 6, wallet: 490000, trips: 3 },
-    { id: 'XE-18', name: 'Anh Tùng Cẩm Lệ', phone: '0905.712.665', type: 'Mitsubishi Xpander 7C', queue: 'DN', loc: 'Ngã tư Cẩm Lệ, Đà Nẵng', seats: 0, maxSeats: 6, wallet: 380000, trips: 3 },
-    { id: 'XE-19', name: 'Anh Nam Sơn Trà', phone: '0989.314.778', type: 'VinFast Limo Green 7C', queue: 'DN', loc: 'Chùa Linh Ứng / Sơn Trà', seats: 0, maxSeats: 6, wallet: 550000, trips: 4 },
-    { id: 'XE-20', name: 'Anh Việt Ngũ Hành Sơn', phone: '0905.238.991', type: 'Mazda 3 4C', queue: 'DN', loc: 'Ngũ Hành Sơn, Đà Nẵng', seats: 0, maxSeats: 4, wallet: 330000, trips: 2 }
+    { id: 'XE-12', name: 'Anh Hải (Trực BV Đa Khoa)', phone: '0905.882.119', type: 'VinFast Limo Green 7C', queue: 'DN', loc: 'Cổng BV Đa Khoa Đà Nẵng', seats: 0, maxSeats: 6, wallet: 590000, trips: 0 },
+    { id: 'XE-13', name: 'Anh Bảo (Trực Sân Bay)', phone: '0935.441.208', type: 'VinFast Limo Green 7C', queue: 'DN', loc: 'Sân bay Quốc tế Đà Nẵng', seats: 0, maxSeats: 6, wallet: 640000, trips: 0 },
+    { id: 'XE-14', name: 'Anh Thành (Trực BV 600G)', phone: '0905.129.884', type: 'Toyota Innova 7C', queue: 'DN', loc: 'BV Phụ Sản - Nhi 600 Giường', seats: 0, maxSeats: 6, wallet: 420000, trips: 0 },
+    { id: 'XE-15', name: 'Anh Đạt (Trực BV Ung Bướu)', phone: '0914.773.210', type: 'VinFast Limo Green 7C', queue: 'DN', loc: 'BV Ung Bướu Đà Nẵng', seats: 0, maxSeats: 6, wallet: 510000, trips: 0 },
+    { id: 'XE-16', name: 'Anh Vũ Hải Châu', phone: '0905.501.337', type: 'Honda City 4C', queue: 'DN', loc: 'Quận Hải Châu, Đà Nẵng', seats: 0, maxSeats: 4, wallet: 360000, trips: 0 },
+    { id: 'XE-17', name: 'Anh Khánh Thanh Khê', phone: '0935.990.142', type: 'VinFast Limo Green 7C', queue: 'DN', loc: 'Ga Đà Nẵng / Thanh Khê', seats: 0, maxSeats: 6, wallet: 490000, trips: 0 },
+    { id: 'XE-18', name: 'Anh Tùng Cẩm Lệ', phone: '0905.712.665', type: 'Mitsubishi Xpander 7C', queue: 'DN', loc: 'Ngã tư Cẩm Lệ, Đà Nẵng', seats: 0, maxSeats: 6, wallet: 380000, trips: 0 },
+    { id: 'XE-19', name: 'Anh Nam Sơn Trà', phone: '0989.314.778', type: 'VinFast Limo Green 7C', queue: 'DN', loc: 'Chùa Linh Ứng / Sơn Trà', seats: 0, maxSeats: 6, wallet: 550000, trips: 0 },
+    { id: 'XE-20', name: 'Anh Việt Ngũ Hành Sơn', phone: '0905.238.991', type: 'Mazda 3 4C', queue: 'DN', loc: 'Ngũ Hành Sơn, Đà Nẵng', seats: 0, maxSeats: 4, wallet: 330000, trips: 0 }
   ];
 
   let activeQueueTab = 'TB';
@@ -942,24 +999,24 @@ document.addEventListener('DOMContentLoaded', () => {
   let countdownTimer = null;
 
   let currentOrder = {
-    code: '#TB-208',
-    customerPhoneMasked: '0905.***889',
-    customerPhoneFull: '0905.382.889',
+    code: '#TB-001',
+    customerPhoneMasked: 'Chờ khách gọi...',
+    customerPhoneFull: 'Chờ khách gọi...',
     queue: 'TB',
     directionText: 'Thăng Bình ➔ Đà Nẵng',
-    pickup: 'Ngã 3 Bình Quý (Xã Bình Quý)',
-    dropoff: 'Bệnh viện Đa khoa Đà Nẵng',
-    serviceName: 'Đi ghép 2 người (100K/người)',
-    seatsNeeded: 2,
+    pickup: 'Thị trấn Hà Lam, Thăng Bình',
+    dropoff: 'Trung tâm TP. Đà Nẵng',
+    serviceName: 'Đi ghép 1 người (100K/người)',
+    seatsNeeded: 1,
     isCharter: false,
-    totalFare: 200000,
-    commissionFee: 20000,
-    driverNet: 180000
+    totalFare: 100000,
+    commissionFee: 10000,
+    driverNet: 90000
   };
 
   const pooledSeats = [
-    { label: 'Ghế 1: Chị Lan (Hà Lam ➔ BV Đa Khoa)', occupied: true },
-    { label: 'Ghế 2: Cô Tư (Hà Lam ➔ BV Đa Khoa)', occupied: true },
+    { label: 'Ghế 1: Đang trống (100K)', occupied: false },
+    { label: 'Ghế 2: Đang trống (100K)', occupied: false },
     { label: 'Ghế 3: Đang trống (100K)', occupied: false },
     { label: 'Ghế 4: Đang trống (100K)', occupied: false },
     { label: 'Ghế 5: Đang trống (100K)', occupied: false },
@@ -1515,6 +1572,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (found) loadOrderIntoAiDispatcher(found);
           });
         });
+      } else if (livePickupListEl) {
+        livePickupListEl.innerHTML = `
+          <div style="font-size: 0.85rem; color: #94a3b8; padding: 6px 0;">
+            🟢 Hệ thống đang ở trạng thái chuẩn (0 đơn). Ngay khi khách bấm <strong>Gọi / Zalo / 📍 HÃY ĐÓN TÔI</strong> trên 16 trang web, dữ liệu sẽ nhảy lên đây và bắn về Telegram tức thì!
+          </div>
+        `;
       }
     } catch (e) {}
   };

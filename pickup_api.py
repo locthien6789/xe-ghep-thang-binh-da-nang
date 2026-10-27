@@ -6,6 +6,7 @@ import os
 import random
 import re
 import threading
+import urllib.error
 import urllib.parse
 import urllib.request
 from datetime import datetime, timezone, timedelta
@@ -26,9 +27,9 @@ DEFAULT_CONFIG = {
     "seatFee": 10000,         # 10.000đ / ghế ghép (100K)
     "charterPercent": 10,     # 10% / chuyến bao xe, du lịch, cưới hỏi
     "dedupMinutes": 30,       # Gom trùng khách trong 30 phút
-    "telegramBotToken": "",
-    "telegramChatId": "",
-    "telegramEnabled": False,
+    "telegramBotToken": "8952626307:AAGJddneOL6I6jEF37Afu02MkhBN5voFmO8",
+    "telegramChatId": "-1003984520283",
+    "telegramEnabled": True,
 }
 
 PAGE_TITLES_MAP = {
@@ -50,6 +51,16 @@ PAGE_TITLES_MAP = {
     "/xe-ghep-binh-tu-da-nang.html": "Tuyến: Xã Bình Tú ↔ Đà Nẵng",
     "/xe-ghep-binh-minh-da-nang.html": "Tuyến: Biển Bình Minh & VinWonders ↔ Đà Nẵng",
 }
+
+
+def normalize_telegram_chat_id(raw_id):
+    cid = str(raw_id or "").strip()
+    if not cid:
+        return ""
+    # Auto-fix missing minus sign on Telegram Supergroup IDs (e.g. 1003984520283 -> -1003984520283)
+    if cid.isdigit() and cid.startswith("100") and len(cid) >= 12:
+        return "-" + cid
+    return cid
 
 
 def load_json(filepath, default_val):
@@ -77,6 +88,7 @@ def load_config():
     merged = dict(DEFAULT_CONFIG)
     if isinstance(cfg, dict):
         merged.update(cfg)
+    merged["telegramChatId"] = normalize_telegram_chat_id(merged.get("telegramChatId", ""))
     return merged
 
 
@@ -88,7 +100,7 @@ def calculate_commission(fare, seats, is_charter, service_code, cfg):
 
     if service_code == "gui-hang" or fare <= 60000:
         return max(5000, int(round(fare * charter_pct / 100.0)))
-    if is_charter or fare >= 350000 or "bao" in str(service_code).lower() or "thue" in str(service_code).lower():
+    if is_charter or seats == 0 or fare >= 350000 or "bao" in str(service_code).lower() or "thue" in str(service_code).lower():
         return int(round(fare * charter_pct / 100.0))
     return seats * seat_fee
 
@@ -125,19 +137,24 @@ def detect_traffic_source(referrer, utm_source=""):
     return "Nguồn Web khác"
 
 
-def send_telegram_async(cfg, text_msg):
-    if not cfg.get("telegramEnabled"):
-        return
+def send_telegram_sync(cfg, text_msg):
     token = str(cfg.get("telegramBotToken", "")).strip()
-    chat_id = str(cfg.get("telegramChatId", "")).strip()
+    chat_id = normalize_telegram_chat_id(cfg.get("telegramChatId", ""))
     if not token or not chat_id:
-        return
+        return False, "Thiếu Bot Token hoặc Chat ID"
 
-    def _worker():
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    candidates = [chat_id]
+    if not chat_id.startswith("-"):
+        candidates.append("-" + chat_id)
+        if not chat_id.startswith("100"):
+            candidates.append("-100" + chat_id)
+
+    last_err = ""
+    for cid in candidates:
         try:
-            url = f"https://api.telegram.org/bot{token}/sendMessage"
             payload = {
-                "chat_id": chat_id,
+                "chat_id": cid,
                 "text": text_msg,
                 "parse_mode": "HTML",
                 "disable_web_page_preview": True,
@@ -151,8 +168,28 @@ def send_telegram_async(cfg, text_msg):
             )
             with urllib.request.urlopen(req, timeout=8) as resp:
                 resp.read()
-        except Exception:
-            pass
+                return True, cid
+        except urllib.error.HTTPError as e:
+            try:
+                err_body = e.read().decode("utf-8", errors="ignore")
+                last_err = f"HTTP {e.code}: {err_body}"
+            except Exception:
+                last_err = f"HTTP {e.code}"
+        except Exception as e:
+            last_err = str(e)
+    return False, last_err
+
+
+def send_telegram_async(cfg, text_msg):
+    if not cfg.get("telegramEnabled"):
+        return
+    token = str(cfg.get("telegramBotToken", "")).strip()
+    chat_id = normalize_telegram_chat_id(cfg.get("telegramChatId", ""))
+    if not token or not chat_id:
+        return
+
+    def _worker():
+        send_telegram_sync(cfg, text_msg)
 
     t = threading.Thread(target=_worker, daemon=True)
     t.start()
@@ -201,7 +238,7 @@ class ConversionAPIHandler(BaseHTTPRequestHandler):
         qs = urllib.parse.parse_qs(parsed.query)
 
         if path == "/api/health":
-            self._send_json(200, {"ok": True, "service": "xeghepthangbinh_conversion_api_v2"})
+            self._send_json(200, {"ok": True, "service": "xeghepthangbinh_conversion_api_v2.1"})
             return
 
         if path == "/api/pickup-requests" or path == "/api/dashboard-summary":
@@ -215,16 +252,15 @@ class ConversionAPIHandler(BaseHTTPRequestHandler):
                 stats = load_json(STATS_FILE, {"pages": {}, "daily": {}})
                 cfg = load_config()
 
-                # Ensure all orders have commission calculated according to current formula if missing
+                # Recalculate fee if needed & normalize fields
                 for o in orders:
-                    if "fee" not in o or o.get("fee") is None:
-                        o["fee"] = calculate_commission(
-                            o.get("fare", 100000),
-                            o.get("seats", 1),
-                            o.get("isCharter", False),
-                            o.get("serviceCode", "ghep-1"),
-                            cfg,
-                        )
+                    o["fee"] = calculate_commission(
+                        o.get("fare", 100000),
+                        o.get("seats", 1),
+                        o.get("isCharter", False),
+                        o.get("serviceCode", "ghep-1"),
+                        cfg,
+                    )
                     if "convType" not in o:
                         o["convType"] = "form_gps" if o.get("phoneClean") else "call_0896"
                     if "pageSlug" not in o:
@@ -236,12 +272,11 @@ class ConversionAPIHandler(BaseHTTPRequestHandler):
                     if "source" not in o:
                         o["source"] = "Google Tìm Kiếm (SEO)"
 
-            # Hide sensitive token if not owner
             safe_cfg = {
                 "seatFee": cfg.get("seatFee", 10000),
                 "charterPercent": cfg.get("charterPercent", 10),
                 "dedupMinutes": cfg.get("dedupMinutes", 30),
-                "telegramEnabled": cfg.get("telegramEnabled", False),
+                "telegramEnabled": cfg.get("telegramEnabled", True),
                 "telegramBotToken": cfg.get("telegramBotToken", "") if role == "owner" else "",
                 "telegramChatId": cfg.get("telegramChatId", "") if role == "owner" else "",
             }
@@ -452,15 +487,15 @@ class ConversionAPIHandler(BaseHTTPRequestHandler):
                     # Send Telegram update if customer upgraded from anonymous call click to real phone number
                     if is_pickup_form:
                         tg_msg = (
-                            f"🔥 <b>[CẬP NHẬT SĐT KHÁCH HÀNG] {existing_order.get('code')}</b>\n"
+                            f"🔥 <b>[CẬP NHẬT SĐT & GPS KHÁCH HÀNG] ({existing_order.get('code')})</b>\n"
                             f"📞 SĐT Khách: <b>{raw_phone}</b>\n"
                             f"🕒 Giờ gửi: {now.strftime('%H:%M:%S - %d/%m/%Y')}\n"
                             f"📍 Lộ trình: {pickup_text} ➔ {dropoff_text}\n"
                             f"🚘 Dịch vụ: {service_text}\n"
                             f"💵 Giá cước: <b>{format_vnd(existing_order['fare'])}</b>\n"
-                            f"💰 Hoa hồng Web (10%): <b>{format_vnd(existing_order['fee'])}</b>\n"
+                            f"💰 Hoa hồng Web (10K/ghế • 10%): <b>{format_vnd(existing_order['fee'])}</b>\n"
                             f"📄 Trang đích: {page_title}\n"
-                            f"{'🗺️ GPS: ' + maps_url if maps_url else ''}"
+                            f"{'🗺️ Bản đồ GPS: ' + maps_url if maps_url else ''}"
                         )
                         send_telegram_async(cfg, tg_msg)
 
@@ -555,6 +590,7 @@ class ConversionAPIHandler(BaseHTTPRequestHandler):
         if self.path.startswith("/api/pickup-status") or self.path.startswith("/api/conversion-status"):
             pin = str(payload.get("pin", "") or self.headers.get("X-Admin-Pin", "")).strip()
             role = "owner" if pin == OWNER_PIN else ("partner" if pin == PARTNER_PIN else "partner")
+            actor_label = "Chủ Web (4268)" if role == "owner" else "Nhà Xe (1691)"
 
             order_id = str(payload.get("id", "")).strip()
             action = str(payload.get("action", "update")).strip()
@@ -579,7 +615,7 @@ class ConversionAPIHandler(BaseHTTPRequestHandler):
                 for o in orders:
                     if o.get("id") == order_id or o.get("code") == order_id:
                         o["status"] = new_status
-                        o["updatedBy"] = "Chủ Web (4268)" if role == "owner" else "Nhà Xe (1691)"
+                        o["updatedBy"] = actor_label
                         o["updatedAt"] = now.strftime("%H:%M:%S %d/%m")
                         if driver_id:
                             o["driverId"] = driver_id
@@ -592,12 +628,19 @@ class ConversionAPIHandler(BaseHTTPRequestHandler):
                             o["refunded"] = False
                             o["cancelReason"] = ""
 
-                        # Allow Owner (or Partner confirming exact charter amount) to update fare/seats and recalculate 10%
                         if custom_fare is not None:
                             o["fare"] = int(custom_fare)
                         if custom_seats is not None:
-                            o["seats"] = int(custom_seats)
-                            o["isCharter"] = int(custom_seats) == 0 or int(o.get("fare", 0)) >= 350000
+                            s_val = int(custom_seats)
+                            o["seats"] = s_val if s_val > 0 else 4
+                            o["isCharter"] = (s_val == 0) or (int(o.get("fare", 0)) >= 350000)
+                            if o["isCharter"]:
+                                o["service"] = f"Bao nguyên xe riêng ({format_vnd(o['fare'])})"
+                                o["serviceCode"] = "bao-xe-4-7"
+                            else:
+                                o["service"] = f"Đi ghép {s_val} ghế ({format_vnd(o['fare'])})"
+                                o["serviceCode"] = f"ghep-{s_val}"
+
                         o["fee"] = calculate_commission(
                             o.get("fare", 100000),
                             o.get("seats", 1),
@@ -610,10 +653,51 @@ class ConversionAPIHandler(BaseHTTPRequestHandler):
 
                 save_json(ORDERS_FILE, orders)
 
+                if updated:
+                    if new_status in ("refunded", "cancelled"):
+                        tg_update = (
+                            f"⚠️ <b>[BÁO HỦY ĐƠN CHUYỂN ĐỔI {updated.get('code')}]</b>\n"
+                            f"👤 Khách: {updated.get('phone')}\n"
+                            f"📝 Lý do hủy: <b>{updated.get('cancelReason')}</b>\n"
+                            f"🛠️ Người thao tác: <b>{actor_label}</b> lúc {now.strftime('%H:%M:%S')}"
+                        )
+                        send_telegram_async(cfg, tg_update)
+                    elif custom_fare is not None:
+                        tg_update = (
+                            f"✏️ <b>[CẬP NHẬT CƯỚC & HOA HỒNG ĐƠN {updated.get('code')}]</b>\n"
+                            f"🚘 Dịch vụ thực tế: <b>{updated.get('service')}</b>\n"
+                            f"💵 Doanh thu cuốc: <b>{format_vnd(updated.get('fare'))}</b>\n"
+                            f"💰 Hoa hồng Web (10K/ghế • 10%): <b>{format_vnd(updated.get('fee'))}</b>\n"
+                            f"🛠️ Người cập nhật: <b>{actor_label}</b> lúc {now.strftime('%H:%M:%S')}"
+                        )
+                        send_telegram_async(cfg, tg_update)
+
             self._send_json(200, {"ok": True, "order": updated})
             return
 
-        # 4. OWNER CONFIGURATION & TELEGRAM BOT SETUP (PIN 4268 ONLY)
+        # 4. RESET ALL DATA TO ZERO FOR NEW SETTLEMENT PERIOD (OWNER PIN 4268 ONLY)
+        if self.path.startswith("/api/reset-data"):
+            pin = str(payload.get("pin", "") or self.headers.get("X-Admin-Pin", "")).strip()
+            if pin != OWNER_PIN:
+                self._send_json(403, {"ok": False, "error": "Chỉ Mã PIN Chủ Web (4268) mới có quyền Reset dữ liệu đối soát!"})
+                return
+
+            with LOCK:
+                save_json(ORDERS_FILE, [])
+                save_json(STATS_FILE, {"pages": {}, "daily": {}})
+                cfg = load_config()
+
+            if payload.get("notifyTelegram", False):
+                tg_reset = (
+                    "🧹 <b>[ĐÃ RESET SỐ LIỆU ĐỐI SOÁT VỀ 0]</b>\n"
+                    f"Chủ Web (PIN 4268) vừa đặt lại toàn bộ bộ đếm Chuyển đổi & Hoa hồng về <b>0</b> lúc <b>{now.strftime('%H:%M:%S - %d/%m/%Y')}</b> để bắt đầu kỳ đối soát chính thức!"
+                )
+                send_telegram_async(cfg, tg_reset)
+
+            self._send_json(200, {"ok": True, "reset": True})
+            return
+
+        # 5. OWNER CONFIGURATION & TELEGRAM BOT SETUP (PIN 4268 ONLY)
         if self.path.startswith("/api/config"):
             pin = str(payload.get("pin", "") or self.headers.get("X-Admin-Pin", "")).strip()
             if pin != OWNER_PIN:
@@ -631,22 +715,36 @@ class ConversionAPIHandler(BaseHTTPRequestHandler):
                 if "telegramBotToken" in payload:
                     cfg["telegramBotToken"] = str(payload["telegramBotToken"]).strip()
                 if "telegramChatId" in payload:
-                    cfg["telegramChatId"] = str(payload["telegramChatId"]).strip()
+                    cfg["telegramChatId"] = normalize_telegram_chat_id(payload["telegramChatId"])
                 if "telegramEnabled" in payload:
                     cfg["telegramEnabled"] = bool(payload["telegramEnabled"])
+                # If both token and chat_id are present and user clicked testTelegram, ensure enabled is True
+                if payload.get("testTelegram") and cfg.get("telegramBotToken") and cfg.get("telegramChatId"):
+                    cfg["telegramEnabled"] = True
                 save_json(CONFIG_FILE, cfg)
 
+            tg_sent = False
+            tg_info = ""
             if payload.get("testTelegram"):
                 test_msg = (
                     "✅ <b>[KẾT NỐI TELEGRAM THÀNH CÔNG]</b>\n"
-                    "Hệ thống Theo Dõi Chuyển Đổi & Đối Soát Ăn Chia <b>xeghepthangbinhdanang.vn</b> đã kết nối!\n"
+                    "Hệ thống Theo Dõi Chuyển Đổi & Đối Soát Ăn Chia <b>xeghepthangbinhdanang.vn</b> đã hoạt động!\n"
                     f"• Công thức ăn chia: <b>Ghép {format_vnd(cfg['seatFee'])}/ghế • Bao xe {cfg['charterPercent']}%</b>\n"
                     f"• Chống trùng khách: <b>{cfg['dedupMinutes']} phút</b>\n"
-                    f"• Thời gian test: {now.strftime('%H:%M:%S - %d/%m/%Y')}"
+                    f"• Thời gian kiểm tra: <b>{now.strftime('%H:%M:%S - %d/%m/%Y')}</b>"
                 )
-                send_telegram_async({**cfg, "telegramEnabled": True}, test_msg)
+                tg_sent, tg_info = send_telegram_sync(cfg, test_msg)
+                if tg_sent and tg_info != cfg.get("telegramChatId"):
+                    with LOCK:
+                        cfg["telegramChatId"] = tg_info
+                        save_json(CONFIG_FILE, cfg)
 
-            self._send_json(200, {"ok": True, "config": cfg})
+            self._send_json(200, {
+                "ok": True,
+                "config": cfg,
+                "telegramSent": tg_sent,
+                "telegramInfo": tg_info,
+            })
             return
 
         self._send_json(404, {"ok": False, "error": "Unknown endpoint"})
@@ -658,5 +756,5 @@ class ConversionAPIHandler(BaseHTTPRequestHandler):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", "8080"))
     server = ThreadingHTTPServer(("0.0.0.0", port), ConversionAPIHandler)
-    print(f"Conversion & Revenue-Share API v2.0 listening on 0.0.0.0:{port}")
+    print(f"Conversion & Revenue-Share API v2.1 listening on 0.0.0.0:{port}")
     server.serve_forever()

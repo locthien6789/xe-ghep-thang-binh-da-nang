@@ -223,13 +223,16 @@
 
           <div class="crm-actions">
             <button type="button" id="btn-refresh-conversions" class="btn-crm-action">
-              🔄 Làm Mới Dữ Liệu
+              🔄 Làm Mới
             </button>
             <button type="button" id="btn-export-csv" class="btn-crm-action emerald">
               📥 Xuất File Đối Soát Excel (CSV)
             </button>
             <button type="button" id="btn-print-statement" class="btn-crm-action amber">
-              🖨️ In Phiếu Đối Soát Ăn Chia
+              🖨️ In Phiếu Đối Soát
+            </button>
+            <button type="button" id="btn-reset-all-data" class="btn-crm-action owner-only-el" style="border-color:#ef4444;color:#f87171;">
+              🧹 Reset Số Liệu Về 0
             </button>
           </div>
         </div>
@@ -626,7 +629,7 @@
             </div>
 
             <div class="settings-form-group" style="display:flex;align-items:center;gap:10px;background:rgba(16,185,129,0.1);padding:12px;border-radius:10px;border:1px solid rgba(16,185,129,0.3);">
-              <input type="checkbox" id="input-cfg-tg-enabled" style="width:20px;height:20px;accent-color:#10b981;cursor:pointer;" />
+              <input type="checkbox" id="input-cfg-tg-enabled" checked style="width:20px;height:20px;accent-color:#10b981;cursor:pointer;" />
               <label for="input-cfg-tg-enabled" style="margin:0;cursor:pointer;font-weight:800;color:#34d399;">
                 Bật bắn thông báo Telegram ngay giây phút khách bấm Gọi / Zalo / Đặt Xe
               </label>
