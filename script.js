@@ -1,4 +1,76 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // =========================================================================
+  // 0. FIRST-PARTY SESSION, PAGEVIEW & CONVERSION TRACKING ENGINE (v5.2)
+  //    Captures 100% of Click-to-Call, Click-to-Zalo & GPS Form leads
+  // =========================================================================
+  const getOrCreateSessionId = () => {
+    try {
+      let sid = sessionStorage.getItem('nghia_session_id') || localStorage.getItem('nghia_session_id');
+      if (!sid) {
+        sid = 'S-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+        sessionStorage.setItem('nghia_session_id', sid);
+        localStorage.setItem('nghia_session_id', sid);
+      }
+      return sid;
+    } catch (e) {
+      return 'S-' + Date.now().toString(36);
+    }
+  };
+
+  const currentSessionId = getOrCreateSessionId();
+  let activeLandmarkNote = '';
+
+  const detectDeviceName = () => {
+    const ua = navigator.userAgent || '';
+    if (/iPhone|iPad|iPod/i.test(ua)) return 'iPhone / iOS';
+    if (/Android/i.test(ua)) return 'Điện thoại Android';
+    return 'Điện thoại / Máy tính';
+  };
+
+  const sendBeaconOrFetch = (url, dataObj) => {
+    try {
+      const jsonStr = JSON.stringify(dataObj);
+      if (navigator.sendBeacon) {
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const queued = navigator.sendBeacon(url, blob);
+        if (queued) return;
+      }
+      fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: jsonStr,
+        keepalive: true
+      }).catch(() => {});
+    } catch (e) {}
+  };
+
+  // Track initial pageview once per session per URL
+  try {
+    const pageKey = 'pv_' + (window.location.pathname || '/');
+    if (!sessionStorage.getItem(pageKey)) {
+      sessionStorage.setItem(pageKey, '1');
+      sendBeaconOrFetch('/api/track-pageview', {
+        sessionId: currentSessionId,
+        page: window.location.pathname || '/',
+        referrer: document.referrer || '',
+        utmSource: new URLSearchParams(window.location.search).get('utm_source') || '',
+        isQuoteInteraction: false
+      });
+    }
+  } catch (e) {}
+
+  let quoteInteractionTracked = false;
+  const trackQuoteInteractionOnce = () => {
+    if (quoteInteractionTracked) return;
+    quoteInteractionTracked = true;
+    sendBeaconOrFetch('/api/track-pageview', {
+      sessionId: currentSessionId,
+      page: window.location.pathname || '/',
+      referrer: document.referrer || '',
+      isQuoteInteraction: true
+    });
+  };
+
   // 1. HERO IMAGE GALLERY SWITCHER
   const mainImg = document.getElementById('hero-main-img');
   const mainCaption = document.getElementById('hero-main-caption');
@@ -19,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 2. INTERACTIVE BOOKING & INSTANT PRICE CALCULATOR V4.0
+  // 2. INTERACTIVE BOOKING & INSTANT PRICE CALCULATOR V5.2
   let currentDirection = 'Thăng Bình ➔ Đà Nẵng';
   const dirTabs = document.querySelectorAll('.dir-tab');
   const pickupSelect = document.getElementById('booking-pickup');
@@ -31,6 +103,68 @@ document.addEventListener('DOMContentLoaded', () => {
   const upsellBannerEl = document.getElementById('upsell-banner');
   const upsellTextEl = document.getElementById('upsell-text');
   const upsellSwitchBtn = document.getElementById('btn-upsell-switch');
+
+  const resolveServiceMetrics = (serviceCode) => {
+    switch (serviceCode) {
+      case 'ghep-1':
+        return { seats: 1, fare: 100000, isCharter: false };
+      case 'ghep-2':
+        return { seats: 2, fare: 200000, isCharter: false };
+      case 'ghep-3':
+        return { seats: 3, fare: 300000, isCharter: false };
+      case 'ghep-4':
+        return { seats: 4, fare: 400000, isCharter: false };
+      case 'bao-xe-4-7':
+        return { seats: 4, fare: 400000, isCharter: true };
+      case 'bao-xe-khu-hoi':
+        return { seats: 4, fare: 700000, isCharter: true };
+      case 'nhom-sat-hach':
+        return { seats: 4, fare: 400000, isCharter: true };
+      case 'thue-xe-du-lich':
+        return { seats: 4, fare: 500000, isCharter: true };
+      case 'thue-xe-cuoi-hoi':
+        return { seats: 4, fare: 600000, isCharter: true };
+      case 'thue-xe-di-tinh':
+        return { seats: 4, fare: 500000, isCharter: true };
+      case 'gui-hang':
+        return { seats: 1, fare: 50000, isCharter: false };
+      default:
+        return { seats: 1, fare: 100000, isCharter: false };
+    }
+  };
+
+  const getCurrentBookingContext = (convType, targetPhone, buttonLabel) => {
+    const serviceCode = serviceSelect ? serviceSelect.value : 'ghep-1';
+    const serviceText = serviceSelect?.options[serviceSelect.selectedIndex]?.text || 'Đi ghép 1 người (100K)';
+    const pickupRaw = pickupSelect?.options[pickupSelect.selectedIndex]?.text || 'Thăng Bình';
+    const dropoffRaw = dropoffSelect?.options[dropoffSelect.selectedIndex]?.text || 'Đà Nẵng';
+    const pickupText = activeLandmarkNote ? `${activeLandmarkNote} (${pickupRaw})` : pickupRaw;
+    const metrics = resolveServiceMetrics(serviceCode);
+    let savedPhone = '';
+    try {
+      savedPhone = localStorage.getItem('nghia_halam_customer_phone') || '';
+    } catch (e) {}
+
+    return {
+      sessionId: currentSessionId,
+      page: window.location.pathname || '/',
+      referrer: document.referrer || '',
+      utmSource: new URLSearchParams(window.location.search).get('utm_source') || '',
+      convType,
+      targetPhone,
+      buttonLabel: (buttonLabel || 'Nút Liên Hệ').replace(/\s+/g, ' ').trim().slice(0, 90),
+      phone: savedPhone,
+      serviceCode,
+      serviceText,
+      pickupText,
+      dropoffText: dropoffRaw,
+      note: activeLandmarkNote,
+      seats: metrics.seats,
+      isCharter: metrics.isCharter,
+      fare: metrics.fare,
+      device: detectDeviceName()
+    };
+  };
 
   const updateQuote = () => {
     if (!serviceSelect || !quotePriceEl || !quoteNoteEl) return;
@@ -125,6 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
     upsellSwitchBtn.addEventListener('click', () => {
       serviceSelect.value = 'bao-xe-4-7';
       updateQuote();
+      trackQuoteInteractionOnce();
       if (typeof window.gtag === 'function') {
         window.gtag('event', 'generate_lead', {
           event_category: 'upsell_bao_xe_click',
@@ -142,11 +277,17 @@ document.addEventListener('DOMContentLoaded', () => {
       tab.classList.add('active');
       currentDirection = tab.getAttribute('data-dir') || 'Thăng Bình ➔ Đà Nẵng';
       updateQuote();
+      trackQuoteInteractionOnce();
     });
   });
 
   [pickupSelect, dropoffSelect, serviceSelect, timeSelect].forEach((el) => {
-    if (el) el.addEventListener('change', updateQuote);
+    if (el) {
+      el.addEventListener('change', () => {
+        updateQuote();
+        trackQuoteInteractionOnce();
+      });
+    }
   });
 
   const quickServiceBtns = document.querySelectorAll('.js-select-service');
@@ -157,6 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (serviceSelect && targetVal) {
         serviceSelect.value = targetVal;
         updateQuote();
+        trackQuoteInteractionOnce();
       }
       const bookingSection = document.getElementById('dat-xe');
       if (bookingSection) {
@@ -186,11 +328,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const zaloBtn1 = document.getElementById('btn-book-zalo-1');
   const zaloBtn2 = document.getElementById('btn-book-zalo-2');
 
-  const handleDirectZalo = (phone) => {
+  const handleDirectZalo = (phone, btnLabel = 'Đặt Xe Qua Zalo') => {
     const msg = buildBookingMessage();
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(msg).catch(() => {});
     }
+    sendBeaconOrFetch('/api/track-conversion', getCurrentBookingContext('zalo_click', phone, btnLabel));
     if (typeof window.gtag === 'function') {
       window.gtag('event', 'generate_lead', {
         event_category: 'zalo_booking_submit',
@@ -202,8 +345,8 @@ document.addEventListener('DOMContentLoaded', () => {
     window.open(`https://zalo.me/${phone}`, '_blank', 'noopener');
   };
 
-  if (zaloBtn1) zaloBtn1.addEventListener('click', () => handleDirectZalo('0896211296'));
-  if (zaloBtn2) zaloBtn2.addEventListener('click', () => handleDirectZalo('0386400800'));
+  if (zaloBtn1) zaloBtn1.addEventListener('click', () => handleDirectZalo('0896211296', zaloBtn1.textContent));
+  if (zaloBtn2) zaloBtn2.addEventListener('click', () => handleDirectZalo('0386400800', zaloBtn2.textContent));
 
   // =========================================================================
   // 3. ELDERLY-FRIENDLY "📍 HÃY ĐÓN TÔI (GỬI SĐT + VỊ TRÍ)" ENGINE
@@ -217,13 +360,6 @@ document.addEventListener('DOMContentLoaded', () => {
     status: 'idle' // idle | loading | success | fallback
   };
 
-  const detectDeviceName = () => {
-    const ua = navigator.userAgent || '';
-    if (/iPhone|iPad|iPod/i.test(ua)) return 'iPhone / iOS';
-    if (/Android/i.test(ua)) return 'Điện thoại Android';
-    return 'Điện thoại / Máy tính';
-  };
-
   const buildSmsHref = (targetPhone, bodyText) => {
     const ua = navigator.userAgent || '';
     const isIOS = /iPhone|iPad|iPod/i.test(ua);
@@ -231,7 +367,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return `sms:${targetPhone}${sep}body=${encodeURIComponent(bodyText)}`;
   };
 
-  // Inject Modal HTML into body so all 6 pages share the exact same experience
+  // Inject Modal HTML into body so all 16 pages share the exact same experience
   const injectPickupMeModal = () => {
     if (document.getElementById('pickup-me-modal')) return;
 
@@ -273,15 +409,15 @@ document.addEventListener('DOMContentLoaded', () => {
               <div class="elderly-field-group">
                 <label>🚘 2. Chọn Số Người Đi (1 người = 100K):</label>
                 <div class="seat-quick-pills" id="modal-seat-pills">
-                  <button type="button" class="seat-pill-btn active" data-service="Đi ghép 1 người (100K)" data-fare="100000">
+                  <button type="button" class="seat-pill-btn active" data-code="ghep-1" data-seats="1" data-service="Đi ghép 1 người (100K)" data-fare="100000">
                     <strong>1 Người</strong>
                     <span>100.000đ</span>
                   </button>
-                  <button type="button" class="seat-pill-btn" data-service="Đi ghép 2 người (200K)" data-fare="200000">
+                  <button type="button" class="seat-pill-btn" data-code="ghep-2" data-seats="2" data-service="Đi ghép 2 người (200K)" data-fare="200000">
                     <strong>2 Người</strong>
                     <span>200.000đ</span>
                   </button>
-                  <button type="button" class="seat-pill-btn" data-service="Bao nguyên xe riêng (350K–600K)" data-fare="400000">
+                  <button type="button" class="seat-pill-btn" data-code="bao-xe-4-7" data-seats="4" data-service="Bao nguyên xe riêng (350K–600K)" data-fare="400000">
                     <strong>Bao Xe Riêng</strong>
                     <span>350K–600K</span>
                   </button>
@@ -372,6 +508,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const backupSmsBtn = document.getElementById('btn-backup-sms');
   const backupZaloBtn = document.getElementById('btn-backup-zalo');
 
+  let selectedModalCode = 'ghep-1';
+  let selectedModalSeats = 1;
   let selectedModalService = 'Đi ghép 1 người (100K)';
   let selectedModalFare = 100000;
   let lastSubmittedMsg = '';
@@ -388,6 +526,8 @@ document.addEventListener('DOMContentLoaded', () => {
     pill.addEventListener('click', () => {
       seatPills.forEach((p) => p.classList.remove('active'));
       pill.classList.add('active');
+      selectedModalCode = pill.getAttribute('data-code') || 'ghep-1';
+      selectedModalSeats = parseInt(pill.getAttribute('data-seats') || '1', 10);
       selectedModalService = pill.getAttribute('data-service') || 'Đi ghép 1 người (100K)';
       selectedModalFare = parseInt(pill.getAttribute('data-fare') || '100000', 10);
     });
@@ -498,10 +638,22 @@ document.addEventListener('DOMContentLoaded', () => {
       const dropoffVal = dropoffSelect?.options[dropoffSelect.selectedIndex]?.text || 'Đà Nẵng';
       const noteVal = (noteInput?.value || '').trim();
       const pickupCombined = noteVal ? `${noteVal} (${pickupVal})` : pickupVal;
+      const isCharterModal = selectedModalFare >= 350000;
+      const calculatedFee = isCharterModal ? Math.round(selectedModalFare * 0.1) : selectedModalSeats * 10000;
 
       const payload = {
+        sessionId: currentSessionId,
+        page: window.location.pathname || '/',
+        referrer: document.referrer || '',
+        utmSource: new URLSearchParams(window.location.search).get('utm_source') || '',
+        convType: 'form_gps',
+        targetPhone: '0896211296',
+        buttonLabel: '📍 Form HÃY ĐÓN TÔI (SĐT + GPS)',
         phone: rawPhone,
+        serviceCode: selectedModalCode,
         serviceText: selectedModalService,
+        seats: selectedModalSeats,
+        isCharter: isCharterModal,
         pickupText: capturedGps.mapsUrl ? `📍 Vị trí GPS khách đứng (${pickupCombined})` : pickupCombined,
         dropoffText: dropoffVal,
         note: noteVal,
@@ -517,7 +669,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const origHtml = submitPickupBtn.innerHTML;
       submitPickupBtn.innerHTML = '<span>⏳ ĐANG GỬI VỀ TỔNG ĐÀI...</span>';
 
-      let serverOrderCode = `#DON-${Math.floor(100 + Math.random() * 899)}`;
+      let serverOrderCode = `#GPS-${Math.floor(1000 + Math.random() * 8999)}`;
 
       try {
         const resp = await fetch('/api/pickup-request', {
@@ -535,9 +687,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Fallback if offline
       }
 
-      // Also save to localStorage for local browser sync
+      // Also save to localStorage for local browser sync (10K/seat, 10% charter)
       try {
-        const nowTime = new Date().toTimeString().slice(0, 5);
+        const nowTime = new Date().toTimeString().slice(0, 8);
         const saved = JSON.parse(localStorage.getItem('nghia_halam_web_orders') || '[]');
         saved.unshift({
           code: serverOrderCode,
@@ -547,7 +699,7 @@ document.addEventListener('DOMContentLoaded', () => {
           service: selectedModalService,
           mapsUrl: capturedGps.mapsUrl,
           fare: selectedModalFare,
-          fee: selectedModalFare >= 350000 ? 45000 : 15000,
+          fee: calculatedFee,
           driverId: 'XE-01',
           driverName: 'Anh Nghĩa (Xe Chủ Lực)',
           refunded: false
@@ -613,6 +765,7 @@ document.addEventListener('DOMContentLoaded', () => {
       chip.classList.add('active');
       const landmarkName = chip.getAttribute('data-landmark') || chip.textContent.trim();
       const selectVal = chip.getAttribute('data-pickup-val');
+      activeLandmarkNote = landmarkName;
       if (pickupSelect && selectVal) {
         const opt = Array.from(pickupSelect.options).find((o) => o.value === selectVal);
         if (opt) pickupSelect.value = selectVal;
@@ -623,6 +776,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (quoteNoteEl && landmarkName) {
         quoteNoteEl.innerHTML = `📍 Đã chọn điểm đón/trả: <strong>${landmarkName}</strong> • Bấm Gọi Ngay hoặc HÃY ĐÓN TÔI để xe vào đón!`;
       }
+      trackQuoteInteractionOnce();
     });
   });
 
@@ -643,11 +797,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
   updateQuote();
 
-  // 5. GA4 LEAD CONVERSION TRACKING (G-79KC9WN1F0)
+  // =========================================================================
+  // 6. FIRST-PARTY SERVER BEACON + GA4 CONVERSION TRACKING (ALL 16 PAGES)
+  // =========================================================================
   document.querySelectorAll('a[href^="tel:"]').forEach((link) => {
     link.addEventListener('click', () => {
+      const rawHref = link.getAttribute('href') || '';
+      const phone = rawHref.replace('tel:', '').replace(/\D/g, '') || '0896211296';
+      const convType = phone.includes('0386') ? 'call_0386' : 'call_0896';
+      const btnLabel = (link.textContent || 'Gọi Hotline').replace(/\s+/g, ' ').trim();
+
+      // Fire First-Party Server Beacon immediately before dialer opens
+      sendBeaconOrFetch('/api/track-conversion', getCurrentBookingContext(convType, phone, btnLabel));
+
       if (typeof window.gtag === 'function') {
-        const phone = link.getAttribute('href').replace('tel:', '');
         window.gtag('event', 'generate_lead', {
           event_category: 'call_hotline',
           event_label: phone,
@@ -660,10 +823,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.querySelectorAll('a[href*="zalo.me"]').forEach((link) => {
     link.addEventListener('click', () => {
+      const rawHref = link.getAttribute('href') || '';
+      const phone = rawHref.includes('0386') ? '0386400800' : '0896211296';
+      const btnLabel = (link.textContent || 'Chat Zalo').replace(/\s+/g, ' ').trim();
+
+      sendBeaconOrFetch('/api/track-conversion', getCurrentBookingContext('zalo_click', phone, btnLabel));
+
       if (typeof window.gtag === 'function') {
         window.gtag('event', 'generate_lead', {
           event_category: 'chat_zalo',
-          event_label: link.getAttribute('href'),
+          event_label: rawHref,
           value: 100000,
           currency: 'VND'
         });

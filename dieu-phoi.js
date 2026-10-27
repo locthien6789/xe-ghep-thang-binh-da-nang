@@ -1,42 +1,918 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // 0. ADMIN PIN GATE & SIDEBAR TAB SWITCHING
+  // =========================================================================
+  // 0. DUAL-PIN ROLE ACCESS CONTROL (4268 = CHỦ WEB | 1691 = ĐỐI TÁC NHÀ XE)
+  // =========================================================================
   const gateOverlay = document.getElementById('admin-gate');
   const btnGateLogin = document.getElementById('btn-gate-login');
   const btnLock = document.getElementById('btn-lock-dashboard');
   const pinInput = document.getElementById('admin-pin-input');
+  const gateErrorMsg = document.getElementById('gate-error-msg');
 
-  if (btnGateLogin && gateOverlay) {
-    btnGateLogin.addEventListener('click', () => {
-      if (!pinInput || pinInput.value.trim().length >= 4) {
-        gateOverlay.classList.add('hidden');
-      } else {
-        alert('Vui lòng nhập mã PIN Quản trị (Mặc định: 1296)');
+  const sbRoleBadge = document.getElementById('sb-role-badge');
+  const sbRoleLabel = document.getElementById('sb-role-label');
+  const sidebarRoleName = document.getElementById('sidebar-role-name');
+  const headerRolePill = document.getElementById('header-role-pill');
+
+  let currentPin = '';
+  let currentRole = 'partner'; // 'owner' (4268) | 'partner' (1691)
+
+  const ALL_16_PAGES = {
+    '/': 'Trang Chủ: Xe Ghép Thăng Bình ↔ Đà Nẵng',
+    '/xe-di-benh-vien-da-nang.html': 'Chuyên Trang: Xe Đi Khám Bệnh Viện Đà Nẵng',
+    '/xe-dua-don-san-bay-da-nang.html': 'Chuyên Trang: Xe Đưa Đón Sân Bay Đà Nẵng',
+    '/thue-xe-cuoi-hoi-thang-binh.html': 'Chuyên Trang: Thuê Xe Hoa Cưới Hỏi',
+    '/thue-xe-cuoi-hoi-du-lich-thang-binh.html': 'Chuyên Trang: Thuê Xe Du Lịch & Đi Tỉnh',
+    '/bang-gia-xe-ghep-thang-binh.html': 'Chuyên Trang: Bảng Giá Xe Ghép Toàn Huyện',
+    '/xe-ghep-ha-lam-da-nang.html': 'Tuyến: Thị Trấn Hà Lam ↔ Đà Nẵng',
+    '/xe-di-sat-hach-lai-xe-quang-nam-da-nang.html': 'Tuyến: Sát Hạch Lái Xe (Minh Sơn & QJC) ↔ Đà Nẵng',
+    '/xe-ghep-binh-nguyen-da-nang.html': 'Tuyến: Bình Nguyên & BV Thăng Hoa ↔ Đà Nẵng',
+    '/xe-ghep-dong-duong-da-nang.html': 'Tuyến: Đồng Dương & Bình Định ↔ Đà Nẵng',
+    '/xe-ghep-binh-phu-da-nang.html': 'Tuyến: Bình Phú & Lý Trường ↔ Đà Nẵng',
+    '/xe-ghep-binh-quy-da-nang.html': 'Tuyến: Bình Quý (Chợ Quý Hương) ↔ Đà Nẵng',
+    '/xe-ghep-binh-phuc-da-nang.html': 'Tuyến: Xã Bình Phục (Cây Cốc) ↔ Đà Nẵng',
+    '/xe-ghep-huong-an-moc-bai-da-nang.html': 'Tuyến: Hương An & Mộc Bài ↔ Đà Nẵng',
+    '/xe-ghep-binh-tu-da-nang.html': 'Tuyến: Xã Bình Tú ↔ Đà Nẵng',
+    '/xe-ghep-binh-minh-da-nang.html': 'Tuyến: Biển Bình Minh & VinWonders ↔ Đà Nẵng'
+  };
+
+  const applyRolePermissions = (role) => {
+    currentRole = role;
+    const isOwner = role === 'owner';
+
+    document.querySelectorAll('.owner-only-el').forEach((el) => {
+      el.style.display = isOwner ? '' : 'none';
+    });
+
+    const feeSeatSelect = document.getElementById('cfg-seat-fee');
+    const feeCharterSelect = document.getElementById('cfg-charter-fee');
+    if (feeSeatSelect) feeSeatSelect.disabled = !isOwner;
+    if (feeCharterSelect) feeCharterSelect.disabled = !isOwner;
+
+    if (isOwner) {
+      if (sbRoleBadge) sbRoleBadge.innerHTML = 'CHỦ WEB<br/>4268';
+      if (sbRoleLabel) sbRoleLabel.textContent = '👑 Quyền Chủ Web & Ăn Chia';
+      if (sidebarRoleName) sidebarRoleName.textContent = '👑 Chủ Web Quản Trị (Full Quyền)';
+      if (headerRolePill) {
+        headerRolePill.textContent = '👑 CHỦ WEB & QUẢN TRỊ ĂN CHIA';
+        headerRolePill.classList.remove('partner');
+      }
+    } else {
+      if (sbRoleBadge) sbRoleBadge.innerHTML = 'NHÀ XE<br/>20 XE';
+      if (sbRoleLabel) sbRoleLabel.textContent = '🤝 Đối Tác Nhà Xe Nghĩa Hà Lam';
+      if (sidebarRoleName) sidebarRoleName.textContent = '🤝 Đối Tác Nhà Xe (Điều Phối & Đối Soát)';
+      if (headerRolePill) {
+        headerRolePill.textContent = '🤝 ĐỐI TÁC NHÀ XE (ĐỐI SOÁT)';
+        headerRolePill.classList.add('partner');
+      }
+      // Ensure partner is not on an owner-only tab
+      const activeTab = document.querySelector('.db-tab-view.active');
+      if (activeTab && (activeTab.id === 'tab-seo-funnel' || activeTab.id === 'tab-settings')) {
+        switchTab('tab-conversions');
+      }
+    }
+  };
+
+  const handleLoginSubmit = async () => {
+    const rawPin = (pinInput?.value || '').trim();
+    if (!rawPin) {
+      if (gateErrorMsg) {
+        gateErrorMsg.textContent = '❌ Vui lòng nhập Mã PIN được cấp!';
+        gateErrorMsg.style.display = 'block';
+      }
+      return;
+    }
+
+    let verifiedRole = null;
+    try {
+      const resp = await fetch('/api/verify-pin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin: rawPin })
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        if (data && data.ok) {
+          verifiedRole = data.role;
+        }
+      }
+    } catch (e) {
+      // Fallback for offline preview
+    }
+
+    if (!verifiedRole) {
+      if (rawPin === '4268') verifiedRole = 'owner';
+      else if (rawPin === '1691') verifiedRole = 'partner';
+    }
+
+    if (!verifiedRole) {
+      if (gateErrorMsg) {
+        gateErrorMsg.textContent = '❌ Mã PIN không chính xác! Vui lòng nhập đúng mã PIN Chủ Web hoặc Nhà Xe.';
+        gateErrorMsg.style.display = 'block';
+      }
+      if (pinInput) {
+        pinInput.value = '';
+        pinInput.focus();
+      }
+      return;
+    }
+
+    currentPin = rawPin;
+    try {
+      sessionStorage.setItem('nghia_dashboard_pin', rawPin);
+    } catch (e) {}
+
+    if (gateErrorMsg) gateErrorMsg.style.display = 'none';
+    applyRolePermissions(verifiedRole);
+    if (gateOverlay) gateOverlay.classList.add('hidden');
+    fetchDashboardData();
+  };
+
+  if (btnGateLogin) {
+    btnGateLogin.addEventListener('click', handleLoginSubmit);
+  }
+  if (pinInput) {
+    pinInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleLoginSubmit();
       }
     });
   }
 
   if (btnLock && gateOverlay) {
     btnLock.addEventListener('click', () => {
+      try {
+        sessionStorage.removeItem('nghia_dashboard_pin');
+      } catch (e) {}
+      if (pinInput) pinInput.value = '';
       gateOverlay.classList.remove('hidden');
+      setTimeout(() => pinInput?.focus(), 100);
     });
   }
+
+  // Restore session PIN if already logged in during current tab session
+  try {
+    const savedSessionPin = sessionStorage.getItem('nghia_dashboard_pin');
+    if (savedSessionPin === '4268' || savedSessionPin === '1691') {
+      currentPin = savedSessionPin;
+      applyRolePermissions(savedSessionPin === '4268' ? 'owner' : 'partner');
+      if (gateOverlay) gateOverlay.classList.add('hidden');
+    }
+  } catch (e) {}
 
   // Sidebar Tabs
   const navBtns = document.querySelectorAll('.sb-nav-btn');
   const tabViews = document.querySelectorAll('.db-tab-view');
 
+  const switchTab = (targetTabId) => {
+    navBtns.forEach((b) => b.classList.toggle('active', b.getAttribute('data-tab') === targetTabId));
+    tabViews.forEach((view) => view.classList.toggle('active', view.id === targetTabId));
+  };
+
   navBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
       const targetTab = btn.getAttribute('data-tab');
-      navBtns.forEach((b) => b.classList.remove('active'));
-      btn.classList.add('active');
-      tabViews.forEach((view) => {
-        view.classList.toggle('active', view.id === targetTab);
-      });
+      if (targetTab) switchTab(targetTab);
     });
   });
 
-  // 1. INITIAL 20-VEHICLE FLEET DATABASE (11 at Thang Binh Queue, 9 at Da Nang Queue)
+  // =========================================================================
+  // 1. GLOBAL STATE & COMMISSION FORMULA (10.000đ/GHẾ • 10% BAO XE)
+  // =========================================================================
+  let systemConfig = {
+    seatFee: 10000,
+    charterPercent: 10,
+    dedupMinutes: 30,
+    telegramEnabled: false,
+    telegramBotToken: '',
+    telegramChatId: ''
+  };
+
+  let serverOrdersList = [];
+  let serverPageStats = { pages: {}, daily: {} };
+  let knownServerOrderIds = new Set();
+  let isFirstLoad = true;
+
+  const feeSeatSelect = document.getElementById('cfg-seat-fee');
+  const feeCharterSelect = document.getElementById('cfg-charter-fee');
+
+  const formatVND = (num) => {
+    const n = parseInt(num || 0, 10);
+    return n.toLocaleString('vi-VN') + 'đ';
+  };
+
+  const computeCommissionFee = (fare, seats, isCharter, serviceCode = '') => {
+    const f = parseInt(fare || 100000, 10);
+    const s = parseInt(seats || 1, 10);
+    const seatUnit = parseInt(systemConfig.seatFee || 10000, 10);
+    const charterPct = parseInt(systemConfig.charterPercent || 10, 10);
+
+    if (serviceCode === 'gui-hang' || f <= 60000) {
+      return Math.max(5000, Math.round((f * charterPct) / 100));
+    }
+    if (isCharter || s === 0 || f >= 350000 || String(serviceCode).includes('bao') || String(serviceCode).includes('thue')) {
+      return Math.round((f * charterPct) / 100);
+    }
+    return s * seatUnit;
+  };
+
+  // =========================================================================
+  // 2. CONVERSION TRACKING, FILTERING, LEDGER & SEO FUNNEL RENDERING
+  // =========================================================================
+  const kpiViewsTotalEl = document.getElementById('kpi-views-total');
+  const kpiQuotesSubEl = document.getElementById('kpi-quotes-sub');
+  const kpiUniqueLeadsEl = document.getElementById('kpi-unique-leads');
+  const kpiLeadsBreakdownEl = document.getElementById('kpi-leads-breakdown');
+  const kpiCrPercentEl = document.getElementById('kpi-cr-percent');
+  const kpiCancelRateAlertEl = document.getElementById('kpi-cancel-rate-alert');
+  const kpiCommissionEl = document.getElementById('kpi-commission');
+  const kpiRevenueSubEl = document.getElementById('kpi-revenue-sub');
+
+  const fraudWarningBanner = document.getElementById('fraud-warning-banner');
+  const fraudWarningText = document.getElementById('fraud-warning-text');
+
+  const filterDateRangeEl = document.getElementById('filter-date-range');
+  const filterConvTypeEl = document.getElementById('filter-conv-type');
+  const filterConvStatusEl = document.getElementById('filter-conv-status');
+
+  const stTotalLeadsEl = document.getElementById('st-total-leads');
+  const stValidLeadsEl = document.getElementById('st-valid-leads');
+  const stCancelledLeadsEl = document.getElementById('st-cancelled-leads');
+  const stGrossFareEl = document.getElementById('st-gross-fare');
+  const stNetCommissionEl = document.getElementById('st-net-commission');
+
+  const conversionsTableBody = document.getElementById('conversions-table-body');
+  const seoFunnelTableBody = document.getElementById('seo-funnel-table-body');
+  const trafficSourcesGrid = document.getElementById('traffic-sources-grid');
+
+  const getFilteredConversions = () => {
+    const dateMode = filterDateRangeEl?.value || 'all';
+    const typeMode = filterConvTypeEl?.value || 'all';
+    const statusMode = filterConvStatusEl?.value || 'all';
+
+    const now = new Date();
+    const todayIso = now.toISOString().slice(0, 10);
+    const monthPrefix = todayIso.slice(0, 7);
+    const sevenDaysAgoTs = Math.floor(now.getTime() / 1000) - 7 * 86400;
+
+    return serverOrdersList.filter((item) => {
+      // Date filter
+      if (dateMode === 'today') {
+        if (item.date && item.date !== todayIso) return false;
+      } else if (dateMode === '7days') {
+        if (item.timestamp && item.timestamp < sevenDaysAgoTs) return false;
+      } else if (dateMode === 'month') {
+        if (item.date && !String(item.date).startsWith(monthPrefix)) return false;
+      }
+
+      // Conversion channel filter
+      const cType = item.convType || (item.phoneClean ? 'form_gps' : 'call_0896');
+      if (typeMode !== 'all' && cType !== typeMode) {
+        return false;
+      }
+
+      // Status filter
+      const isCancelled = Boolean(item.refunded) || item.status === 'refunded' || item.status === 'cancelled';
+      const isConfirmed = !isCancelled && item.status === 'confirmed';
+      const isNew = !isCancelled && !isConfirmed;
+
+      if (statusMode === 'active' && isCancelled) return false;
+      if (statusMode === 'new' && !isNew) return false;
+      if (statusMode === 'confirmed' && !isConfirmed) return false;
+      if (statusMode === 'refunded' && !isCancelled) return false;
+
+      return true;
+    });
+  };
+
+  const renderConvTypeBadge = (item) => {
+    const cType = item.convType || (item.phoneClean ? 'form_gps' : 'call_0896');
+    const clicks = parseInt(item.clickCount || 1, 10);
+    let badgeHtml = '';
+
+    if (cType === 'form_gps') {
+      badgeHtml = `<span class="conv-badge gps">📍 Gửi SĐT + Định vị GPS</span>`;
+    } else if (cType === 'call_0386') {
+      badgeHtml = `<span class="conv-badge call2">📞 Bấm Gọi 0386.400.800</span>`;
+    } else if (cType === 'zalo_click') {
+      badgeHtml = `<span class="conv-badge zalo">💬 Bấm Đặt Qua Zalo</span>`;
+    } else {
+      badgeHtml = `<span class="conv-badge call1">📞 Bấm Gọi 0896.211.296</span>`;
+    }
+
+    const dedupHtml =
+      clicks > 1
+        ? `<br/><span class="dedup-tag" title="${(item.actionHistory || []).join(' | ')}">🛡️ Khách bấm ${clicks} lần (Chỉ tính 1 cuốc)</span>`
+        : `<br/><small style="color:#64748b;font-size:0.7rem;">${item.buttonLabel || 'Chuyển đổi trực tiếp'}</small>`;
+
+    return badgeHtml + dedupHtml;
+  };
+
+  const renderConversionDashboard = () => {
+    // 1. Compute global stats across all 16 pages
+    const pagesObj = (serverPageStats && serverPageStats.pages) || {};
+    let totalViews = 0;
+    let totalQuotes = 0;
+    let totalRawClicks = 0;
+
+    Object.values(pagesObj).forEach((p) => {
+      totalViews += parseInt(p.views || 0, 10);
+      totalQuotes += parseInt(p.quotes || 0, 10);
+      totalRawClicks += parseInt(p.rawClicks || 0, 10);
+    });
+
+    const totalUniqueLeads = serverOrdersList.length;
+    if (totalViews < totalUniqueLeads) totalViews = totalUniqueLeads;
+    if (totalRawClicks < totalUniqueLeads) totalRawClicks = totalUniqueLeads;
+
+    let gpsCount = 0;
+    let callCount = 0;
+    let zaloCount = 0;
+    let cancelledCount = 0;
+    let activeCommissionTotal = 0;
+    let activeRevenueTotal = 0;
+
+    serverOrdersList.forEach((o) => {
+      const cType = o.convType || (o.phoneClean ? 'form_gps' : 'call_0896');
+      if (cType === 'form_gps') gpsCount += 1;
+      else if (cType === 'zalo_click') zaloCount += 1;
+      else callCount += 1;
+
+      const isCancelled = Boolean(o.refunded) || o.status === 'refunded' || o.status === 'cancelled';
+      const fareVal = parseInt(o.fare || 100000, 10);
+      const feeVal = o.fee !== undefined ? parseInt(o.fee, 10) : computeCommissionFee(fareVal, o.seats || 1, o.isCharter, o.serviceCode);
+
+      if (isCancelled) {
+        cancelledCount += 1;
+      } else {
+        activeRevenueTotal += fareVal;
+        activeCommissionTotal += feeVal;
+      }
+    });
+
+    const crPct = totalViews > 0 ? ((totalUniqueLeads / totalViews) * 100).toFixed(1) : '0.0';
+    const cancelRatePct = totalUniqueLeads > 0 ? Math.round((cancelledCount / totalUniqueLeads) * 100) : 0;
+
+    if (kpiViewsTotalEl) kpiViewsTotalEl.textContent = `${totalViews.toLocaleString('vi-VN')} lượt xem`;
+    if (kpiQuotesSubEl) kpiQuotesSubEl.textContent = `⚡ ${totalQuotes.toLocaleString('vi-VN')} tương tác giá • ${totalRawClicks} lượt bấm`;
+    if (kpiUniqueLeadsEl) kpiUniqueLeadsEl.textContent = `${totalUniqueLeads} khách duy nhất`;
+    if (kpiLeadsBreakdownEl) kpiLeadsBreakdownEl.textContent = `📍 ${gpsCount} GPS • 📞 ${callCount} Gọi • 💬 ${zaloCount} Zalo`;
+    if (kpiCrPercentEl) kpiCrPercentEl.textContent = `${crPct}%`;
+
+    if (kpiCancelRateAlertEl) {
+      if (cancelRatePct > 25 && totalUniqueLeads >= 3) {
+        kpiCancelRateAlertEl.style.color = '#f87171';
+        kpiCancelRateAlertEl.textContent = `⚠️ Tỷ lệ hủy: ${cancelRatePct}% (${cancelledCount}/${totalUniqueLeads} đơn)`;
+      } else {
+        kpiCancelRateAlertEl.style.color = '#34d399';
+        kpiCancelRateAlertEl.textContent = `🟢 Tỷ lệ hủy: ${cancelRatePct}% (${cancelledCount} đơn hủy)`;
+      }
+    }
+
+    if (fraudWarningBanner) {
+      if (cancelRatePct > 25 && totalUniqueLeads >= 3) {
+        fraudWarningBanner.style.display = 'flex';
+        if (fraudWarningText) {
+          fraudWarningText.textContent = `Tỷ lệ báo hủy đang ở mức ${cancelRatePct}% (${cancelledCount}/${totalUniqueLeads} khách). Chủ Web (PIN 4268) có thể đối chiếu Giờ bấm gọi chính xác tới từng giây trên bảng với lịch sử cuộc gọi đến của tổng đài 0896.211.296.`;
+        }
+      } else {
+        fraudWarningBanner.style.display = 'none';
+      }
+    }
+
+    if (kpiCommissionEl) kpiCommissionEl.textContent = formatVND(activeCommissionTotal);
+    if (kpiRevenueSubEl) kpiRevenueSubEl.textContent = `💵 Doanh thu cuốc từ Web: ${formatVND(activeRevenueTotal)}`;
+
+    // 2. Render Filtered Statement Summary Bar & Conversion Ledger Table
+    const filtered = getFilteredConversions();
+    let fltValid = 0;
+    let fltCancelled = 0;
+    let fltGross = 0;
+    let fltCommission = 0;
+
+    filtered.forEach((o) => {
+      const isCancelled = Boolean(o.refunded) || o.status === 'refunded' || o.status === 'cancelled';
+      const fareVal = parseInt(o.fare || 100000, 10);
+      const feeVal = o.fee !== undefined ? parseInt(o.fee, 10) : computeCommissionFee(fareVal, o.seats || 1, o.isCharter, o.serviceCode);
+      if (isCancelled) {
+        fltCancelled += 1;
+      } else {
+        fltValid += 1;
+        fltGross += fareVal;
+        fltCommission += feeVal;
+      }
+    });
+
+    if (stTotalLeadsEl) stTotalLeadsEl.textContent = `${filtered.length} khách`;
+    if (stValidLeadsEl) stValidLeadsEl.textContent = `${fltValid} cuốc hợp lệ`;
+    if (stCancelledLeadsEl) stCancelledLeadsEl.textContent = `${fltCancelled} cuốc hủy`;
+    if (stGrossFareEl) stGrossFareEl.textContent = formatVND(fltGross);
+    if (stNetCommissionEl) stNetCommissionEl.textContent = formatVND(fltCommission);
+
+    if (conversionsTableBody) {
+      if (filtered.length === 0) {
+        conversionsTableBody.innerHTML = `
+          <tr>
+            <td colspan="9" style="text-align:center;padding:28px;color:#94a3b8;">
+              Chưa có lượt chuyển đổi nào khớp với bộ lọc hiện tại. Hãy thử bấm nút Gọi / Zalo / 📍 HÃY ĐÓN TÔI trên trang web để kiểm tra!
+            </td>
+          </tr>
+        `;
+      } else {
+        conversionsTableBody.innerHTML = filtered
+          .map((o) => {
+            const isCancelled = Boolean(o.refunded) || o.status === 'refunded' || o.status === 'cancelled';
+            const isConfirmed = !isCancelled && o.status === 'confirmed';
+            const fareVal = parseInt(o.fare || 100000, 10);
+            const feeVal = o.fee !== undefined ? parseInt(o.fee, 10) : computeCommissionFee(fareVal, o.seats || 1, o.isCharter, o.serviceCode);
+            const pageSlug = o.pageSlug || '/';
+            const pageTitle = o.pageTitle || ALL_16_PAGES[pageSlug] || pageSlug;
+
+            let statusHtml = `<span class="status-pill pending">⏳ Mới / Chờ đối soát</span>`;
+            if (isConfirmed) {
+              statusHtml = `<span class="status-pill done">✅ Đã đón khách (Chốt)</span>`;
+            } else if (isCancelled) {
+              statusHtml = `<span class="status-pill refund">❌ Khách hủy (0đ)</span>`;
+            }
+
+            return `
+              <tr style="${isCancelled ? 'opacity:0.65;' : ''}">
+                <td>
+                  <strong style="color:#fde047;font-size:0.9rem;">${o.code}</strong><br/>
+                  <span style="color:#38bdf8;font-weight:800;font-size:0.8rem;">🕒 ${o.time || ''}</span>
+                  <br/><small style="color:#64748b;font-size:0.7rem;">${o.date || ''}</small>
+                </td>
+                <td>
+                  ${renderConvTypeBadge(o)}
+                </td>
+                <td>
+                  ${
+                    o.phoneClean
+                      ? `<strong><a href="tel:${o.phoneClean}" style="color:#38bdf8;text-decoration:underline;font-size:0.92rem;">📞 ${o.phone}</a></strong>`
+                      : `<strong style="color:#e2e8f0;font-size:0.82rem;">${o.phone || 'Khách bấm gọi Hotline'}</strong>`
+                  }
+                  <br/><small style="color:#94a3b8;font-size:0.72rem;">📱 ${o.device || 'Mobile'}</small>
+                  ${
+                    o.mapsUrl
+                      ? `<br/><a href="${o.mapsUrl}" target="_blank" rel="noopener" style="color:#34d399;font-size:0.75rem;font-weight:800;text-decoration:underline;">🗺️ Mở Vị Trí GPS ↗</a>`
+                      : ''
+                  }
+                </td>
+                <td>
+                  <a href="${pageSlug}" target="_blank" style="color:#38bdf8;font-weight:700;font-size:0.8rem;text-decoration:underline;">
+                    ${pageTitle}
+                  </a>
+                  <br/><small style="color:#94a3b8;font-size:0.72rem;">🔍 ${o.source || 'Google Tìm Kiếm (SEO)'}</small>
+                </td>
+                <td>
+                  <strong style="color:#fff;font-size:0.82rem;">${o.route || `${o.pickup} ➔ ${o.dropoff}`}</strong>
+                  <br/><small style="color:#fde047;font-weight:700;">🚘 ${o.service || 'Đi ghép 1 người (100K)'}</small>
+                  ${o.note ? `<br/><small style="color:#34d399;">📝 Ghi chú: ${o.note}</small>` : ''}
+                </td>
+                <td>
+                  <strong style="color:#fff;font-size:0.92rem;">${formatVND(fareVal)}</strong>
+                  <br/><small style="color:#94a3b8;font-size:0.7rem;">${o.isCharter || fareVal >= 350000 ? 'Bao xe (10%)' : `${o.seats || 1} ghế (10K/ghế)`}</small>
+                </td>
+                <td>
+                  <strong style="color:${isCancelled ? '#f87171' : '#34d399'};font-size:0.98rem;">
+                    ${isCancelled ? '0đ (Miễn phí)' : formatVND(feeVal)}
+                  </strong>
+                </td>
+                <td>
+                  ${statusHtml}
+                  ${o.cancelReason ? `<br/><small style="color:#fca5a5;font-size:0.7rem;">Lý do: ${o.cancelReason}</small>` : ''}
+                  ${o.updatedBy ? `<br/><small style="color:#64748b;font-size:0.68rem;">Bởi: ${o.updatedBy}</small>` : ''}
+                </td>
+                <td>
+                  <div style="display:flex;flex-wrap:wrap;gap:5px;max-width:190px;">
+                    ${
+                      !isConfirmed
+                        ? `<button type="button" class="btn-topup js-conv-confirm" data-id="${o.id || o.code}" style="border-color:#10b981;color:#34d399;">✅ Chốt Đón</button>`
+                        : ''
+                    }
+                    <button type="button" class="btn-topup js-conv-edit" data-id="${o.id || o.code}" style="border-color:#fde047;color:#fde047;">✏️ Sửa Cước</button>
+                    ${
+                      !isCancelled
+                        ? `<button type="button" class="btn-topup js-conv-cancel" data-id="${o.id || o.code}" style="border-color:#ef4444;color:#f87171;">❌ Báo Hủy</button>`
+                        : ''
+                    }
+                    <button type="button" class="btn-topup js-conv-dispatch" data-id="${o.id || o.code}" style="border-color:#38bdf8;color:#38bdf8;">⚡ Bắn Xe</button>
+                    ${
+                      currentRole === 'owner'
+                        ? `<button type="button" class="btn-topup js-conv-delete" data-id="${o.id || o.code}" style="border-color:#64748b;color:#94a3b8;">🗑️ Xóa</button>`
+                        : ''
+                    }
+                  </div>
+                </td>
+              </tr>
+            `;
+          })
+          .join('');
+
+        bindLedgerActions();
+      }
+    }
+
+    // 3. Render 16-Page SEO Funnel Table (Tab 2 - Owner 4268)
+    renderSeoFunnelTable();
+  };
+
+  const renderSeoFunnelTable = () => {
+    if (!seoFunnelTableBody) return;
+    const pagesStats = (serverPageStats && serverPageStats.pages) || {};
+
+    // Aggregate actual orders per pageSlug
+    const ordersByPage = {};
+    const sourcesCount = {};
+
+    serverOrdersList.forEach((o) => {
+      const slug = o.pageSlug || '/';
+      if (!ordersByPage[slug]) {
+        ordersByPage[slug] = { unique: 0, call: 0, zalo: 0, gps: 0, commission: 0 };
+      }
+      ordersByPage[slug].unique += 1;
+      const cType = o.convType || (o.phoneClean ? 'form_gps' : 'call_0896');
+      if (cType === 'form_gps') ordersByPage[slug].gps += 1;
+      else if (cType === 'zalo_click') ordersByPage[slug].zalo += 1;
+      else ordersByPage[slug].call += 1;
+
+      const isCancelled = Boolean(o.refunded) || o.status === 'refunded' || o.status === 'cancelled';
+      if (!isCancelled) {
+        ordersByPage[slug].commission += parseInt(o.fee || 10000, 10);
+      }
+
+      const src = o.source || 'Google Tìm Kiếm (SEO)';
+      sourcesCount[src] = (sourcesCount[src] || 0) + 1;
+    });
+
+    const rows = Object.entries(ALL_16_PAGES).map(([slug, title]) => {
+      const st = pagesStats[slug] || {};
+      const ord = ordersByPage[slug] || { unique: 0, call: 0, zalo: 0, gps: 0, commission: 0 };
+      const uniqueLeads = Math.max(parseInt(st.uniqueLeads || 0, 10), ord.unique);
+      const rawClicks = Math.max(parseInt(st.rawClicks || 0, 10), uniqueLeads);
+      const views = Math.max(parseInt(st.views || 0, 10), uniqueLeads);
+      const quotes = parseInt(st.quotes || 0, 10);
+      const cr = views > 0 ? ((uniqueLeads / views) * 100).toFixed(1) : '0.0';
+
+      return {
+        slug,
+        title,
+        views,
+        quotes,
+        rawClicks,
+        uniqueLeads,
+        call: Math.max(parseInt(st.callClicks || 0, 10), ord.call),
+        zalo: Math.max(parseInt(st.zaloClicks || 0, 10), ord.zalo),
+        gps: Math.max(parseInt(st.gpsForms || 0, 10), ord.gps),
+        cr: parseFloat(cr),
+        commission: ord.commission
+      };
+    });
+
+    // Sort by Unique Leads desc, then Views desc
+    rows.sort((a, b) => b.uniqueLeads - a.uniqueLeads || b.views - a.views);
+
+    seoFunnelTableBody.innerHTML = rows
+      .map(
+        (r, idx) => `
+        <tr>
+          <td><strong style="color:#94a3b8;">#${idx + 1}</strong></td>
+          <td>
+            <a href="${r.slug}" target="_blank" style="color:#38bdf8;font-weight:800;text-decoration:underline;">${r.title}</a>
+            <br/><small style="color:#64748b;">${r.slug}</small>
+          </td>
+          <td><strong>${r.views.toLocaleString('vi-VN')}</strong></td>
+          <td>${r.quotes.toLocaleString('vi-VN')}</td>
+          <td>${r.rawClicks.toLocaleString('vi-VN')}</td>
+          <td><strong style="color:#fde047;font-size:0.95rem;">${r.uniqueLeads} khách</strong></td>
+          <td>
+            <span style="font-size:0.76rem;color:#cbd5e1;">
+              📞 ${r.call} Gọi • 💬 ${r.zalo} Zalo • 📍 ${r.gps} GPS
+            </span>
+          </td>
+          <td><strong style="color:#34d399;">${r.cr.toFixed(1)}%</strong></td>
+          <td><strong style="color:#fde047;">${formatVND(r.commission)}</strong></td>
+        </tr>
+      `
+      )
+      .join('');
+
+    if (trafficSourcesGrid) {
+      const defaultSources = {
+        'Google Tìm Kiếm (SEO)': sourcesCount['Google Tìm Kiếm (SEO)'] || 0,
+        'AI Search (ChatGPT / Gemini)': sourcesCount['AI Search (ChatGPT / Gemini)'] || 0,
+        Zalo: sourcesCount['Zalo'] || 0,
+        'Google Maps': sourcesCount['Google Maps'] || 0,
+        'Trực tiếp / Lưu trang': sourcesCount['Trực tiếp / Lưu trang'] || 0
+      };
+      trafficSourcesGrid.innerHTML = Object.entries(defaultSources)
+        .map(
+          ([srcName, count]) => `
+          <div class="source-stat-card">
+            <span>${srcName}</span>
+            <strong>${count} khách chuyển đổi</strong>
+          </div>
+        `
+        )
+        .join('');
+    }
+  };
+
+  // =========================================================================
+  // 3. LEDGER ACTIONS (CONFIRM, EDIT FARE/SEATS, CANCEL, DELETE, DISPATCH)
+  // =========================================================================
+  const editModal = document.getElementById('edit-order-modal');
+  const editModalCode = document.getElementById('edit-modal-code');
+  const editModalFareInput = document.getElementById('edit-modal-fare-input');
+  const editModalSeatsInput = document.getElementById('edit-modal-seats-input');
+  const btnSaveEditOrder = document.getElementById('btn-save-edit-order');
+  const btnCloseEditOrder = document.getElementById('btn-close-edit-order');
+  let editingOrderId = null;
+
+  const updateOrderOnServer = async (payload) => {
+    try {
+      const resp = await fetch('/api/conversion-status', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Pin': currentPin
+        },
+        body: JSON.stringify({ ...payload, pin: currentPin })
+      });
+      if (resp.ok) {
+        await fetchDashboardData();
+      }
+    } catch (e) {}
+  };
+
+  const bindLedgerActions = () => {
+    if (!conversionsTableBody) return;
+
+    conversionsTableBody.querySelectorAll('.js-conv-confirm').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-id');
+        updateOrderOnServer({ id, status: 'confirmed' });
+        addLog(`✅ Đã xác nhận đón khách thành công cho mã chuyển đổi <strong>${id}</strong>.`);
+      });
+    });
+
+    conversionsTableBody.querySelectorAll('.js-conv-cancel').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-id');
+        const reason = prompt('Vui lòng nhập lý do khách hủy / không đi (Để đối soát minh bạch giữa Chủ Web & Nhà Xe):', 'Khách báo hoãn lịch / Đổi giờ đi');
+        if (reason === null) return;
+        updateOrderOnServer({
+          id,
+          status: 'refunded',
+          cancelReason: reason.trim() || 'Khách báo hủy'
+        });
+        addLog(`❌ Đã ghi nhận báo hủy đơn <strong>${id}</strong> (Lý do: ${reason}).`);
+      });
+    });
+
+    conversionsTableBody.querySelectorAll('.js-conv-delete').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        if (currentRole !== 'owner') return;
+        const id = btn.getAttribute('data-id');
+        if (!confirm(`Xác nhận xóa vĩnh viễn bản ghi chuyển đổi ${id}? (Chỉ Chủ Web PIN 4268 mới có quyền này)`)) return;
+        updateOrderOnServer({ id, action: 'delete' });
+      });
+    });
+
+    conversionsTableBody.querySelectorAll('.js-conv-edit').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-id');
+        const found = serverOrdersList.find((x) => x.id === id || x.code === id);
+        if (!found) return;
+        editingOrderId = id;
+        if (editModalCode) editModalCode.textContent = found.code;
+        if (editModalFareInput) editModalFareInput.value = found.fare || 100000;
+        if (editModalSeatsInput) editModalSeatsInput.value = found.isCharter ? 0 : found.seats || 1;
+        if (editModal) editModal.classList.remove('hidden');
+      });
+    });
+
+    conversionsTableBody.querySelectorAll('.js-conv-dispatch').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-id');
+        const found = serverOrdersList.find((x) => x.id === id || x.code === id);
+        if (!found) return;
+        loadOrderIntoAiDispatcher(found);
+        switchTab('tab-dispatch');
+      });
+    });
+  };
+
+  document.querySelectorAll('.btn-quick-fare').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const f = parseInt(btn.getAttribute('data-fare') || '100000', 10);
+      const s = parseInt(btn.getAttribute('data-seats') || '1', 10);
+      const isC = btn.getAttribute('data-charter') === '1';
+      if (editModalFareInput) editModalFareInput.value = f;
+      if (editModalSeatsInput) editModalSeatsInput.value = isC ? 0 : s;
+    });
+  });
+
+  if (btnSaveEditOrder) {
+    btnSaveEditOrder.addEventListener('click', () => {
+      if (!editingOrderId) return;
+      const newFare = parseInt(editModalFareInput?.value || '100000', 10);
+      const newSeats = parseInt(editModalSeatsInput?.value || '1', 10);
+      updateOrderOnServer({
+        id: editingOrderId,
+        status: 'confirmed',
+        fare: newFare,
+        seats: newSeats
+      });
+      if (editModal) editModal.classList.add('hidden');
+      addLog(`✏️ Đã cập nhật cước thực tế đơn <strong>${editingOrderId}</strong>: Doanh thu <strong>${formatVND(newFare)}</strong>.`);
+    });
+  }
+
+  if (btnCloseEditOrder && editModal) {
+    btnCloseEditOrder.addEventListener('click', () => editModal.classList.add('hidden'));
+  }
+
+  [filterDateRangeEl, filterConvTypeEl, filterConvStatusEl].forEach((el) => {
+    if (el) el.addEventListener('change', renderConversionDashboard);
+  });
+
+  const btnRefreshConversions = document.getElementById('btn-refresh-conversions');
+  if (btnRefreshConversions) {
+    btnRefreshConversions.addEventListener('click', () => fetchDashboardData());
+  }
+
+  // Export CSV Statement
+  const btnExportCsv = document.getElementById('btn-export-csv');
+  if (btnExportCsv) {
+    btnExportCsv.addEventListener('click', () => {
+      const filtered = getFilteredConversions();
+      if (filtered.length === 0) {
+        alert('Không có dữ liệu chuyển đổi nào trong bộ lọc hiện tại để xuất file!');
+        return;
+      }
+
+      const headers = [
+        'Mã Đơn',
+        'Giờ Chính Xác',
+        'Ngày',
+        'Kênh Chuyển Đổi',
+        'Số Lần Bấm',
+        'Khách Hàng / SĐT',
+        'Trang Đích SEO',
+        'Nguồn Truy Cập',
+        'Lộ Trình Đón Trả',
+        'Dịch Vụ',
+        'Doanh Thu Cuốc (VND)',
+        'Hoa Hồng Ăn Chia (VND)',
+        'Trạng Thái Đối Soát',
+        'Lý Do Hủy / Ghi Chú'
+      ];
+
+      let totalGross = 0;
+      let totalFee = 0;
+
+      const csvRows = [headers.join(',')];
+      filtered.forEach((o) => {
+        const isCancelled = Boolean(o.refunded) || o.status === 'refunded' || o.status === 'cancelled';
+        const fareVal = parseInt(o.fare || 100000, 10);
+        const feeVal = isCancelled ? 0 : parseInt(o.fee || 10000, 10);
+        if (!isCancelled) {
+          totalGross += fareVal;
+          totalFee += feeVal;
+        }
+        const row = [
+          o.code,
+          o.time || '',
+          o.date || '',
+          o.convType || 'call_0896',
+          o.clickCount || 1,
+          `"${(o.phone || '').replace(/"/g, '""')}"`,
+          `"${(o.pageTitle || o.pageSlug || '/').replace(/"/g, '""')}"`,
+          `"${(o.source || '').replace(/"/g, '""')}"`,
+          `"${(o.route || '').replace(/"/g, '""')}"`,
+          `"${(o.service || '').replace(/"/g, '""')}"`,
+          fareVal,
+          feeVal,
+          isCancelled ? 'Khách hủy (0đ)' : o.status === 'confirmed' ? 'Đã đón khách' : 'Hợp lệ / Chờ xác nhận',
+          `"${(o.cancelReason || o.note || '').replace(/"/g, '""')}"`
+        ];
+        csvRows.push(row.join(','));
+      });
+
+      csvRows.push(
+        ['TỔNG CỘNG ĐỐI SOÁT', '', '', '', '', '', '', '', '', '', totalGross, totalFee, '', ''].join(',')
+      );
+
+      const csvContent = '\uFEFF' + csvRows.join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Doi-Soat-An-Chia-XeGhepThangBinh-${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+  }
+
+  const btnPrintStatement = document.getElementById('btn-print-statement');
+  if (btnPrintStatement) {
+    btnPrintStatement.addEventListener('click', () => {
+      window.print();
+    });
+  }
+
+  // =========================================================================
+  // 4. OWNER CONFIGURATION & TELEGRAM BOT SETUP (PIN 4268)
+  // =========================================================================
+  const inputCfgSeatFee = document.getElementById('input-cfg-seat-fee');
+  const inputCfgCharterPct = document.getElementById('input-cfg-charter-pct');
+  const inputCfgDedupMins = document.getElementById('input-cfg-dedup-mins');
+  const inputCfgTgEnabled = document.getElementById('input-cfg-tg-enabled');
+  const inputCfgTgToken = document.getElementById('input-cfg-tg-token');
+  const inputCfgTgChatId = document.getElementById('input-cfg-tg-chatid');
+  const btnSaveSystemConfig = document.getElementById('btn-save-system-config');
+  const btnTestTelegram = document.getElementById('btn-test-telegram');
+  const settingsSaveFeedback = document.getElementById('settings-save-feedback');
+
+  const syncConfigInputs = (cfg) => {
+    if (!cfg) return;
+    systemConfig = { ...systemConfig, ...cfg };
+    if (feeSeatSelect) feeSeatSelect.value = String(systemConfig.seatFee || 10000);
+    if (feeCharterSelect) feeCharterSelect.value = String(systemConfig.charterPercent || 10);
+    if (inputCfgSeatFee) inputCfgSeatFee.value = systemConfig.seatFee || 10000;
+    if (inputCfgCharterPct) inputCfgCharterPct.value = systemConfig.charterPercent || 10;
+    if (inputCfgDedupMins) inputCfgDedupMins.value = systemConfig.dedupMinutes || 30;
+    if (inputCfgTgEnabled) inputCfgTgEnabled.checked = Boolean(systemConfig.telegramEnabled);
+    if (currentRole === 'owner') {
+      if (inputCfgTgToken && cfg.telegramBotToken !== undefined) inputCfgTgToken.value = cfg.telegramBotToken;
+      if (inputCfgTgChatId && cfg.telegramChatId !== undefined) inputCfgTgChatId.value = cfg.telegramChatId;
+    }
+  };
+
+  const saveOwnerConfig = async (testTelegram = false) => {
+    if (currentRole !== 'owner') {
+      alert('Chỉ Mã PIN Chủ Web (4268) mới có quyền thay đổi cấu hình ăn chia & Telegram!');
+      return;
+    }
+    const payload = {
+      pin: currentPin,
+      seatFee: parseInt(inputCfgSeatFee?.value || '10000', 10),
+      charterPercent: parseInt(inputCfgCharterPct?.value || '10', 10),
+      dedupMinutes: parseInt(inputCfgDedupMins?.value || '30', 10),
+      telegramEnabled: Boolean(inputCfgTgEnabled?.checked),
+      telegramBotToken: (inputCfgTgToken?.value || '').trim(),
+      telegramChatId: (inputCfgTgChatId?.value || '').trim(),
+      testTelegram
+    };
+
+    try {
+      const resp = await fetch('/api/config', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Pin': currentPin
+        },
+        body: JSON.stringify(payload)
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        if (data && data.config) syncConfigInputs(data.config);
+        if (settingsSaveFeedback) {
+          settingsSaveFeedback.style.display = 'block';
+          settingsSaveFeedback.textContent = testTelegram
+            ? '🚀 Đã lưu cấu hình và gửi tin nhắn Test về Telegram! Anh vui lòng kiểm tra điện thoại.'
+            : '✅ Đã lưu cấu hình công thức ăn chia (10K/ghế • 10%) & Telegram thành công!';
+        }
+        fetchDashboardData();
+      }
+    } catch (e) {}
+  };
+
+  if (btnSaveSystemConfig) {
+    btnSaveSystemConfig.addEventListener('click', () => saveOwnerConfig(false));
+  }
+  if (btnTestTelegram) {
+    btnTestTelegram.addEventListener('click', () => saveOwnerConfig(true));
+  }
+
+  // Header quick dropdowns for Owner
+  [feeSeatSelect, feeCharterSelect].forEach((sel) => {
+    if (sel) {
+      sel.addEventListener('change', () => {
+        if (currentRole !== 'owner') return;
+        if (inputCfgSeatFee && feeSeatSelect) inputCfgSeatFee.value = feeSeatSelect.value;
+        if (inputCfgCharterPct && feeCharterSelect) inputCfgCharterPct.value = feeCharterSelect.value;
+        saveOwnerConfig(false);
+      });
+    }
+  });
+
+  // =========================================================================
+  // 5. 20-VEHICLE FLEET & AI DISPATCH WORKSPACE (TAB 3 & TAB 4)
+  // =========================================================================
   const fleet = [
     { id: 'XE-01', name: 'Anh Nghĩa (Xe Chủ Lực)', phone: '0896.211.296', type: 'VinFast Limo Green 7C', queue: 'TB', loc: '469 Huỳnh Thúc Kháng, Hà Lam', seats: 0, maxSeats: 6, wallet: 850000, trips: 5 },
     { id: 'XE-02', name: 'Anh Tuấn Hà Lam', phone: '0905.214.112', type: 'VinFast Limo Green 7C', queue: 'TB', loc: 'Ngã 3 Cây Cốc, Hà Lam', seats: 2, maxSeats: 6, wallet: 520000, trips: 4 },
@@ -61,23 +937,6 @@ document.addEventListener('DOMContentLoaded', () => {
     { id: 'XE-20', name: 'Anh Việt Ngũ Hành Sơn', phone: '0905.238.991', type: 'Mazda 3 4C', queue: 'DN', loc: 'Ngũ Hành Sơn, Đà Nẵng', seats: 0, maxSeats: 4, wallet: 330000, trips: 2 }
   ];
 
-  // Initial Orders History List (Tab 2 CRM) + Sync Web Bookings from localStorage
-  const defaultOrders = [
-    { code: '#TB-205', time: '06:15', customerPhone: '0905.218.442', route: 'Thị trấn Hà Lam ➔ BV Đa khoa Đà Nẵng', service: 'Ghép 2 người (100K/người)', fare: 200000, fee: 30000, driverId: 'XE-02', driverName: 'Anh Tuấn Hà Lam', refunded: false },
-    { code: '#TB-206', time: '06:30', customerPhone: '0935.881.109', route: 'Chợ Hà Châu ➔ Sân bay Đà Nẵng', service: 'Bao nguyên xe 7 chỗ', fare: 450000, fee: 45000, driverId: 'XE-05', driverName: 'Anh Khoa Hà Châu', refunded: false },
-    { code: '#DN-207', time: '07:05', customerPhone: '0914.339.712', route: 'BV 600 Giường ĐN ➔ Cầu Ông Triệu', service: 'Ghép 1 người (100K/người)', fare: 100000, fee: 15000, driverId: 'XE-12', driverName: 'Anh Hải', refunded: false }
-  ];
-  let webSavedOrders = [];
-  try {
-    webSavedOrders = JSON.parse(localStorage.getItem('nghia_halam_web_orders') || '[]');
-  } catch (e) {}
-  const ordersHistory = [...webSavedOrders, ...defaultOrders];
-
-  // State counters
-  let totalCallsToday = 142;
-  let totalSeatsToday = 86;
-  let totalChartersToday = 14;
-  let totalCommissionToday = 2450000;
   let activeQueueTab = 'TB';
   let countdownValue = 45;
   let countdownTimer = null;
@@ -90,13 +949,12 @@ document.addEventListener('DOMContentLoaded', () => {
     directionText: 'Thăng Bình ➔ Đà Nẵng',
     pickup: 'Ngã 3 Bình Quý (Xã Bình Quý)',
     dropoff: 'Bệnh viện Đa khoa Đà Nẵng',
-    serviceName: 'Đi ghép 2 người (100K/người + 100K)',
+    serviceName: 'Đi ghép 2 người (100K/người)',
     seatsNeeded: 2,
     isCharter: false,
     totalFare: 200000,
-    commissionFee: 30000,
-    driverNet: 170000,
-    timeNote: 'Đi ngay (Đón sau 15 phút)'
+    commissionFee: 20000,
+    driverNet: 180000
   };
 
   const pooledSeats = [
@@ -108,22 +966,13 @@ document.addEventListener('DOMContentLoaded', () => {
     { label: 'Ghế 6: Đang trống (100K)', occupied: false }
   ];
 
-  // DOM Elements
-  const feeSeatSelect = document.getElementById('cfg-seat-fee');
-  const feeCharterSelect = document.getElementById('cfg-charter-fee');
-  const kpiCallsEl = document.getElementById('kpi-calls');
-  const kpiTripsEl = document.getElementById('kpi-trips');
-  const kpiCommissionEl = document.getElementById('kpi-commission');
   const transcriptInput = document.getElementById('call-transcript-input');
   const btnAiExtract = document.getElementById('btn-ai-extract');
   const btnMic = document.getElementById('btn-voice-mic');
   const queueListEl = document.getElementById('driver-queue-list');
   const seatSlotsEl = document.getElementById('pooling-seat-slots');
   const logBoxEl = document.getElementById('dispatch-activity-log');
-  const ordersTableBody = document.getElementById('orders-table-body');
   const fleetFullTableBody = document.getElementById('fleet-full-table-body');
-
-  const formatVND = (num) => num.toLocaleString('vi-VN') + 'đ';
 
   const addLog = (htmlMsg) => {
     if (!logBoxEl) return;
@@ -148,75 +997,6 @@ document.addEventListener('DOMContentLoaded', () => {
       .join('');
   };
 
-  // Render Orders History Table (Tab 2)
-  const renderOrdersTable = () => {
-    if (!ordersTableBody) return;
-    ordersTableBody.innerHTML = ordersHistory
-      .map(
-        (o, idx) => `
-      <tr>
-        <td><strong style="color:#fde047">${o.code}</strong><br><small>${o.time}</small></td>
-        <td>
-          <strong><a href="tel:${o.phoneClean || o.customerPhone}" style="color:#38bdf8;text-decoration:underline;">📞 ${o.customerPhone}</a></strong>
-          ${o.mapsUrl ? `<br><a href="${o.mapsUrl}" target="_blank" rel="noopener" style="color:#34d399;font-size:0.78rem;font-weight:800;">🗺️ Mở Bản Đồ GPS ↗</a>` : ''}
-        </td>
-        <td>${o.route}</td>
-        <td>${o.service}</td>
-        <td><strong style="color:#fff">${formatVND(o.fare)}</strong></td>
-        <td><strong style="color:#34d399">${o.refunded ? '0đ (Đã hoàn)' : '-' + formatVND(o.fee)}</strong></td>
-        <td>${o.driverId} • ${o.driverName}</td>
-        <td>
-          <span class="status-pill ${o.refunded ? 'refund' : 'done'}">
-            ${o.refunded ? 'Khách hủy (Đã hoàn phí)' : 'Đã nhận cuốc'}
-          </span>
-        </td>
-        <td>
-          ${
-            o.refunded
-              ? '<small style="color:#64748b">Đã xử lý</small>'
-              : `<button type="button" class="btn-topup js-refund-order" data-idx="${idx}">↩ Hoàn Phí Cò</button>
-                 <button type="button" class="btn-topup js-remind-return" data-idx="${idx}" style="margin-top:4px;border-color:#38bdf8;color:#38bdf8;">💬 Nhắc Chiều Về</button>`
-          }
-        </td>
-      </tr>
-    `
-      )
-      .join('');
-
-    ordersTableBody.querySelectorAll('.js-remind-return').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const i = parseInt(btn.getAttribute('data-idx'), 10);
-        const order = ordersHistory[i];
-        if (!order) return;
-        const msg = `Dạ Nhà Xe Nghĩa Hà Lam (xeghepthangbinhdanang.vn) cảm ơn anh/chị (${order.customerPhone}) đã đặt chuyến ${order.route}! Anh/chị lưu số tổng đài 0896.211.296 nhé, lúc nào khám bệnh / công việc xong chỉ cần gọi trước 15 phút hoặc gửi định vị Zalo là có xe điện đón về tận nhà ngay ạ!`;
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(msg).catch(() => {});
-        }
-        addLog(`💬 Đã sao chép tin nhắn <strong>Chăm sóc & Chốt chiều về (Khứ hồi)</strong> cho đơn <strong>${order.code} (${order.customerPhone})</strong>.`);
-        alert(`Đã sao chép tin nhắn chăm sóc khách & chốt chiều về:\n\n"${msg}"`);
-      });
-    });
-
-    ordersTableBody.querySelectorAll('.js-refund-order').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const i = parseInt(btn.getAttribute('data-idx'), 10);
-        const order = ordersHistory[i];
-        if (order && !order.refunded) {
-          order.refunded = true;
-          const car = fleet.find((c) => c.id === order.driverId);
-          if (car) car.wallet += order.fee;
-          totalCommissionToday -= order.fee;
-          if (kpiCommissionEl) kpiCommissionEl.textContent = formatVND(totalCommissionToday);
-          addLog(`↩️ Quản trị viên đã duyệt <strong>Hoàn phí điều xe +${formatVND(order.fee)}</strong> đơn <strong>${order.code}</strong> về Ví tài xế <strong>${order.driverName}</strong>.`);
-          renderOrdersTable();
-          renderQueue();
-          renderFullFleetTable();
-        }
-      });
-    });
-  };
-
-  // Render Full 20-Vehicle Table (Tab 3)
   const renderFullFleetTable = () => {
     if (!fleetFullTableBody) return;
     fleetFullTableBody.innerHTML = fleet
@@ -248,7 +1028,7 @@ document.addEventListener('DOMContentLoaded', () => {
           car.wallet += 200000;
           renderFullFleetTable();
           renderQueue();
-          addLog(`💳 Admin vừa nạp <strong>+200.000đ</strong> vào Ví cọc của <strong>${car.id} (${car.name})</strong>.`);
+          addLog(`💳 Vừa nạp <strong>+200.000đ</strong> vào Ví cọc của <strong>${car.id} (${car.name})</strong>.`);
         }
       });
     });
@@ -261,13 +1041,12 @@ document.addEventListener('DOMContentLoaded', () => {
           car.loc = car.queue === 'TB' ? 'Thị trấn Hà Lam, Thăng Bình' : 'Trung tâm TP. Đà Nẵng';
           renderFullFleetTable();
           renderQueue();
-          addLog(`⇄ Admin đã chuyển đầu bến của <strong>${car.id} (${car.name})</strong> sang <strong>${car.queue === 'TB' ? 'Bến Thăng Bình' : 'Bến Đà Nẵng'}</strong>.`);
+          addLog(`⇄ Đã chuyển đầu bến của <strong>${car.id} (${car.name})</strong> sang <strong>${car.queue === 'TB' ? 'Bến Thăng Bình' : 'Bến Đà Nẵng'}</strong>.`);
         }
       });
     });
   };
 
-  // Render Live Queue List (Tab 1)
   const renderQueue = () => {
     if (!queueListEl) return;
     const filtered = fleet.filter((car) => car.queue === activeQueueTab);
@@ -299,7 +1078,7 @@ document.addEventListener('DOMContentLoaded', () => {
           targetCar.wallet += 200000;
           renderQueue();
           renderFullFleetTable();
-          addLog(`💳 Tài xế <strong>${targetCar.name} (${targetCar.id})</strong> vừa quét VietQR nạp thêm <strong>+200.000đ</strong> vào Ví Điều Phối.`);
+          addLog(`💳 Tài xế <strong>${targetCar.name} (${targetCar.id})</strong> vừa nạp thêm <strong>+200.000đ</strong> vào Ví Điều Phối.`);
         }
       });
     });
@@ -376,10 +1155,33 @@ document.addEventListener('DOMContentLoaded', () => {
     startCountdown();
   };
 
+  const loadOrderIntoAiDispatcher = (srvOrder) => {
+    const fareVal = parseInt(srvOrder.fare || 100000, 10);
+    const feeVal = srvOrder.fee !== undefined ? parseInt(srvOrder.fee, 10) : computeCommissionFee(fareVal, srvOrder.seats || 1, srvOrder.isCharter, srvOrder.serviceCode);
+    currentOrder = {
+      code: srvOrder.code,
+      customerPhoneMasked: srvOrder.phone,
+      customerPhoneFull: srvOrder.phone,
+      queue: (srvOrder.pickup || '').toLowerCase().includes('đà nẵng') ? 'DN' : 'TB',
+      directionText: srvOrder.route || `${srvOrder.pickup} ➔ ${srvOrder.dropoff}`,
+      pickup: srvOrder.mapsUrl ? `${srvOrder.pickup} (Có ghim GPS)` : srvOrder.pickup,
+      dropoff: srvOrder.dropoff,
+      serviceName: srvOrder.service,
+      seatsNeeded: srvOrder.seats || (fareVal === 200000 ? 2 : 1),
+      isCharter: Boolean(srvOrder.isCharter || fareVal >= 350000),
+      totalFare: fareVal,
+      commissionFee: feeVal,
+      driverNet: fareVal - feeVal
+    };
+    renderCurrentOrder(true);
+    startCountdown();
+    addLog(`⚡ Đã nạp cuốc chuyển đổi <strong>${srvOrder.code} (${srvOrder.phone})</strong> vào bộ chia xe 20 đầu xe!`);
+  };
+
   const parseCallTranscript = (rawText) => {
     const text = rawText.toLowerCase();
-    const seatFeeUnit = parseInt(feeSeatSelect?.value || '15000', 10);
-    const charterFeePct = parseInt(feeCharterSelect?.value || '10', 10);
+    const seatFeeUnit = parseInt(systemConfig.seatFee || 10000, 10);
+    const charterFeePct = parseInt(systemConfig.charterPercent || 10, 10);
 
     let queue = 'TB';
     let directionText = 'Thăng Bình ➔ Đà Nẵng';
@@ -449,7 +1251,7 @@ document.addEventListener('DOMContentLoaded', () => {
       seatsNeeded = 1;
       serviceName = 'Gửi hàng hóa / Bưu kiện hỏa tốc';
       totalFare = 50000;
-      commissionFee = 10000;
+      commissionFee = 5000;
     }
 
     const randomNum = Math.floor(100 + Math.random() * 899);
@@ -468,8 +1270,7 @@ document.addEventListener('DOMContentLoaded', () => {
       isCharter,
       totalFare,
       commissionFee,
-      driverNet: totalFare - commissionFee,
-      timeNote: 'Đi ngay (Đón sau 15 phút)'
+      driverNet: totalFare - commissionFee
     };
 
     activeQueueTab = queue;
@@ -477,16 +1278,13 @@ document.addEventListener('DOMContentLoaded', () => {
       t.classList.toggle('active', t.getAttribute('data-q') === activeQueueTab);
     });
 
-    totalCallsToday += 1;
-    if (kpiCallsEl) kpiCallsEl.textContent = `${totalCallsToday} cuộc`;
-
     renderQueue();
     renderCurrentOrder(false);
     startCountdown();
 
     const topCar = fleet.find((c) => c.queue === currentOrder.queue);
     addLog(
-      `🤖 <strong>AI Voicebot</strong> vừa bóc tách cuộc gọi <strong>${currentOrder.code}</strong> (${currentOrder.serviceName} - <strong>${formatVND(currentOrder.totalFare)}</strong>) ➔ Tự động bắn cho <strong>${topCar.id} (${topCar.name})</strong>.`
+      `🤖 <strong>AI Voicebot</strong> vừa bóc tách cuộc gọi <strong>${currentOrder.code}</strong> (${currentOrder.serviceName} - <strong>${formatVND(currentOrder.totalFare)}</strong> • Hoa hồng <strong>${formatVND(currentOrder.commissionFee)}</strong>) ➔ Bắn cho <strong>${topCar.id} (${topCar.name})</strong>.`
     );
   };
 
@@ -558,15 +1356,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
       topCar.wallet -= currentOrder.commissionFee;
       topCar.trips += 1;
-      totalCommissionToday += currentOrder.commissionFee;
 
       if (currentOrder.isCharter) {
-        totalChartersToday += 1;
         topCar.seats = topCar.maxSeats;
       } else {
-        totalSeatsToday += currentOrder.seatsNeeded;
         topCar.seats = Math.min(topCar.maxSeats, topCar.seats + currentOrder.seatsNeeded);
-
         let needed = currentOrder.seatsNeeded;
         pooledSeats.forEach((slot) => {
           if (!slot.occupied && needed > 0) {
@@ -578,30 +1372,11 @@ document.addEventListener('DOMContentLoaded', () => {
         renderPoolingSlots();
       }
 
-      // Add to Orders CRM History
-      const nowTime = new Date().toTimeString().slice(0, 5);
-      ordersHistory.unshift({
-        code: currentOrder.code,
-        time: nowTime,
-        customerPhone: currentOrder.customerPhoneFull,
-        route: `${currentOrder.pickup} ➔ ${currentOrder.dropoff}`,
-        service: currentOrder.serviceName,
-        fare: currentOrder.totalFare,
-        fee: currentOrder.commissionFee,
-        driverId: topCar.id,
-        driverName: topCar.name,
-        refunded: false
-      });
-
-      if (kpiTripsEl) kpiTripsEl.textContent = `${totalSeatsToday} ghế • ${totalChartersToday} bao xe`;
-      if (kpiCommissionEl) kpiCommissionEl.textContent = formatVND(totalCommissionToday);
-
       renderCurrentOrder(true);
-      renderOrdersTable();
       renderFullFleetTable();
 
       addLog(
-        `✅ <strong>${topCar.id} (${topCar.name})</strong> đã NHẬN CUỐC <strong>${currentOrder.code}</strong>! Trừ <strong>-${formatVND(currentOrder.commissionFee)}</strong> phí điều xe và gửi Zalo ZNS cho khách <strong>${currentOrder.customerPhoneFull}</strong>.`
+        `✅ <strong>${topCar.id} (${topCar.name})</strong> đã NHẬN CUỐC <strong>${currentOrder.code}</strong>! Trừ <strong>-${formatVND(currentOrder.commissionFee)}</strong> phí hoa hồng (10K/ghế • 10%).`
       );
 
       const idx = fleet.indexOf(topCar);
@@ -619,30 +1394,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  [feeSeatSelect, feeCharterSelect].forEach((sel) => {
-    if (sel) {
-      sel.addEventListener('change', () => {
-        if (transcriptInput && transcriptInput.value.trim()) {
-          parseCallTranscript(transcriptInput.value.trim());
-        }
-      });
-    }
-  });
-
   renderPoolingSlots();
   renderQueue();
-  renderOrdersTable();
   renderFullFleetTable();
   renderCurrentOrder(false);
   startCountdown();
 
-  // =====================================================================
-  // 5. REAL-TIME POLLING OF "📍 HÃY ĐÓN TÔI" PICKUP REQUESTS FROM VPS API
-  // =====================================================================
+  // =========================================================================
+  // 6. REAL-TIME POLLING FROM VPS CONVERSION & REVENUE-SHARE API (EVERY 5S)
+  // =========================================================================
   const livePickupListEl = document.getElementById('live-pickup-list');
   const livePickupCounterEl = document.getElementById('live-pickup-counter');
-  let knownServerOrderIds = new Set();
-  let isFirstLoad = true;
 
   const playAlertChime = () => {
     try {
@@ -663,82 +1425,82 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (e) {}
   };
 
-  const fetchServerPickups = async () => {
+  const fetchDashboardData = async () => {
     try {
-      const resp = await fetch('/api/pickup-requests?t=' + Date.now(), { cache: 'no-store' });
+      const resp = await fetch(`/api/dashboard-summary?pin=${encodeURIComponent(currentPin)}&t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: { 'X-Admin-Pin': currentPin }
+      });
       if (!resp.ok) return;
       const data = await resp.json();
-      if (!data || !Array.isArray(data.orders)) return;
+      if (!data || !data.ok) return;
 
-      const serverOrders = data.orders;
-      let hasNewOrder = false;
+      if (data.config) {
+        syncConfigInputs(data.config);
+      }
+      if (data.stats) {
+        serverPageStats = data.stats;
+      }
 
-      serverOrders.forEach((srvOrder) => {
-        if (!knownServerOrderIds.has(srvOrder.id)) {
-          knownServerOrderIds.add(srvOrder.id);
+      const incomingOrders = Array.isArray(data.orders) ? data.orders : [];
+      let hasNewConversion = false;
+
+      incomingOrders.forEach((srvOrder) => {
+        const oid = srvOrder.id || srvOrder.code;
+        if (!knownServerOrderIds.has(oid)) {
+          knownServerOrderIds.add(oid);
           if (!isFirstLoad) {
-            hasNewOrder = true;
+            hasNewConversion = true;
             addLog(
-              `🚨 <strong>KHÁCH BẤM "📍 HÃY ĐÓN TÔI" (${srvOrder.code}):</strong> SĐT <strong>${srvOrder.phone}</strong> • ${srvOrder.service} • ${srvOrder.mapsUrl ? `<a href="${srvOrder.mapsUrl}" target="_blank" style="color:#fde047;text-decoration:underline;">Mở Bản Đồ GPS ↗</a>` : srvOrder.pickup}`
+              `🚨 <strong>CHUYỂN ĐỔI MỚI (${srvOrder.code}):</strong> ${srvOrder.phone} • ${srvOrder.service} (${formatVND(srvOrder.fare || 100000)} ➔ Hoa hồng <strong>${formatVND(srvOrder.fee || 10000)}</strong>) từ trang <em>${srvOrder.pageSlug || '/'}</em>`
             );
-          }
-          // Sync into ordersHistory if not already present
-          if (!ordersHistory.some((o) => o.code === srvOrder.code)) {
-            ordersHistory.unshift({
-              code: srvOrder.code,
-              time: srvOrder.time,
-              customerPhone: srvOrder.phone,
-              phoneClean: srvOrder.phoneClean,
-              route: srvOrder.route,
-              service: srvOrder.service,
-              mapsUrl: srvOrder.mapsUrl,
-              fare: srvOrder.fare || 100000,
-              fee: srvOrder.fee || 15000,
-              driverId: srvOrder.driverId || 'XE-01',
-              driverName: srvOrder.driverName || 'Anh Nghĩa (Xe Chủ Lực)',
-              refunded: Boolean(srvOrder.refunded)
-            });
           }
         }
       });
 
-      if (hasNewOrder) {
-        playAlertChime();
-        renderOrdersTable();
-      } else if (isFirstLoad && serverOrders.length > 0) {
-        renderOrdersTable();
-      }
+      serverOrdersList = incomingOrders;
       isFirstLoad = false;
 
-      if (livePickupCounterEl) {
-        livePickupCounterEl.textContent = `🟢 ${serverOrders.length} Yêu Cầu Đón Thực Tế`;
+      if (hasNewConversion) {
+        playAlertChime();
       }
 
-      if (livePickupListEl && serverOrders.length > 0) {
-        livePickupListEl.innerHTML = serverOrders
+      renderConversionDashboard();
+
+      if (livePickupCounterEl) {
+        livePickupCounterEl.textContent = `🟢 ${serverOrdersList.length} Chuyển Đổi Thực Tế`;
+      }
+
+      if (livePickupListEl && serverOrdersList.length > 0) {
+        livePickupListEl.innerHTML = serverOrdersList
           .slice(0, 6)
           .map(
             (item) => `
             <div style="background:rgba(15,23,42,0.92);border:1.5px solid ${item.hasGps ? '#34d399' : '#fde047'};border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;">
               <div style="display:flex;justify-content:space-between;align-items:center;">
-                <strong style="color:#fde047;font-size:0.95rem;">${item.code} • 🕒 ${item.time}</strong>
-                <span style="font-size:0.75rem;background:rgba(52,211,153,0.18);color:#34d399;padding:2px 8px;border-radius:999px;font-weight:700;">${item.device || 'Mobile'}</span>
+                <strong style="color:#fde047;font-size:0.92rem;">${item.code} • 🕒 ${item.time}</strong>
+                <span style="font-size:0.72rem;background:rgba(52,211,153,0.18);color:#34d399;padding:2px 8px;border-radius:999px;font-weight:700;">Hoa hồng: ${formatVND(item.fee || 10000)}</span>
               </div>
-              <div style="font-size:1.1rem;font-weight:900;">
-                <a href="tel:${item.phoneClean || item.phone}" style="color:#38bdf8;text-decoration:underline;">📞 Gọi Khách: ${item.phone}</a>
+              <div style="font-size:1rem;font-weight:900;">
+                ${
+                  item.phoneClean
+                    ? `<a href="tel:${item.phoneClean}" style="color:#38bdf8;text-decoration:underline;">📞 Gọi Khách: ${item.phone}</a>`
+                    : `<span style="color:#e2e8f0;">${item.phone}</span>`
+                }
               </div>
-              <div style="font-size:0.82rem;color:#cbd5e1;">
+              <div style="font-size:0.8rem;color:#cbd5e1;">
                 <strong>Dịch vụ:</strong> ${item.service} (${formatVND(item.fare || 100000)})<br/>
-                <strong>Đón:</strong> ${item.pickup}
+                <strong>Lộ trình:</strong> ${item.route || item.pickup}<br/>
+                <strong>Trang SEO:</strong> <span style="color:#38bdf8">${item.pageTitle || item.pageSlug || '/'}</span>
               </div>
               <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">
                 ${
                   item.mapsUrl
-                    ? `<a href="${item.mapsUrl}" target="_blank" rel="noopener" class="btn-topup" style="border-color:#34d399;color:#34d399;font-weight:800;">🗺️ Mở Bản Đồ Chỗ Khách Đứng ↗</a>`
-                    : `<span style="font-size:0.76rem;color:#fde047;">🟡 Khách gửi SĐT (Chưa bật GPS)</span>`
+                    ? `<a href="${item.mapsUrl}" target="_blank" rel="noopener" class="btn-topup" style="border-color:#34d399;color:#34d399;font-weight:800;">🗺️ Mở Bản Đồ GPS ↗</a>`
+                    : ''
                 }
                 <button type="button" class="btn-topup js-dispatch-pickup" data-code="${item.code}" style="border-color:#fde047;color:#fde047;font-weight:800;">
-                  ⚡ Bắn Cuốc Cho Tài Xế
+                  ⚡ Nạp Vào Bộ Chia Xe
                 </button>
               </div>
             </div>
@@ -749,33 +1511,14 @@ document.addEventListener('DOMContentLoaded', () => {
         livePickupListEl.querySelectorAll('.js-dispatch-pickup').forEach((btn) => {
           btn.addEventListener('click', () => {
             const targetCode = btn.getAttribute('data-code');
-            const found = serverOrders.find((x) => x.code === targetCode);
-            if (!found) return;
-            currentOrder = {
-              code: found.code,
-              customerPhoneMasked: found.phone,
-              customerPhoneFull: found.phone,
-              queue: found.pickup.toLowerCase().includes('bệnh viện') || found.pickup.toLowerCase().includes('sân bay') ? 'DN' : 'TB',
-              directionText: found.route,
-              pickup: found.mapsUrl ? `${found.pickup} (Có ghim GPS)` : found.pickup,
-              dropoff: found.dropoff,
-              serviceName: found.service,
-              seatsNeeded: found.fare === 200000 ? 2 : 1,
-              isCharter: found.fare >= 350000,
-              totalFare: found.fare || 100000,
-              commissionFee: found.fee || 15000,
-              driverNet: (found.fare || 100000) - (found.fee || 15000),
-              timeNote: 'Khách bấm 📍 HÃY ĐÓN TÔI'
-            };
-            renderCurrentOrder(true);
-            startCountdown();
-            addLog(`⚡ Admin vừa nạp yêu cầu <strong>${found.code} (SĐT: ${found.phone})</strong> vào bộ chia xe tự động!`);
+            const found = serverOrdersList.find((x) => x.code === targetCode);
+            if (found) loadOrderIntoAiDispatcher(found);
           });
         });
       }
     } catch (e) {}
   };
 
-  fetchServerPickups();
-  setInterval(fetchServerPickups, 5000);
+  fetchDashboardData();
+  setInterval(fetchDashboardData, 5000);
 });
