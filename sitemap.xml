@@ -1,128 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://xeghepthangbinhdanang.vn/</loc>
-    <lastmod>2026-10-27</lastmod>
-    <image:image>
-      <image:loc>https://xeghepthangbinhdanang.vn/assets/images/xe-ghep-thang-binh-da-nang-100k-banner.jpg</image:loc>
-    </image:image>
-    <image:image>
-      <image:loc>https://xeghepthangbinhdanang.vn/assets/images/xe-tien-chuyen-thang-binh-da-nang-vinfast.jpg</image:loc>
-    </image:image>
-    <image:image>
-      <image:loc>https://xeghepthangbinhdanang.vn/assets/images/xe-ghep-ha-lam-thang-binh-43h-19845.jpg</image:loc>
-    </image:image>
-    <image:image>
-      <image:loc>https://xeghepthangbinhdanang.vn/assets/images/doi-xe-dien-limo-green-thang-binh-da-nang.jpg</image:loc>
-    </image:image>
-    <image:image>
-      <image:loc>https://xeghepthangbinhdanang.vn/assets/images/hotline-xe-ghep-nghia-ha-lam-0896211296.jpg</image:loc>
-    </image:image>
+    <lastmod>2026-10-28</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
   </url>
   <url>
     <loc>https://xeghepthangbinhdanang.vn/xe-di-benh-vien-da-nang.html</loc>
-    <lastmod>2026-10-27</lastmod>
-    <image:image>
-      <image:loc>https://xeghepthangbinhdanang.vn/assets/images/xe-ghep-ha-lam-thang-binh-43h-19845.jpg</image:loc>
-    </image:image>
+    <lastmod>2026-10-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
   </url>
   <url>
     <loc>https://xeghepthangbinhdanang.vn/xe-dua-don-san-bay-da-nang.html</loc>
-    <lastmod>2026-10-27</lastmod>
-    <image:image>
-      <image:loc>https://xeghepthangbinhdanang.vn/assets/images/xe-tien-chuyen-thang-binh-da-nang-vinfast.jpg</image:loc>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://xeghepthangbinhdanang.vn/thue-xe-cuoi-hoi-thang-binh.html</loc>
-    <lastmod>2026-10-27</lastmod>
-    <image:image>
-      <image:loc>https://xeghepthangbinhdanang.vn/assets/images/doi-xe-dien-limo-green-thang-binh-da-nang.jpg</image:loc>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://xeghepthangbinhdanang.vn/thue-xe-cuoi-hoi-du-lich-thang-binh.html</loc>
-    <lastmod>2026-10-27</lastmod>
-    <image:image>
-      <image:loc>https://xeghepthangbinhdanang.vn/assets/images/doi-xe-dien-limo-green-thang-binh-da-nang.jpg</image:loc>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://xeghepthangbinhdanang.vn/bang-gia-xe-ghep-thang-binh.html</loc>
-    <lastmod>2026-10-27</lastmod>
-    <image:image>
-      <image:loc>https://xeghepthangbinhdanang.vn/assets/images/xe-ghep-thang-binh-da-nang-100k-banner.jpg</image:loc>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://xeghepthangbinhdanang.vn/xe-ghep-ha-lam-da-nang.html</loc>
-    <lastmod>2026-10-27</lastmod>
-    <image:image>
-      <image:loc>https://xeghepthangbinhdanang.vn/assets/images/xe-ghep-ha-lam-thang-binh-43h-19845.jpg</image:loc>
-    </image:image>
+    <lastmod>2026-10-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
   </url>
   <url>
     <loc>https://xeghepthangbinhdanang.vn/xe-di-sat-hach-lai-xe-quang-nam-da-nang.html</loc>
-    <lastmod>2026-10-27</lastmod>
-    <image:image>
-      <image:loc>https://xeghepthangbinhdanang.vn/assets/images/xe-tien-chuyen-thang-binh-da-nang-vinfast.jpg</image:loc>
-    </image:image>
+    <lastmod>2026-10-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://xeghepthangbinhdanang.vn/xe-ghep-binh-nguyen-da-nang.html</loc>
-    <lastmod>2026-10-27</lastmod>
-    <image:image>
-      <image:loc>https://xeghepthangbinhdanang.vn/assets/images/xe-ghep-thang-binh-da-nang-100k-banner.jpg</image:loc>
-    </image:image>
+    <loc>https://xeghepthangbinhdanang.vn/thue-xe-cuoi-hoi-thang-binh.html</loc>
+    <lastmod>2026-10-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://xeghepthangbinhdanang.vn/xe-ghep-dong-duong-da-nang.html</loc>
-    <lastmod>2026-10-27</lastmod>
-    <image:image>
-      <image:loc>https://xeghepthangbinhdanang.vn/assets/images/xe-ghep-ha-lam-thang-binh-43h-19845.jpg</image:loc>
-    </image:image>
+    <loc>https://xeghepthangbinhdanang.vn/thue-xe-cuoi-hoi-du-lich-thang-binh.html</loc>
+    <lastmod>2026-10-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://xeghepthangbinhdanang.vn/xe-ghep-binh-phu-da-nang.html</loc>
-    <lastmod>2026-10-27</lastmod>
-    <image:image>
-      <image:loc>https://xeghepthangbinhdanang.vn/assets/images/xe-tien-chuyen-thang-binh-da-nang-vinfast.jpg</image:loc>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://xeghepthangbinhdanang.vn/xe-ghep-binh-quy-da-nang.html</loc>
-    <lastmod>2026-10-27</lastmod>
-    <image:image>
-      <image:loc>https://xeghepthangbinhdanang.vn/assets/images/xe-ghep-ha-lam-thang-binh-43h-19845.jpg</image:loc>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://xeghepthangbinhdanang.vn/xe-ghep-binh-phuc-da-nang.html</loc>
-    <lastmod>2026-10-27</lastmod>
-    <image:image>
-      <image:loc>https://xeghepthangbinhdanang.vn/assets/images/xe-ghep-thang-binh-da-nang-100k-banner.jpg</image:loc>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://xeghepthangbinhdanang.vn/xe-ghep-huong-an-moc-bai-da-nang.html</loc>
-    <lastmod>2026-10-27</lastmod>
-    <image:image>
-      <image:loc>https://xeghepthangbinhdanang.vn/assets/images/xe-tien-chuyen-thang-binh-da-nang-vinfast.jpg</image:loc>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://xeghepthangbinhdanang.vn/xe-ghep-binh-tu-da-nang.html</loc>
-    <lastmod>2026-10-27</lastmod>
-    <image:image>
-      <image:loc>https://xeghepthangbinhdanang.vn/assets/images/xe-ghep-ha-lam-thang-binh-43h-19845.jpg</image:loc>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://xeghepthangbinhdanang.vn/xe-ghep-binh-minh-da-nang.html</loc>
-    <lastmod>2026-10-27</lastmod>
-    <image:image>
-      <image:loc>https://xeghepthangbinhdanang.vn/assets/images/doi-xe-dien-limo-green-thang-binh-da-nang.jpg</image:loc>
-    </image:image>
+    <loc>https://xeghepthangbinhdanang.vn/bang-gia-xe-ghep-thang-binh.html</loc>
+    <lastmod>2026-10-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
   </url>
 </urlset>

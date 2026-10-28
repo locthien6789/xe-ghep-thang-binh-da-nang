@@ -33,23 +33,14 @@ DEFAULT_CONFIG = {
 }
 
 PAGE_TITLES_MAP = {
-    "/": "Trang Chủ: Xe Ghép Thăng Bình ↔ Đà Nẵng",
-    "/index.html": "Trang Chủ: Xe Ghép Thăng Bình ↔ Đà Nẵng",
-    "/xe-di-benh-vien-da-nang.html": "Chuyên Trang: Xe Đi Khám Bệnh Viện Đà Nẵng",
-    "/xe-dua-don-san-bay-da-nang.html": "Chuyên Trang: Xe Đưa Đón Sân Bay Đà Nẵng",
-    "/thue-xe-cuoi-hoi-thang-binh.html": "Chuyên Trang: Thuê Xe Hoa Cưới Hỏi",
-    "/thue-xe-cuoi-hoi-du-lich-thang-binh.html": "Chuyên Trang: Thuê Xe Du Lịch & Đi Tỉnh",
-    "/bang-gia-xe-ghep-thang-binh.html": "Chuyên Trang: Bảng Giá Xe Ghép Toàn Huyện",
-    "/xe-ghep-ha-lam-da-nang.html": "Tuyến: Thị Trấn Hà Lam ↔ Đà Nẵng",
-    "/xe-di-sat-hach-lai-xe-quang-nam-da-nang.html": "Tuyến: Sát Hạch Lái Xe (Minh Sơn & QJC) ↔ Đà Nẵng",
-    "/xe-ghep-binh-nguyen-da-nang.html": "Tuyến: Bình Nguyên & BV Thăng Hoa ↔ Đà Nẵng",
-    "/xe-ghep-dong-duong-da-nang.html": "Tuyến: Đồng Dương & Bình Định ↔ Đà Nẵng",
-    "/xe-ghep-binh-phu-da-nang.html": "Tuyến: Bình Phú & Lý Trường ↔ Đà Nẵng",
-    "/xe-ghep-binh-quy-da-nang.html": "Tuyến: Bình Quý (Chợ Quý Hương) ↔ Đà Nẵng",
-    "/xe-ghep-binh-phuc-da-nang.html": "Tuyến: Xã Bình Phục (Cây Cốc) ↔ Đà Nẵng",
-    "/xe-ghep-huong-an-moc-bai-da-nang.html": "Tuyến: Hương An & Mộc Bài ↔ Đà Nẵng",
-    "/xe-ghep-binh-tu-da-nang.html": "Tuyến: Xã Bình Tú ↔ Đà Nẵng",
-    "/xe-ghep-binh-minh-da-nang.html": "Tuyến: Biển Bình Minh & VinWonders ↔ Đà Nẵng",
+    "/": "Trang Chủ Mega-Hub: Xe Ghép Thăng Bình & Các Xã ↔ Đà Nẵng",
+    "/index.html": "Trang Chủ Mega-Hub: Xe Ghép Thăng Bình & Các Xã ↔ Đà Nẵng",
+    "/xe-di-benh-vien-da-nang.html": "Chuyên Trang: Xe Đi Khám Bệnh Viện Đà Nẵng (04h45)",
+    "/xe-dua-don-san-bay-da-nang.html": "Chuyên Trang: Xe Đưa Đón Sân Bay Đà Nẵng & Chu Lai",
+    "/xe-di-sat-hach-lai-xe-quang-nam-da-nang.html": "Chuyên Trang: Xe Đi Sát Hạch Lái Xe Quảng Nam (Minh Sơn & QJC)",
+    "/thue-xe-cuoi-hoi-thang-binh.html": "Chuyên Trang: Thuê Xe Hoa Cưới Hỏi & Đoàn Rước Dâu",
+    "/thue-xe-cuoi-hoi-du-lich-thang-binh.html": "Chuyên Trang: Thuê Xe Du Lịch (VinWonders, Hội An, Bà Nà) & Đi Tỉnh",
+    "/bang-gia-xe-ghep-thang-binh.html": "Chuyên Trang: Bảng Giá Cước Niêm Yết Toàn Huyện 2026",
 }
 
 
@@ -111,7 +102,7 @@ def normalize_page_slug(raw_path):
     p = str(raw_path).split("?")[0].split("#")[0].strip()
     if not p.startswith("/"):
         p = "/" + p
-    if p == "/index.html":
+    if p == "/index.html" or p.startswith("/xe-ghep-"):
         return "/"
     return p
 
