@@ -4,27 +4,27 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
-  <title>Dashboard Theo Dõi Chuyển Đổi &amp; Đối Soát Ăn Chia | xeghepthangbinhdanang.vn</title>
+  <title>Hệ Thống Quản Trị Điều Phối &amp; Đối Soát Chuyển Đổi | xeghepthangbinhdanang.vn</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="dieu-phoi.css?v=5.3" />
+  <link rel="stylesheet" href="dieu-phoi.css?v=5.4" />
 </head>
 <body>
 
   <!-- =========================================================
-       1. PRIVATE DUAL-PIN LOGIN GATE (OWNER vs PARTNER)
+       1. PRIVATE DUAL-PIN LOGIN GATE (ADMIN vs PARTNER)
        ========================================================= -->
   <div id="admin-gate" class="admin-gate-overlay">
     <div class="gate-card">
       <div class="gate-icon">🔐</div>
-      <h2>HỆ THỐNG ĐỐI SOÁT CHUYỂN ĐỔI &amp; ĐIỀU PHỐI</h2>
+      <h2>HỆ THỐNG QUẢN TRỊ ĐIỀU PHỐI &amp; ĐỐI SOÁT</h2>
       <p>
-        Theo dõi chuyển đổi thời gian thực &amp; Đối soát hoa hồng minh bạch<br />
+        Theo dõi chuyển đổi thời gian thực &amp; Đối soát doanh thu minh bạch<br />
         <strong>xeghepthangbinhdanang.vn • Nhà Xe Nghĩa Hà Lam</strong>
       </p>
       <label for="admin-pin-input" style="display:block;font-size:0.8rem;color:#cbd5e1;font-weight:700;margin-bottom:8px;">
-        Nhập Mã PIN Phân Quyền (Chủ Web hoặc Đối Tác Nhà Xe):
+        Nhập Mã PIN Đăng Nhập Hệ Thống:
       </label>
       <input
         type="password"
@@ -39,10 +39,10 @@
         ❌ Mã PIN không chính xác! Vui lòng nhập đúng mã PIN được cấp.
       </div>
       <button type="button" id="btn-gate-login" class="btn-gate-login">
-        🔓 Đăng Nhập Hệ Thống Đối Soát
+        🔓 Đăng Nhập Hệ Thống Quản Trị
       </button>
       <div style="margin-top:14px;font-size:0.74rem;color:#64748b;line-height:1.45;">
-        🛡️ Hệ thống bảo mật 2 lớp: Tự động nhận diện quyền <strong>Chủ Web Quản Trị</strong> hoặc <strong>Đối Tác Nhà Xe</strong> theo mã PIN đăng nhập.
+        🛡️ Hệ thống phân quyền tự động: Cấp quyền <strong>Quản Trị Hệ Thống</strong> hoặc <strong>Điều Phối Nhà Xe</strong> theo mã PIN đăng nhập.
       </div>
     </div>
   </div>
@@ -65,13 +65,13 @@
 
         <nav class="sb-menu" aria-label="Menu Quản Trị">
           <button type="button" class="sb-nav-btn active" data-tab="tab-conversions">
-            <span>💰</span> 1. Chuyển Đổi &amp; Ăn Chia
+            <span>📊</span> 1. Chuyển Đổi &amp; Đối Soát
           </button>
           <button type="button" class="sb-nav-btn owner-only-el" data-tab="tab-seo-funnel" id="nav-btn-seo-funnel">
             <span>📈</span> 2. Phễu SEO 7 Trang (Hub &amp; Spoke)
           </button>
           <button type="button" class="sb-nav-btn" data-tab="tab-dispatch">
-            <span>📊</span> 3. Điều Phối AI 20 Xe
+            <span>⚡</span> 3. Điều Phối AI 20 Xe
           </button>
           <button type="button" class="sb-nav-btn" data-tab="tab-fleet">
             <span>🚘</span> 4. Đội Xe 20 Chiếc &amp; Ví
@@ -84,7 +84,7 @@
 
       <div class="sidebar-footer">
         <div class="role-status-card" id="sidebar-role-card">
-          <small>Quyền truy cập hiện tại:</small>
+          <small>Tài khoản đang đăng nhập:</small>
           <strong id="sidebar-role-name">Đang xác thực...</strong>
         </div>
         <button type="button" id="btn-lock-dashboard" class="btn-lock">
@@ -103,8 +103,8 @@
       <header class="dp-header">
         <div class="dp-header-title">
           <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-            <h1>DASHBOARD THEO DÕI CHUYỂN ĐỔI &amp; ĐỐI SOÁT ĂN CHIA HOA HỒNG</h1>
-            <span class="role-header-pill" id="header-role-pill">👑 CHỦ WEB</span>
+            <h1>HỆ THỐNG QUẢN TRỊ CHUYỂN ĐỔI &amp; ĐỐI SOÁT DOANH THU</h1>
+            <span class="role-header-pill" id="header-role-pill">🛡️ QUẢN TRỊ HỆ THỐNG</span>
           </div>
           <p>Web: <strong>xeghepthangbinhdanang.vn</strong> (7 URL Tinh Gọn Hub &amp; Spoke) • Hotline Nhà xe: <strong>0896.211.296 – 0386.400.800</strong></p>
         </div>
@@ -163,7 +163,7 @@
 
         <div class="kpi-card" style="border-color:rgba(250,204,21,0.5);background:linear-gradient(135deg, rgba(250,204,21,0.12) 0%, rgba(30,41,59,0.95) 100%);">
           <div class="kpi-info">
-            <span>Tổng Hoa Hồng Ăn Chia (10K/Ghế • 10%)</span>
+            <span>Tổng Phí Dịch Vụ / Hoa Hồng (10K/Ghế • 10%)</span>
             <strong id="kpi-commission" style="color: #fde047;">0đ</strong>
             <small id="kpi-revenue-sub">💵 Tổng cước từ Web: 0đ</small>
           </div>
@@ -172,7 +172,7 @@
       </section>
 
       <!-- ===================================================
-           TAB 1 (DEFAULT): CONVERSION TRACKING & REVENUE-SHARE LEDGER
+           TAB 1 (DEFAULT): CONVERSION TRACKING & RECONCILIATION LEDGER
            =================================================== -->
       <div id="tab-conversions" class="db-tab-view active">
 
@@ -181,7 +181,7 @@
           <span>⚠️</span>
           <div>
             <strong>CẢNH BÁO TỶ LỆ BÁO HỦY CAO BẤT THƯỜNG:</strong>
-            <span id="fraud-warning-text">Tỷ lệ báo hủy đang vượt ngưỡng 25%. Chủ Web vui lòng kiểm tra lại giờ khách bấm gọi đối chiếu với Nhật ký cuộc gọi của nhà xe.</span>
+            <span id="fraud-warning-text">Tỷ lệ báo hủy đang vượt ngưỡng 25%. Vui lòng kiểm tra lại thời gian khách bấm gọi đối chiếu với Nhật ký cuộc gọi của nhà xe.</span>
           </div>
         </div>
 
@@ -215,7 +215,7 @@
                 <option value="all">Tất cả trạng thái</option>
                 <option value="active">Tính phí (Mới + Đã đón)</option>
                 <option value="new">⏳ Mới / Chờ xác nhận</option>
-                <option value="confirmed">✅ Đã đón khách (Chốt ăn chia)</option>
+                <option value="confirmed">✅ Đã đón khách (Hoàn tất)</option>
                 <option value="refunded">❌ Khách hủy / Không đi (0đ)</option>
               </select>
             </div>
@@ -256,7 +256,7 @@
             <strong id="st-gross-fare" style="color:#38bdf8;">0đ</strong>
           </div>
           <div class="st-box highlight">
-            <span>💰 HOA HỒNG CHỦ WEB ĐƯỢC NHẬN (10K/Ghế • 10%)</span>
+            <span>💰 TỔNG PHÍ ĐỐI SOÁT HỢP LỆ (10K/Ghế • 10%)</span>
             <strong id="st-net-commission" style="color:#fde047;font-size:1.2rem;">0đ</strong>
           </div>
         </div>
@@ -265,7 +265,7 @@
         <div class="admin-table-card">
           <div class="panel-title-row" style="margin-bottom: 14px;">
             <div>
-              <h2>📋 Nhật Ký Chuyển Đổi Người Dùng &amp; Bảng Đối Soát Ăn Chia Chi Tiết (Real-Time)</h2>
+              <h2>📋 Nhật Ký Chuyển Đổi Khách Hàng &amp; Bảng Đối Soát Chi Tiết (Real-Time)</h2>
               <p style="font-size:0.77rem;color:#94a3b8;margin-top:2px;">
                 Tự động ghi nhận chính xác tới từng giây khi khách bấm <strong>Gọi 0896.211.296 / 0386.400.800</strong>, <strong>Zalo</strong> hoặc <strong>📍 HÃY ĐÓN TÔI</strong> • Tự động gộp trùng 30 phút để bảo vệ nhà xe.
               </p>
@@ -306,9 +306,9 @@
           <div class="admin-table-card">
             <div class="panel-title-row" style="margin-bottom: 14px;">
               <div>
-                <h2>📈 Phễu Chuyển Đổi Chi Tiết 7 Trang Đích Hub &amp; Spoke (Chỉ Chủ Web PIN 4268)</h2>
+                <h2>📈 Phễu Hiệu Suất Chuyển Đổi 7 Trang Đích Hub &amp; Spoke</h2>
                 <p style="font-size:0.77rem;color:#94a3b8;margin-top:2px;">
-                  Đo lường chính xác Trang Chủ Mega-Hub (hợp nhất 301 từ 9 xã) và 6 trang dịch vụ chuyên biệt nào đang mang lại nhiều cuộc gọi, Zalo và doanh thu ăn chia cao nhất.
+                  Đo lường chính xác Trang Chủ Mega-Hub (hợp nhất 301 từ 9 xã) và 6 trang dịch vụ chuyên biệt nào đang mang lại nhiều cuộc gọi, Zalo và doanh thu cao nhất.
                 </p>
               </div>
               <span class="badge-live">7 URLs Tinh Gọn Hub &amp; Spoke 2026</span>
@@ -587,18 +587,18 @@
           <!-- CARD 1: COMMISSION & DEDUPLICATION FORMULA -->
           <div class="admin-table-card">
             <div class="panel-title-row" style="margin-bottom: 16px;">
-              <h2>💰 1. Cấu Hình Công Thức Ăn Chia &amp; Chống Trùng Khách (PIN 4268)</h2>
-              <span class="badge-live">Quyền Chủ Web</span>
+              <h2>⚙️ 1. Cấu Hình Định Mức Đối Soát &amp; Chống Trùng Khách</h2>
+              <span class="badge-live">Quản Trị Hệ Thống</span>
             </div>
 
             <div class="settings-form-group">
-              <label for="input-cfg-seat-fee">🚕 Hoa hồng Ghép khách (Mặc định: 10.000đ / ghế):</label>
+              <label for="input-cfg-seat-fee">🚕 Phí dịch vụ / Hoa hồng Ghép khách (Mặc định: 10.000đ / ghế):</label>
               <input type="number" id="input-cfg-seat-fee" class="settings-input" value="10000" step="1000" />
               <small>Áp dụng cho cuốc ghép 100K/người: 1 ghế = 10.000đ, 2 ghế = 20.000đ, 3 ghế = 30.000đ.</small>
             </div>
 
             <div class="settings-form-group">
-              <label for="input-cfg-charter-pct">🚘 Hoa hồng Bao xe / Du lịch / Cưới hỏi (% trên doanh thu cuốc):</label>
+              <label for="input-cfg-charter-pct">🚘 Phí dịch vụ / Hoa hồng Bao xe / Du lịch / Cưới hỏi (% trên doanh thu cuốc):</label>
               <input type="number" id="input-cfg-charter-pct" class="settings-input" value="10" step="1" min="1" max="50" />
               <small>Áp dụng cho Bao xe 4–7 chỗ (350K–600K), Bao xe chờ khứ hồi, Xe hoa cưới hỏi (VD: 400K ➔ 40.000đ).</small>
             </div>
@@ -606,17 +606,17 @@
             <div class="settings-form-group">
               <label for="input-cfg-dedup-mins">🛡️ Thời gian Gộp Trùng Khách Duy Nhất (Phút):</label>
               <input type="number" id="input-cfg-dedup-mins" class="settings-input" value="30" step="5" min="5" max="1440" />
-              <small>Nếu 1 khách bấm gọi hoặc bấm Zalo liên tiếp nhiều lần trong 30 phút, hệ thống tự động gộp thành <strong>1 Khách Duy Nhất</strong> để không tính trùng tiền nhà xe.</small>
+              <small>Nếu 1 khách bấm gọi hoặc bấm Zalo liên tiếp nhiều lần trong 30 phút, hệ thống tự động gộp thành <strong>1 Khách Duy Nhất</strong> để không tính trùng phí đối soát.</small>
             </div>
 
             <div class="extracted-grid" style="margin-top:16px;">
               <div class="ext-item">
-                <span>🔑 Mã PIN Chủ Web (Full Quyền)</span>
-                <strong style="color:#fde047;font-size:1rem;">4268 (Chỉ mình anh giữ)</strong>
+                <span>🔑 Mã PIN Quản Trị Hệ Thống</span>
+                <strong style="color:#fde047;font-size:1rem;">Toàn quyền cấu hình &amp; Phễu SEO</strong>
               </div>
               <div class="ext-item">
-                <span>🤝 Mã PIN Đối Tác Nhà Xe</span>
-                <strong style="color:#34d399;font-size:1rem;">1691 (Cấp cho nhà xe)</strong>
+                <span>🚘 Mã PIN Điều Phối Nhà Xe</span>
+                <strong style="color:#34d399;font-size:1rem;">Nhận chuyến &amp; Đối soát doanh thu</strong>
               </div>
             </div>
           </div>
@@ -646,7 +646,7 @@
             </div>
 
             <div class="settings-form-group">
-              <label for="input-cfg-tg-chatid">💬 Telegram Chat ID (ID cá nhân hoặc Nhóm Chủ Web + Nhà Xe):</label>
+              <label for="input-cfg-tg-chatid">💬 Telegram Chat ID (ID cá nhân hoặc Nhóm Điều Phối):</label>
               <input
                 type="text"
                 id="input-cfg-tg-chatid"
@@ -734,6 +734,6 @@
     </div>
   </div>
 
-  <script src="dieu-phoi.js?v=5.3"></script>
+  <script src="dieu-phoi.js?v=5.4"></script>
 </body>
 </html>

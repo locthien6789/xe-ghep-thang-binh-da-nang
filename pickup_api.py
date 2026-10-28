@@ -318,9 +318,9 @@ class ConversionAPIHandler(BaseHTTPRequestHandler):
         if self.path.startswith("/api/verify-pin"):
             pin = str(payload.get("pin", "")).strip()
             if pin == OWNER_PIN:
-                self._send_json(200, {"ok": True, "role": "owner", "label": "Chủ Web & Quản Trị Ăn Chia (Full Quyền)"})
+                self._send_json(200, {"ok": True, "role": "owner", "label": "Quản Trị Hệ Thống (Toàn Quyền)"})
             elif pin == PARTNER_PIN:
-                self._send_json(200, {"ok": True, "role": "partner", "label": "Đối Tác Nhà Xe (Điều Phối & Đối Soát)"})
+                self._send_json(200, {"ok": True, "role": "partner", "label": "Điều Phối Nhà Xe (Nhận Chuyến & Đối Soát)"})
             else:
                 self._send_json(401, {"ok": False, "error": "Mã PIN không chính xác! Vui lòng kiểm tra lại."})
             return
@@ -598,7 +598,7 @@ class ConversionAPIHandler(BaseHTTPRequestHandler):
         if self.path.startswith("/api/pickup-status") or self.path.startswith("/api/conversion-status"):
             pin = str(payload.get("pin", "") or self.headers.get("X-Admin-Pin", "")).strip()
             role = "owner" if pin == OWNER_PIN else ("partner" if pin == PARTNER_PIN else "partner")
-            actor_label = "Chủ Web (4268)" if role == "owner" else "Nhà Xe (1691)"
+            actor_label = "Quản trị hệ thống" if role == "owner" else "Điều phối Nhà xe"
 
             order_id = str(payload.get("id", "")).strip()
             action = str(payload.get("action", "update")).strip()
@@ -687,7 +687,7 @@ class ConversionAPIHandler(BaseHTTPRequestHandler):
         if self.path.startswith("/api/reset-data"):
             pin = str(payload.get("pin", "") or self.headers.get("X-Admin-Pin", "")).strip()
             if pin != OWNER_PIN:
-                self._send_json(403, {"ok": False, "error": "Chỉ Mã PIN Chủ Web (4268) mới có quyền Reset dữ liệu đối soát!"})
+                self._send_json(403, {"ok": False, "error": "Chỉ Quản trị viên hệ thống mới có quyền đặt lại dữ liệu đối soát!"})
                 return
 
             with LOCK:
@@ -698,7 +698,7 @@ class ConversionAPIHandler(BaseHTTPRequestHandler):
             if payload.get("notifyTelegram", False):
                 tg_reset = (
                     "🧹 <b>[ĐÃ RESET SỐ LIỆU ĐỐI SOÁT VỀ 0]</b>\n"
-                    f"Chủ Web (PIN 4268) vừa đặt lại toàn bộ bộ đếm Chuyển đổi & Hoa hồng về <b>0</b> lúc <b>{now.strftime('%H:%M:%S - %d/%m/%Y')}</b> để bắt đầu kỳ đối soát chính thức!"
+                    f"Quản trị hệ thống vừa đặt lại toàn bộ bộ đếm Chuyển đổi & Đối soát về <b>0</b> lúc <b>{now.strftime('%H:%M:%S - %d/%m/%Y')}</b> để bắt đầu kỳ đối soát mới!"
                 )
                 send_telegram_async(cfg, tg_reset)
 
@@ -709,7 +709,7 @@ class ConversionAPIHandler(BaseHTTPRequestHandler):
         if self.path.startswith("/api/config"):
             pin = str(payload.get("pin", "") or self.headers.get("X-Admin-Pin", "")).strip()
             if pin != OWNER_PIN:
-                self._send_json(403, {"ok": False, "error": "Chỉ Mã PIN Chủ Web (4268) mới có quyền thay đổi cấu hình hệ thống!"})
+                self._send_json(403, {"ok": False, "error": "Chỉ Quản trị viên hệ thống mới có quyền thay đổi cấu hình!"})
                 return
 
             with LOCK:
@@ -736,8 +736,8 @@ class ConversionAPIHandler(BaseHTTPRequestHandler):
             if payload.get("testTelegram"):
                 test_msg = (
                     "✅ <b>[KẾT NỐI TELEGRAM THÀNH CÔNG]</b>\n"
-                    "Hệ thống Theo Dõi Chuyển Đổi & Đối Soát Ăn Chia <b>xeghepthangbinhdanang.vn</b> đã hoạt động!\n"
-                    f"• Công thức ăn chia: <b>Ghép {format_vnd(cfg['seatFee'])}/ghế • Bao xe {cfg['charterPercent']}%</b>\n"
+                    "Hệ thống Quản Trị Chuyển Đổi & Đối Soát Doanh Thu <b>xeghepthangbinhdanang.vn</b> đã hoạt động!\n"
+                    f"• Định mức đối soát: <b>Ghép {format_vnd(cfg['seatFee'])}/ghế • Bao xe {cfg['charterPercent']}%</b>\n"
                     f"• Chống trùng khách: <b>{cfg['dedupMinutes']} phút</b>\n"
                     f"• Thời gian kiểm tra: <b>{now.strftime('%H:%M:%S - %d/%m/%Y')}</b>"
                 )

@@ -40,19 +40,19 @@ document.addEventListener('DOMContentLoaded', () => {
     if (feeCharterSelect) feeCharterSelect.disabled = !isOwner;
 
     if (isOwner) {
-      if (sbRoleBadge) sbRoleBadge.innerHTML = 'CHỦ WEB<br/>4268';
-      if (sbRoleLabel) sbRoleLabel.textContent = '👑 Quyền Chủ Web & Ăn Chia';
-      if (sidebarRoleName) sidebarRoleName.textContent = '👑 Chủ Web Quản Trị (Full Quyền)';
+      if (sbRoleBadge) sbRoleBadge.innerHTML = 'ADMIN<br/>PRO';
+      if (sbRoleLabel) sbRoleLabel.textContent = '🟢 Quản trị viên Hệ thống';
+      if (sidebarRoleName) sidebarRoleName.textContent = '🛡️ Quản Trị Hệ Thống (Toàn Quyền)';
       if (headerRolePill) {
-        headerRolePill.textContent = '👑 CHỦ WEB & QUẢN TRỊ ĂN CHIA';
+        headerRolePill.textContent = '🛡️ QUẢN TRỊ HỆ THỐNG';
         headerRolePill.classList.remove('partner');
       }
     } else {
-      if (sbRoleBadge) sbRoleBadge.innerHTML = 'NHÀ XE<br/>20 XE';
-      if (sbRoleLabel) sbRoleLabel.textContent = '🤝 Đối Tác Nhà Xe Nghĩa Hà Lam';
-      if (sidebarRoleName) sidebarRoleName.textContent = '🤝 Đối Tác Nhà Xe (Điều Phối & Đối Soát)';
+      if (sbRoleBadge) sbRoleBadge.innerHTML = 'ĐIỀU PHỐI<br/>20 XE';
+      if (sbRoleLabel) sbRoleLabel.textContent = '🚘 Điều phối viên Nhà xe';
+      if (sidebarRoleName) sidebarRoleName.textContent = '🚘 Điều Phối Nhà Xe (Nhận Chuyến & Đối Soát)';
       if (headerRolePill) {
-        headerRolePill.textContent = '🤝 ĐỐI TÁC NHÀ XE (ĐỐI SOÁT)';
+        headerRolePill.textContent = '🚘 ĐIỀU PHỐI NHÀ XE';
         headerRolePill.classList.add('partner');
       }
       // Ensure partner is not on an owner-only tab
@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!verifiedRole) {
       if (gateErrorMsg) {
-        gateErrorMsg.textContent = '❌ Mã PIN không chính xác! Vui lòng nhập đúng mã PIN Chủ Web hoặc Nhà Xe.';
+        gateErrorMsg.textContent = '❌ Mã PIN không chính xác! Vui lòng kiểm tra lại mã PIN đăng nhập.';
         gateErrorMsg.style.display = 'block';
       }
       if (pinInput) {
@@ -369,7 +369,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (cancelRatePct > 25 && totalUniqueLeads >= 3) {
         fraudWarningBanner.style.display = 'flex';
         if (fraudWarningText) {
-          fraudWarningText.textContent = `Tỷ lệ báo hủy đang ở mức ${cancelRatePct}% (${cancelledCount}/${totalUniqueLeads} khách). Chủ Web (PIN 4268) có thể đối chiếu Giờ bấm gọi chính xác tới từng giây trên bảng với lịch sử cuộc gọi đến của tổng đài 0896.211.296.`;
+          fraudWarningText.textContent = `Tỷ lệ báo hủy đang ở mức ${cancelRatePct}% (${cancelledCount}/${totalUniqueLeads} khách). Quản trị viên có thể đối chiếu thời gian khách bấm gọi chính xác tới từng giây với lịch sử cuộc gọi tổng đài 0896.211.296.`;
         }
       } else {
         fraudWarningBanner.style.display = 'none';
@@ -655,7 +655,7 @@ document.addEventListener('DOMContentLoaded', () => {
     conversionsTableBody.querySelectorAll('.js-conv-cancel').forEach((btn) => {
       btn.addEventListener('click', () => {
         const id = btn.getAttribute('data-id');
-        const reason = prompt('Vui lòng nhập lý do khách hủy / không đi (Để đối soát minh bạch giữa Chủ Web & Nhà Xe):', 'Khách báo hoãn lịch / Đổi giờ đi');
+        const reason = prompt('Vui lòng nhập lý do khách hủy / thay đổi lịch trình (Ghi nhận vào nhật ký đối soát):', 'Khách báo hoãn lịch / Đổi giờ đi');
         if (reason === null) return;
         updateOrderOnServer({
           id,
@@ -670,7 +670,7 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.addEventListener('click', () => {
         if (currentRole !== 'owner') return;
         const id = btn.getAttribute('data-id');
-        if (!confirm(`Xác nhận xóa vĩnh viễn bản ghi chuyển đổi ${id}? (Chỉ Chủ Web PIN 4268 mới có quyền này)`)) return;
+        if (!confirm(`Xác nhận xóa vĩnh viễn bản ghi chuyển đổi ${id} khỏi hệ thống?`)) return;
         updateOrderOnServer({ id, action: 'delete' });
       });
     });
@@ -760,7 +760,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'Lộ Trình Đón Trả',
         'Dịch Vụ',
         'Doanh Thu Cuốc (VND)',
-        'Hoa Hồng Ăn Chia (VND)',
+        'Phí Dịch Vụ / Hoa Hồng (VND)',
         'Trạng Thái Đối Soát',
         'Lý Do Hủy / Ghi Chú'
       ];
@@ -805,7 +805,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `Doi-Soat-An-Chia-XeGhepThangBinh-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.download = `Bang-Doi-Soat-Chuyen-Doi-XeGhepThangBinh-${new Date().toISOString().slice(0, 10)}.csv`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -825,7 +825,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnResetAllData) {
     btnResetAllData.addEventListener('click', async () => {
       if (currentRole !== 'owner') {
-        alert('Chỉ Chủ Web (PIN 4268) mới có quyền Reset số liệu đối soát!');
+        alert('Chỉ Quản trị viên hệ thống mới có quyền đặt lại số liệu đối soát!');
         return;
       }
       if (
@@ -853,7 +853,7 @@ document.addEventListener('DOMContentLoaded', () => {
           serverPageStats = { pages: {}, daily: {} };
           renderConversionDashboard();
           await fetchDashboardData();
-          addLog('🧹 <strong>Chủ Web (PIN 4268)</strong> vừa Reset toàn bộ số liệu chuyển đổi & đối soát về <strong>0</strong>.');
+          addLog('🧹 <strong>Quản trị hệ thống</strong> vừa đặt lại toàn bộ số liệu chuyển đổi & đối soát về <strong>0</strong>.');
           alert('✅ Đã Reset toàn bộ số liệu về 0 thành công! Hệ thống sẵn sàng ghi nhận dữ liệu chuẩn từ bây giờ.');
         }
       } catch (e) {}
@@ -890,7 +890,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const saveOwnerConfig = async (testTelegram = false) => {
     if (currentRole !== 'owner') {
-      alert('Chỉ Mã PIN Chủ Web (4268) mới có quyền thay đổi cấu hình ăn chia & Telegram!');
+      alert('Chỉ Quản trị viên hệ thống mới có quyền thay đổi cấu hình định mức & Telegram!');
       return;
     }
     if (testTelegram && inputCfgTgEnabled) {
@@ -931,7 +931,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
           } else {
             settingsSaveFeedback.style.color = '#34d399';
-            settingsSaveFeedback.textContent = '✅ Đã lưu cấu hình công thức ăn chia (10K/ghế • 10%) & Telegram thành công!';
+            settingsSaveFeedback.textContent = '✅ Đã lưu cấu hình định mức đối soát (10K/ghế • 10%) & Telegram thành công!';
           }
         }
         fetchDashboardData();
