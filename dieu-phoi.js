@@ -1566,7 +1566,7 @@ document.addEventListener('DOMContentLoaded', () => {
       } else if (livePickupListEl) {
         livePickupListEl.innerHTML = `
           <div style="font-size: 0.85rem; color: #94a3b8; padding: 6px 0;">
-            🟢 Hệ thống đang ở trạng thái chuẩn (0 đơn). Ngay khi khách bấm <strong>Gọi / Zalo / 📍 HÃY ĐÓN TÔI</strong> trên 16 trang web, dữ liệu sẽ nhảy lên đây và bắn về Telegram tức thì!
+            🟢 Hệ thống đang ở trạng thái chuẩn (0 đơn). Ngay khi khách bấm <strong>Gọi / Zalo / 📍 HÃY ĐÓN TÔI</strong> trên hệ thống 7 trang Hub & Spoke, dữ liệu sẽ nhảy lên đây và bắn về Telegram tức thì!
           </div>
         `;
       }

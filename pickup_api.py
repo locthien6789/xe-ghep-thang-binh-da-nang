@@ -243,6 +243,25 @@ class ConversionAPIHandler(BaseHTTPRequestHandler):
                 stats = load_json(STATS_FILE, {"pages": {}, "daily": {}})
                 cfg = load_config()
 
+                # Normalize & roll up any legacy 9-commune page stats into Mega-Hub "/"
+                raw_pages = stats.get("pages", {})
+                merged_pages = {}
+                for raw_slug, p_val in raw_pages.items():
+                    norm_slug = normalize_page_slug(raw_slug)
+                    target = merged_pages.setdefault(norm_slug, {
+                        "title": PAGE_TITLES_MAP.get(norm_slug, norm_slug),
+                        "views": 0,
+                        "quotes": 0,
+                        "rawClicks": 0,
+                        "uniqueLeads": 0,
+                        "callClicks": 0,
+                        "zaloClicks": 0,
+                        "gpsForms": 0,
+                    })
+                    for k in ("views", "quotes", "rawClicks", "uniqueLeads", "callClicks", "zaloClicks", "gpsForms"):
+                        target[k] = target.get(k, 0) + int(p_val.get(k, 0))
+                stats["pages"] = merged_pages
+
                 # Recalculate fee if needed & normalize fields
                 for o in orders:
                     o["fee"] = calculate_commission(
@@ -254,10 +273,8 @@ class ConversionAPIHandler(BaseHTTPRequestHandler):
                     )
                     if "convType" not in o:
                         o["convType"] = "form_gps" if o.get("phoneClean") else "call_0896"
-                    if "pageSlug" not in o:
-                        o["pageSlug"] = "/"
-                    if "pageTitle" not in o:
-                        o["pageTitle"] = PAGE_TITLES_MAP.get(o["pageSlug"], o["pageSlug"])
+                    o["pageSlug"] = normalize_page_slug(o.get("pageSlug", "/"))
+                    o["pageTitle"] = PAGE_TITLES_MAP.get(o["pageSlug"], o.get("pageTitle", o["pageSlug"]))
                     if "clickCount" not in o:
                         o["clickCount"] = 1
                     if "source" not in o:
