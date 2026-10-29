@@ -2313,3 +2313,46 @@ img {
   }
 }
 
+/* Sunflow Footer Signature & Brand Link */
+.footer-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.footer-credit {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin: 0;
+  letter-spacing: 0.01em;
+}
+
+.sunflow-brand-link {
+  color: #fde047;
+  font-weight: 800;
+  text-decoration: none;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(253, 224, 71, 0.1);
+  border: 1px solid rgba(253, 224, 71, 0.25);
+  transition: all 0.2s ease;
+  display: inline-block;
+  margin-left: 3px;
+}
+
+.sunflow-brand-link:hover {
+  background: rgba(253, 224, 71, 0.22);
+  border-color: #fde047;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(253, 224, 71, 0.2);
+}
+
+@media (max-width: 768px) {
+  .site-footer {
+    padding-bottom: 92px;
+  }
+}
+
