@@ -111,15 +111,17 @@ def detect_traffic_source(referrer, utm_source=""):
     ref = (str(referrer or "") + " " + str(utm_source or "")).lower()
     if not ref.strip():
         return "Trực tiếp / Lưu trang"
+    if any(k in ref for k in ["gclid", "gad_source", "googleadservices", "doubleclick.net", "googlesyndication", "utm_medium=cpc", "google_ads", "adwords"]):
+        return "Quảng Cáo Google Ads (CPC)"
     if any(k in ref for k in ["chatgpt", "openai", "perplexity", "claude", "gemini", "copilot", "bing.com/chat"]):
         return "AI Search (ChatGPT / Gemini)"
-    if "google." in ref or "google" in utm_source.lower():
+    if "google." in ref or "google" in str(utm_source or "").lower():
         if "maps" in ref:
             return "Google Maps"
         return "Google Tìm Kiếm (SEO)"
-    if "zalo" in ref:
+    if "zalo" in ref or "zarsrc" in ref:
         return "Zalo"
-    if "facebook" in ref or "fb." in ref or "messenger" in ref:
+    if "facebook" in ref or "fb." in ref or "messenger" in ref or "fbclid" in ref:
         return "Facebook"
     if "bing." in ref or "coccoc" in ref or "yahoo" in ref:
         return "Bing / Cốc Cốc"

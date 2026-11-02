@@ -596,6 +596,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (trafficSourcesGrid) {
       const defaultSources = {
         'Google Tìm Kiếm (SEO)': sourcesCount['Google Tìm Kiếm (SEO)'] || 0,
+        'Quảng Cáo Google Ads (CPC)': sourcesCount['Quảng Cáo Google Ads (CPC)'] || 0,
         'AI Search (ChatGPT / Gemini)': sourcesCount['AI Search (ChatGPT / Gemini)'] || 0,
         Zalo: sourcesCount['Zalo'] || 0,
         'Google Maps': sourcesCount['Google Maps'] || 0,

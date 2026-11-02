@@ -44,16 +44,48 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (e) {}
   };
 
+  const resolveTrackingParams = () => {
+    try {
+      const qs = window.location.search || '';
+      const params = new URLSearchParams(qs);
+      const tokens = [];
+      if (params.get('utm_source')) tokens.push(params.get('utm_source'));
+      if (params.get('utm_medium')) tokens.push('utm_medium=' + params.get('utm_medium'));
+      if (params.get('gclid')) tokens.push('gclid');
+      if (params.get('gad_source')) tokens.push('gad_source');
+      if (params.get('fbclid')) tokens.push('fbclid');
+      if (params.get('zarsrc')) tokens.push('zarsrc');
+      const currentTokenStr = tokens.join(' ');
+      if (currentTokenStr) {
+        sessionStorage.setItem('nghia_init_utm', currentTokenStr);
+      }
+      const rawRef = document.referrer || '';
+      if (rawRef && !rawRef.includes('xeghepthangbinhdanang.vn')) {
+        sessionStorage.setItem('nghia_init_ref', rawRef);
+      }
+      return {
+        referrer: sessionStorage.getItem('nghia_init_ref') || rawRef,
+        utmSource: sessionStorage.getItem('nghia_init_utm') || currentTokenStr
+      };
+    } catch (e) {
+      return {
+        referrer: document.referrer || '',
+        utmSource: ''
+      };
+    }
+  };
+
   // Track initial pageview once per session per URL
   try {
     const pageKey = 'pv_' + (window.location.pathname || '/');
     if (!sessionStorage.getItem(pageKey)) {
       sessionStorage.setItem(pageKey, '1');
+      const trk = resolveTrackingParams();
       sendBeaconOrFetch('/api/track-pageview', {
         sessionId: currentSessionId,
         page: window.location.pathname || '/',
-        referrer: document.referrer || '',
-        utmSource: new URLSearchParams(window.location.search).get('utm_source') || '',
+        referrer: trk.referrer,
+        utmSource: trk.utmSource,
         isQuoteInteraction: false
       });
     }
@@ -145,11 +177,12 @@ document.addEventListener('DOMContentLoaded', () => {
       savedPhone = localStorage.getItem('nghia_halam_customer_phone') || '';
     } catch (e) {}
 
+    const trk = resolveTrackingParams();
     return {
       sessionId: currentSessionId,
       page: window.location.pathname || '/',
-      referrer: document.referrer || '',
-      utmSource: new URLSearchParams(window.location.search).get('utm_source') || '',
+      referrer: trk.referrer,
+      utmSource: trk.utmSource,
       convType,
       targetPhone,
       buttonLabel: (buttonLabel || 'Nút Liên Hệ').replace(/\s+/g, ' ').trim().slice(0, 90),
